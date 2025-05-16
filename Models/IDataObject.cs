@@ -13,7 +13,7 @@ public interface IDataObject
     /// <summary>
     /// get and set the type of the information object.
     /// </summary>
-    ObjectType ObjectType { get; set; }
+    ObjectType? ObjectType { get; set; }
 
     /// <summary>
     /// Gets the name of the information object.
@@ -28,9 +28,9 @@ public interface IDataObject
     /// <summary>
     /// if the information object is an external component.
     /// </summary>
-    bool isExternalComponent { get; set; }
+    bool? isExternalComponent { get; set; }
 
-     
+
     List<IObjectRelation> Relations { get; set; }
 
 }

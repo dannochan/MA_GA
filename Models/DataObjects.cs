@@ -7,6 +7,16 @@ public class DataObjects
 
     List<IDataObject> dataObjects = new List<IDataObject>();
 
+    public DataObjects()
+    {
+        dataObjects = new List<IDataObject>();
+    }
+
+    public bool IsEmpty()
+    {
+        return dataObjects.Count == 0;
+    }
+
     public void AddDataObject(IDataObject dataObject)
     {
         dataObjects.Add(dataObject);
@@ -27,6 +37,7 @@ public class DataObjects
 
     public void readList()
     {
+        Console.WriteLine("Registered Data Objects are :");
         foreach (var dataObject in dataObjects)
         {
             Console.WriteLine(dataObject.Name);
