@@ -50,7 +50,7 @@ public class DataObject : IDataObject
         Console.WriteLine("Relations of " + Name + ":");
         foreach (var relation in Relations)
         {
-            Console.WriteLine(relation.TargetObject.Name + " - " + relation.RelationType);
+            Console.WriteLine(relation.TargetObject + " - " + relation.RelationType);
         }
     }
 

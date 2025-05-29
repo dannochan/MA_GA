@@ -7,9 +7,12 @@ public interface IObjectRelation
     // Type of the relation
     RelationType RelationType { get; set; }
 
+    // Source object
+    string SourceObject { get; set; }
+
 
     // target object
-    IDataObject TargetObject { get; set; }
+    string TargetObject { get; set; }
 
 
 }

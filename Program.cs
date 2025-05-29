@@ -1,15 +1,20 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using MA_GA.Models;
+using Microsoft.Extensions.Logging;
 
 class MainApp
 {
     static void Main(string[] args)
     {
+        // logger
+        using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
+        ILogger logger = factory.CreateLogger("Program");
+        // define the path to the JSON file
         string filePath = "/home/danno/Documents/MA_Project/MA_GA/data/SmallTestcase.json";
-        DataObjects dataObjectCenter = new DataObjects();
+        // object to hold the data
+        Graph dataObjectCenter = new Graph();
         GraphObject rawObject;
-        Console.WriteLine(File.Exists(filePath));
 
         using (StreamReader sr = new StreamReader(filePath))
         {
@@ -21,27 +26,7 @@ class MainApp
             if (rawObject != null)
             {
 
-                Console.WriteLine("Raw object array is not null");
-
-
-                if (rawObject.informationObjects != null)
-                {
-                    foreach (var item in rawObject.informationObjects)
-                    {
-                        dataObjectCenter.AddDataObject(new DataObject(
-                            item.name,
-                            ObjectType.InformationObject,
-                            item.nameShort,
-                            item.externalComponent
-                        ));
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("InformationObjects is null");
-                }
-
-
+                ObjectHelper.MapDataObjects(rawObject, dataObjectCenter, logger);
             }
 
             if (!dataObjectCenter.IsEmpty())
@@ -52,10 +37,6 @@ class MainApp
             {
                 Console.WriteLine("DataObjects is null");
             }
-
-
-
-
 
         }
 
