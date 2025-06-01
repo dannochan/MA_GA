@@ -32,6 +32,15 @@ class MainApp
             if (!dataObjectCenter.IsEmpty())
             {
                 dataObjectCenter.readList();
+                dataObjectCenter.addConnectionToNodes();
+                Console.WriteLine("Graph is not empty, connections added.");
+                dataObjectCenter.ReadNodeConnection();
+                Console.WriteLine("Connections read successfully.");
+                dataObjectCenter.RemoveNodeFromGraph("PKPla"); // Example of removing a node
+                Console.WriteLine("Node PKPla removed from graph.");
+                dataObjectCenter.readList();
+                Console.WriteLine("Graph after removal:");
+                dataObjectCenter.ReadNodeConnection();
             }
             else
             {
@@ -39,8 +48,6 @@ class MainApp
             }
 
         }
-
-
 
     }
 }

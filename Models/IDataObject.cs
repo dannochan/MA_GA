@@ -32,5 +32,12 @@ public interface IDataObject
 
 
     List<IObjectRelation> Relations { get; set; }
+    List<IDataObject> OriginObjects { get; set; }
+    List<IDataObject> TargetObjects { get; set; }
+
+    string ToString();
+
+    string ReadOriginObjects();
+    string ReadTargetObjects();
 
 }

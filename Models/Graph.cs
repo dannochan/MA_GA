@@ -6,12 +6,12 @@ public class Graph
 {
 
     List<IDataObject> nodeObjects;
-    List<IObjectRelation> relations;
+    List<IObjectRelation> edgeObjects;
 
     public Graph()
     {
         nodeObjects = new List<IDataObject>();
-        relations = new List<IObjectRelation>();
+        edgeObjects = new List<IObjectRelation>();
     }
 
     public bool IsEmpty()
@@ -27,7 +27,42 @@ public class Graph
     public void AddRelationToGraph(IObjectRelation relation)
     {
 
-        relations.Add(relation);
+
+        if (relation == null)
+        {
+            throw new ArgumentNullException(nameof(relation), "Relation cannot be null");
+        }
+
+        edgeObjects.Add(relation);
+
+    }
+
+    public void addConnectionToNodes()
+    {
+
+        if (nodeObjects.Count == 0)
+        {
+            throw new InvalidOperationException("No data objects available to connect");
+        }
+        if (edgeObjects.Count == 0)
+        {
+            throw new InvalidOperationException("No relations available to connect nodes");
+        }
+        foreach (var relation in edgeObjects)
+        {
+            var sourceObject = GetNodeObjectByName(relation.SourceObject);
+            var targetObject = GetNodeObjectByName(relation.TargetObject);
+
+            if (sourceObject == null || targetObject == null)
+            {
+                throw new InvalidOperationException("Source or target object not found for relation");
+            }
+
+            sourceObject.TargetObjects.Add(targetObject);
+            targetObject.OriginObjects.Add(sourceObject);
+
+        }
+
     }
 
 
@@ -46,6 +81,7 @@ public class Graph
 
     public IDataObject GetNodeObjectByName(string name)
     {
+        var nodeWanted = default(IDataObject);
         if (string.IsNullOrEmpty(name))
         {
             throw new ArgumentNullException(nameof(name), "Name cannot be null or empty");
@@ -54,7 +90,71 @@ public class Graph
         {
             throw new InvalidOperationException("No data objects available");
         }
-        return nodeObjects.FirstOrDefault(d => d.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+
+        foreach (var dataObject in nodeObjects)
+        {
+            if (dataObject.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            {
+                nodeWanted = dataObject;
+            }
+        }
+
+        return nodeWanted;
+
+    }
+
+    public void RemoveEdgeFromGraph(string sourceNode, string targetNode)
+    {
+        if (string.IsNullOrEmpty(sourceNode) || string.IsNullOrEmpty(targetNode))
+        {
+            throw new ArgumentNullException("Source or target node name cannot be null or empty");
+        }
+
+        var relationToRemove = edgeObjects.FirstOrDefault(r => r.SourceObject.Equals(sourceNode, StringComparison.OrdinalIgnoreCase) &&
+                                                                r.TargetObject.Equals(targetNode, StringComparison.OrdinalIgnoreCase));
+
+
+        if (relationToRemove == null)
+        {
+            throw new InvalidOperationException("Relation not found in the graph");
+        }
+
+        edgeObjects.Remove(relationToRemove);
+
+        var sourceObject = GetNodeObjectByName(sourceNode);
+        var targetObject = GetNodeObjectByName(targetNode);
+
+        sourceObject?.TargetObjects.Remove(targetObject);
+        targetObject?.OriginObjects.Remove(sourceObject);
+    }
+
+    public void RemoveNodeFromGraph(string dataObjectName)
+    {
+        var dataObject = GetNodeObjectByName(dataObjectName);
+        if (dataObject == null)
+        {
+            throw new InvalidOperationException("Data object not found in the graph");
+        }
+
+        if (dataObject.TargetObjects.Count == 0 && dataObject.OriginObjects.Count == 0)
+        {
+            nodeObjects.Remove(dataObject);
+            return;
+        }
+
+        foreach (var originNode in dataObject.OriginObjects.ToList())
+        {
+            this.RemoveEdgeFromGraph(originNode.Name, dataObject.Name);
+        }
+
+        foreach (var targetNode in dataObject.TargetObjects.ToList())
+        {
+            this.RemoveEdgeFromGraph(dataObject.Name, targetNode.Name);
+        }
+
+        this.nodeObjects.Remove(dataObject);
+
     }
 
     public void readList()
@@ -65,9 +165,23 @@ public class Graph
             Console.WriteLine(dataObject.Name);
         }
         Console.WriteLine("Relations are :");
-        foreach (var relation in relations)
+        foreach (var relation in edgeObjects)
         {
             Console.WriteLine($"{relation.SourceObject} - {relation.TargetObject} ({relation.RelationType})");
+        }
+    }
+
+    public void ReadNodeConnection()
+    {
+        if (nodeObjects.Count == 0)
+        {
+            throw new InvalidOperationException("No data objects available to read connections");
+        }
+        foreach (var dataObject in nodeObjects)
+        {
+            Console.WriteLine($"Data Object: {dataObject.Name}");
+            Console.WriteLine(dataObject.ReadOriginObjects());
+            Console.WriteLine(dataObject.ReadTargetObjects());
         }
     }
 

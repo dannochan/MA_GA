@@ -13,7 +13,9 @@ public class DataObject : IDataObject
 
     public bool? isExternalComponent { get; set; }
 
-    public List<IObjectRelation> Relations { get; set; } = [];
+    public List<IObjectRelation> Relations { get; set; }
+    public List<IDataObject> OriginObjects { get; set; }
+    public List<IDataObject> TargetObjects { get; set; }
 
 
 
@@ -24,6 +26,8 @@ public class DataObject : IDataObject
         this.Name = name;
         this.ShortName = shortName;
         this.isExternalComponent = isExternalComponent;
+        this.OriginObjects = new List<IDataObject>();
+        this.TargetObjects = new List<IDataObject>();
     }
 
 
@@ -53,6 +57,92 @@ public class DataObject : IDataObject
             Console.WriteLine(relation.TargetObject + " - " + relation.RelationType);
         }
     }
+
+    public void AddOriginObject(IDataObject originObject)
+    {
+        if (this.CheckOriginObject(originObject))
+        {
+            Console.WriteLine($"Origin object {originObject.Name} already exists in {Name}.");
+            return;
+        }
+
+        OriginObjects.Add(originObject);
+    }
+    public void AddTargetObject(IDataObject targetObject)
+    {
+
+        if (this.CheckTargetObject(targetObject))
+        {
+            Console.WriteLine($"Target object {targetObject.Name} already exists in {Name}.");
+            return;
+        }
+        TargetObjects.Add(targetObject);
+    }
+
+    public bool CheckOriginObject(IDataObject originObject)
+    {
+
+        return originObject != null && OriginObjects.Contains(originObject);
+    }
+
+    public bool CheckTargetObject(IDataObject targetObject)
+    {
+        return targetObject != null && TargetObjects.Contains(targetObject);
+    }
+
+    public void RemoveOriginObject(IDataObject originObject)
+    {
+        OriginObjects.Remove(originObject);
+    }
+
+    public void RemoveTargetObject(IDataObject targetObject)
+    {
+        TargetObjects.Remove(targetObject);
+    }
+
+    public List<IDataObject> GetOriginObjects()
+    {
+        return OriginObjects;
+    }
+
+    public List<IDataObject> GetTargetObjects()
+    {
+        return TargetObjects;
+    }
+    public override string ToString()
+    {
+        return $"DataObject: {Name}, Type: {ObjectType}, ShortName: {ShortName}, External: {isExternalComponent}";
+    }
+
+    public string ReadOriginObjects()
+    {
+        if (OriginObjects.Count == 0)
+        {
+            return "No origin objects found.";
+        }
+        string result = "Origin Objects: ";
+        foreach (var originObject in OriginObjects)
+        {
+            result += originObject.Name + ", ";
+        }
+        return result.TrimEnd(',', ' ');
+    }
+
+    public string ReadTargetObjects()
+    {
+        if (TargetObjects.Count == 0)
+        {
+            return "No target objects found.";
+        }
+        string result = "Target Objects: ";
+        foreach (var targetObject in TargetObjects)
+        {
+            result += targetObject.Name + ", ";
+        }
+        return result.TrimEnd(',', ' ');
+    }
+
+
 
 
 }
