@@ -8,6 +8,6 @@ namespace MA_GA;
 public abstract class ModularisableElement
 {
 
-    public abstract int getIndex();
+    public abstract int GetIndex();
 
 }

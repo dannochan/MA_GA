@@ -1,5 +1,6 @@
 using System;
 using QuikGraph;
+using QuikGraph.Graphviz;
 
 namespace MA_GA.Models;
 
@@ -20,15 +21,15 @@ public class Graph
     private readonly Dictionary<int, IDataObject> _nodeDictionary = [];
     private readonly Dictionary<int, IObjectRelation> _edgeDictionary = [];
 
-    private readonly BidirectionalGraph<IDataObject, IObjectRelation> _Graph;
+    private readonly AdjacencyGraph<IDataObject, IObjectRelation> _Graph;
 
 
     public Graph()
     {
         nodeObjects = new List<IDataObject>();
         edgeObjects = new List<IObjectRelation>();
-        _Graph = new BidirectionalGraph<IDataObject, IObjectRelation>();
-        
+        _Graph = new AdjacencyGraph<IDataObject, IObjectRelation>();
+
     }
 
     public bool IsEmpty()
@@ -36,12 +37,14 @@ public class Graph
         return nodeObjects.Count == 0;
     }
 
-    public void AddNodeToGraph(IDataObject dataObject)
+    public void AddNodeToGraph(DataObject dataObject)
     {
         nodeObjects.Add(dataObject);
+        _Graph.AddVertex(dataObject);
+        _nodeDictionary.Add(dataObject.GetIndex() + _Graph.VertexCount, dataObject);
     }
 
-    public void AddRelationToGraph(IObjectRelation relation)
+    public void AddRelationToGraph(ObjectRelation relation)
     {
 
 
@@ -51,6 +54,8 @@ public class Graph
         }
 
         edgeObjects.Add(relation);
+        _Graph.AddEdge(relation);
+        _edgeDictionary.Add(relation.GetIndex() + _Graph.EdgeCount, relation);
 
     }
 
@@ -187,6 +192,23 @@ public class Graph
             Console.WriteLine(dataObject.ReadOriginObjects());
             Console.WriteLine(dataObject.ReadTargetObjects());
         }
+    }
+
+    public void ReadGraph()
+    {
+        Console.WriteLine("Graph contains the following nodes and edges:");
+        foreach (var vertex in _Graph.Vertices)
+        {
+            Console.WriteLine($"Node: {vertex.Name}");
+        }
+        foreach (var edge in _Graph.Edges)
+        {
+            Console.WriteLine($"Edge from {edge.SourceObject.Name} to {edge.TargetObject.Name} with relation type {edge.RelationType}");
+        }
+
+        Console.WriteLine("Graphviz representation:");
+        Console.WriteLine(_Graph.ToGraphviz());
+
     }
 
 

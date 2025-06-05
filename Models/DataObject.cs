@@ -19,7 +19,6 @@ public class DataObject : ModularisableElement, IDataObject
     public List<IDataObject> TargetObjects { get; set; }
 
 
-
     public DataObject(string name, ObjectType objectType, string shortName, bool? isExternalComponent)
     {
         this.ObjectType = objectType;
@@ -142,9 +141,9 @@ public class DataObject : ModularisableElement, IDataObject
         return result.TrimEnd(',', ' ');
     }
 
-    public override int getIndex()
+    public override int GetIndex()
     {
-        throw new NotImplementedException();
+        return EdgeNumber;
     }
 
     public override bool Equals(object? obj)

@@ -26,7 +26,7 @@ public class ObjectRelation : ModularisableElement, IObjectRelation
         Target = targetObject;
     }
 
-    public override int getIndex()
+    public override int GetIndex()
     {
         return EdgeNumber;
     }
