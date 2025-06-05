@@ -1,18 +1,25 @@
 using System;
+using QuikGraph;
 
 namespace MA_GA.Models;
 
-public interface IObjectRelation
+/// <summary>
+/// This interface defines the existing relations between objects in the graph.
+/// It includes properties for the type of relation, the source object, and the target object.
+/// </summary>
+
+public interface IObjectRelation : IEdge<IDataObject>
 {
     // Type of the relation
     RelationType RelationType { get; set; }
 
     // Source object
-    string SourceObject { get; set; }
+    IDataObject SourceObject { get; set; }
 
 
     // target object
-    string TargetObject { get; set; }
+    
+    IDataObject TargetObject { get; set; }
 
 
 }

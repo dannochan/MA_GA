@@ -5,10 +5,6 @@ namespace MA_GA.Models;
 
 public interface IDataObject
 {
-    /// <summary>
-    /// Gets the unique identifier of the information object.
-    /// </summary>
-    Guid Id { get; }
 
     /// <summary>
     /// get and set the type of the information object.

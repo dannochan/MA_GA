@@ -2,9 +2,10 @@ using System;
 
 namespace MA_GA.Models;
 
-public class DataObject : IDataObject
+public class DataObject : ModularisableElement, IDataObject
 {
-    public Guid Id { get; set; }
+
+    private int EdgeNumber { get; set; }
     public ObjectType? ObjectType { get; set; }
 
     public string Name { get; set; }
@@ -21,7 +22,6 @@ public class DataObject : IDataObject
 
     public DataObject(string name, ObjectType objectType, string shortName, bool? isExternalComponent)
     {
-        Id = Guid.NewGuid();
         this.ObjectType = objectType;
         this.Name = name;
         this.ShortName = shortName;
@@ -142,7 +142,25 @@ public class DataObject : IDataObject
         return result.TrimEnd(',', ' ');
     }
 
+    public override int getIndex()
+    {
+        throw new NotImplementedException();
+    }
 
+    public override bool Equals(object? obj)
+    {
+        return obj is DataObject @object &&
+               ObjectType == @object.ObjectType &&
+               Name == @object.Name &&
+               ShortName == @object.ShortName &&
+               isExternalComponent == @object.isExternalComponent &&
+               EqualityComparer<List<IObjectRelation>>.Default.Equals(Relations, @object.Relations) &&
+               EqualityComparer<List<IDataObject>>.Default.Equals(OriginObjects, @object.OriginObjects) &&
+               EqualityComparer<List<IDataObject>>.Default.Equals(TargetObjects, @object.TargetObjects);
+    }
 
-
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ObjectType, Name, ShortName, isExternalComponent, Relations, OriginObjects, TargetObjects);
+    }
 }

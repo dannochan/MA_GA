@@ -3,6 +3,10 @@ using MA_GA.Models.MappingModels;
 
 namespace MA_GA.Models;
 
+/// <summary>
+/// GraphObject class represents the structure of the graph object as defined in the JSON file.
+/// </summary>
+
 public class GraphObject
 {
     public List<NodeObject>? externalComponents { get; set; }

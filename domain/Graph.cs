@@ -1,6 +1,14 @@
 using System;
+using QuikGraph;
 
 namespace MA_GA.Models;
+
+/// <summary>
+/// Graph class represents a directed graph structure containing nodes and edges.
+/// It allows adding nodes, relations, and connections between nodes.
+/// It also provides methods to retrieve nodes by ID or name, remove nodes and edges,
+/// and read the current state of the graph.
+/// </summary>
 
 public class Graph
 {
@@ -8,10 +16,19 @@ public class Graph
     List<IDataObject> nodeObjects;
     List<IObjectRelation> edgeObjects;
 
+    // properties for creating graph using quikgraph
+    private readonly Dictionary<int, IDataObject> _nodeDictionary = [];
+    private readonly Dictionary<int, IObjectRelation> _edgeDictionary = [];
+
+    private readonly BidirectionalGraph<IDataObject, IObjectRelation> _Graph;
+
+
     public Graph()
     {
         nodeObjects = new List<IDataObject>();
         edgeObjects = new List<IObjectRelation>();
+        _Graph = new BidirectionalGraph<IDataObject, IObjectRelation>();
+        
     }
 
     public bool IsEmpty()
@@ -37,7 +54,7 @@ public class Graph
 
     }
 
-    public void addConnectionToNodes()
+    public void AddConnectionToNodes()
     {
 
         if (nodeObjects.Count == 0)
@@ -50,8 +67,8 @@ public class Graph
         }
         foreach (var relation in edgeObjects)
         {
-            var sourceObject = GetNodeObjectByName(relation.SourceObject);
-            var targetObject = GetNodeObjectByName(relation.TargetObject);
+            var sourceObject = GetNodeObjectByName(relation.SourceObject.Name);
+            var targetObject = GetNodeObjectByName(relation.TargetObject.Name);
 
             if (sourceObject == null || targetObject == null)
             {
@@ -65,19 +82,6 @@ public class Graph
 
     }
 
-
-    public IDataObject GetNodeObjectById(Guid id)
-    {
-        if (id == null)
-        {
-            throw new ArgumentNullException(nameof(id), "ID cannot be null");
-        }
-        if (nodeObjects.Count == 0)
-        {
-            throw new InvalidOperationException("No data objects available");
-        }
-        return nodeObjects.FirstOrDefault(d => d.Id == id);
-    }
 
     public IDataObject GetNodeObjectByName(string name)
     {
@@ -111,8 +115,8 @@ public class Graph
             throw new ArgumentNullException("Source or target node name cannot be null or empty");
         }
 
-        var relationToRemove = edgeObjects.FirstOrDefault(r => r.SourceObject.Equals(sourceNode, StringComparison.OrdinalIgnoreCase) &&
-                                                                r.TargetObject.Equals(targetNode, StringComparison.OrdinalIgnoreCase));
+        var relationToRemove = edgeObjects.FirstOrDefault(r => r.SourceObject.Name.Equals(sourceNode, StringComparison.OrdinalIgnoreCase) &&
+                                                                r.TargetObject.Name.Equals(targetNode, StringComparison.OrdinalIgnoreCase));
 
 
         if (relationToRemove == null)
@@ -157,7 +161,7 @@ public class Graph
 
     }
 
-    public void readList()
+    public void ReadList()
     {
         Console.WriteLine("Registered Data Objects are :");
         foreach (var dataObject in nodeObjects)
@@ -185,34 +189,5 @@ public class Graph
         }
     }
 
-    public void addRelation(Guid id, IObjectRelation relation)
-    {
-        var sourceObject = GetNodeObjectById(id);
-        var targetObject = GetNodeObjectByName(relation.TargetObject);
-        if (sourceObject != null && targetObject != null)
-        {
-            // check if the relation already exists
-
-            if (sourceObject.Relations.Any(r => r == targetObject))
-            {
-                throw new InvalidOperationException("Relation already exists in source object");
-
-            }
-
-            if (targetObject.Relations.Any(r => r == sourceObject))
-            {
-                throw new InvalidOperationException("Relation already exists in target object");
-
-            }
-
-            sourceObject.Relations.Add(relation);
-            targetObject.Relations.Add(relation);
-            Console.WriteLine($"Relation added between {sourceObject.Name} and {targetObject.Name}");
-        }
-        else
-        {
-            throw new InvalidOperationException("Data object not found");
-        }
-    }
 
 }

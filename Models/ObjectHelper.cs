@@ -57,8 +57,8 @@ public static class ObjectHelper
             {
                 dataObjectCenter.AddRelationToGraph(new ObjectRelation(
                    convertIntToRelationTyp(item.type),
-                    item.from,
-                    item.to
+                    dataObjectCenter.GetNodeObjectByName(item.from),
+                    dataObjectCenter.GetNodeObjectByName(item.to)
 
                 ));
 
