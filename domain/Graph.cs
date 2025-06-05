@@ -1,4 +1,5 @@
 using System;
+using MA_GA.domain;
 using QuikGraph;
 using QuikGraph.Graphviz;
 
@@ -28,7 +29,7 @@ public class Graph
     {
         nodeObjects = new List<IDataObject>();
         edgeObjects = new List<IObjectRelation>();
-        _Graph = new AdjacencyGraph<IDataObject, IObjectRelation>();
+        _Graph = GraphService.CreateAdjacencyGraph();
 
     }
 
@@ -207,7 +208,8 @@ public class Graph
         }
 
         Console.WriteLine("Graphviz representation:");
-        Console.WriteLine(_Graph.ToGraphviz());
+        
+        Console.WriteLine(GraphService.GenerateGraphToDOT(_Graph));
 
     }
 
