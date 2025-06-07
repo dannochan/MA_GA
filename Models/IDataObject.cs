@@ -31,9 +31,13 @@ public interface IDataObject
     List<IDataObject> OriginObjects { get; set; }
     List<IDataObject> TargetObjects { get; set; }
 
+    int Weight { get; set; }
+
     string ToString();
 
     string ReadOriginObjects();
     string ReadTargetObjects();
+
+    void UpdateWeight(int weight);
 
 }

@@ -22,7 +22,7 @@ public class Graph
     private readonly Dictionary<int, IDataObject> _nodeDictionary = [];
     private readonly Dictionary<int, IObjectRelation> _edgeDictionary = [];
 
-    private readonly AdjacencyGraph<IDataObject, IObjectRelation> _Graph;
+    private readonly AdjacencyGraph<DataObject, IObjectRelation> _Graph;
 
 
     public Graph()
@@ -53,10 +53,19 @@ public class Graph
         {
             throw new ArgumentNullException(nameof(relation), "Relation cannot be null");
         }
+        // check if source and target objects are both information objects
+        if (relation.SourceObject.ObjectType == ObjectType.InformationObject &&
+            relation.TargetObject.ObjectType == ObjectType.InformationObject)
+        {
+            return; // do not add relation between two information objects
+        }
 
         edgeObjects.Add(relation);
         _Graph.AddEdge(relation);
         _edgeDictionary.Add(relation.GetIndex() + _Graph.EdgeCount, relation);
+        // update vertex weights based on relation type
+        relation.SourceObject.UpdateWeight(ObjectHelper.ConvertRelationTypeToWeight(relation.RelationType));
+        relation.TargetObject.UpdateWeight(ObjectHelper.ConvertRelationTypeToWeight(relation.RelationType));
 
     }
 
@@ -89,9 +98,9 @@ public class Graph
     }
 
 
-    public IDataObject GetNodeObjectByName(string name)
+    public DataObject GetNodeObjectByName(string name)
     {
-        var nodeWanted = default(IDataObject);
+        var nodeWanted = default(DataObject);
         if (string.IsNullOrEmpty(name))
         {
             throw new ArgumentNullException(nameof(name), "Name cannot be null or empty");
@@ -106,7 +115,7 @@ public class Graph
         {
             if (dataObject.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
-                nodeWanted = dataObject;
+                nodeWanted = (DataObject?)dataObject;
             }
         }
 
@@ -208,9 +217,14 @@ public class Graph
         }
 
         Console.WriteLine("Graphviz representation:");
-        
+
         Console.WriteLine(GraphService.GenerateGraphToDOT(_Graph));
 
+    }
+
+    public AdjacencyGraph<DataObject, IObjectRelation> GetGraph()
+    {
+        return _Graph;
     }
 
 

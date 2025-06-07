@@ -4,26 +4,30 @@ namespace MA_GA.Models;
 
 public class ObjectRelation : ModularisableElement, IObjectRelation
 {
-    private int EdgeNumber { get; set; }
+    public int EdgeNumber { get; set; }
     public RelationType RelationType { get; set; }
 
     public IDataObject SourceObject { get; set; }
 
-    public IDataObject TargetObject { get; set; }
+    public DataObject TargetObject { get; set; }
 
     public DataObject Source { get; set; }
 
     public DataObject Target { get; set; }
 
-    public ObjectRelation(RelationType relationType,
+    public int Weight { get; set; }
+
+    public ObjectRelation(int edgeNumber, RelationType relationType,
     DataObject sourceObject,
     DataObject targetObject)
     {
+        EdgeNumber = edgeNumber;
         RelationType = relationType;
         SourceObject = sourceObject;
         TargetObject = targetObject;
         Source = sourceObject;
         Target = targetObject;
+        Weight = ObjectHelper.ConvertRelationTypeToWeight(relationType);
     }
 
     public override int GetIndex()
@@ -36,11 +40,12 @@ public class ObjectRelation : ModularisableElement, IObjectRelation
         return obj is ObjectRelation relation &&
                RelationType == relation.RelationType &&
                EqualityComparer<IDataObject>.Default.Equals(SourceObject, relation.SourceObject) &&
-               EqualityComparer<IDataObject>.Default.Equals(TargetObject, relation.TargetObject);
+               EqualityComparer<IDataObject>.Default.Equals(TargetObject, relation.TargetObject) &&
+               Weight == relation.Weight;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(RelationType, SourceObject, TargetObject);
+        return HashCode.Combine(RelationType, SourceObject, TargetObject, Weight);
     }
 }

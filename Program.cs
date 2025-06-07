@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
+using MA_GA.domain.GreedyAlgorithm;
 using MA_GA.Models;
 using Microsoft.Extensions.Logging;
 
@@ -42,7 +43,21 @@ class MainApp
                 //  Console.WriteLine("Graph after removal:");
                 //  dataObjectCenter.ReadNodeConnection();
                 logger.LogInformation("DataObjects are not empty, proceeding with graph displaying.");
-                dataObjectCenter.ReadGraph();
+                // dataObjectCenter.ReadGraph();
+                var graph = dataObjectCenter.GetGraph();
+                if (graph != null)
+                {
+                    // output edge count
+                    Console.WriteLine($"Graph contains {graph.VertexCount} vertices and {graph.EdgeCount} edges.");
+                    var algorithm = new GraphPartitionGreedyAlgorithm(graph);
+                    algorithm.CreatePriorityList();
+                    Console.WriteLine("Priority List created successfully.");
+                }
+                else
+                {
+                    logger.LogError("Graph is null after creation.");
+                }
+
             }
             else
             {

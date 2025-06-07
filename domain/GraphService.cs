@@ -14,9 +14,9 @@ public static class GraphService
     ///  Creates a adjacency graph for the given data objects and their relations.
     /// </summary>
     /// <returns></returns>
-    public static AdjacencyGraph<IDataObject, IObjectRelation> CreateAdjacencyGraph()
+    public static AdjacencyGraph<DataObject, IObjectRelation> CreateAdjacencyGraph()
     {
-        var graph = new AdjacencyGraph<IDataObject, IObjectRelation>(
+        var graph = new AdjacencyGraph<DataObject, IObjectRelation>(
             allowParallelEdges: true
         );
         return graph;
@@ -33,7 +33,7 @@ public static class GraphService
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
 
-    public static string GenerateGraphToDOT(AdjacencyGraph<IDataObject, IObjectRelation> graph)
+    public static string GenerateGraphToDOT(AdjacencyGraph<DataObject, IObjectRelation> graph)
     {
         if (graph == null)
         {

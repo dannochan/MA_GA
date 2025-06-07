@@ -56,6 +56,7 @@ public static class ObjectHelper
             foreach (var item in rawObject.relations)
             {
                 dataObjectCenter.AddRelationToGraph(new ObjectRelation(
+                    rawObject.relations.IndexOf(item),
                    convertIntToRelationTyp(item.type),
                     dataObjectCenter.GetNodeObjectByName(item.from),
                     dataObjectCenter.GetNodeObjectByName(item.to)
@@ -70,6 +71,29 @@ public static class ObjectHelper
             logger.LogError("RelationObjects is null");
         }
 
+
+    }
+
+    /// <summary>
+    /// Converts a RelationType to a weight value.
+    /// </summary>
+    /// <param name="relationType">The type of relation to convert.</param>
+    /// <returns>An integer representing the weight of the relation type. -1 indicates relation between information object</returns>
+    public static int ConvertRelationTypeToWeight(RelationType relationType)
+    {
+        return relationType switch
+        {
+            RelationType.Konjunktion => 2,
+            RelationType.Disjunktion => 1,
+            RelationType.ExclusiveDisjunktion => 3,
+            RelationType.Create => 3,
+            RelationType.Read => 1,
+            RelationType.Update => 3,
+            RelationType.RelatedTo => 0,
+            RelationType.PartOf => 0,
+            RelationType.IsA => 0,
+            _ => throw new ArgumentOutOfRangeException(nameof(relationType), "Invalid relation type")
+        };
     }
 
     private static RelationType convertIntToRelationTyp(int type)

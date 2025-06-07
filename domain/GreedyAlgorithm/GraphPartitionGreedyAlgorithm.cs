@@ -33,8 +33,37 @@ public class GraphPartitionGreedyAlgorithm
         {
             this.HandleExternalRelations(externalRelationList);
         }
-        
+
         // sort edges by weight
+        var sortedEdges = InitGraph.Edges.ToList()
+            .OrderByDescending(edge => edge.Weight)
+            .ToList();
+        var CurrentEdgeWeight = sortedEdges.FirstOrDefault().Weight;
+        sortedEdges.GroupBy(edge => edge.Weight)
+            .ToList().ForEach(
+                group =>
+                {
+                    // sort edges by the sum of source and target object weights
+                    var sortedGroup = group.OrderByDescending(edge => edge.SourceObject.Weight + edge.TargetObject.Weight).ToList();
+                    foreach (var edge in sortedGroup)
+                    {
+                        if (!PriorityList.ContainsKey(edge.Weight))
+                        {
+                            PriorityList.Add(edge.Weight, $"{edge.EdgeNumber}");
+                        }
+                        else
+                        {
+                            PriorityList[edge.Weight] += $", {edge.EdgeNumber}";
+                        }
+                    }
+                }
+            );
+        // console output of the priority list
+        Console.WriteLine("Priority List:");
+        foreach (var item in PriorityList)
+        {
+            Console.WriteLine($"Weight: {item.Key}, Edges: {item.Value}");
+        }
 
     }
 
@@ -46,11 +75,11 @@ public class GraphPartitionGreedyAlgorithm
     private List<IObjectRelation> CheckConnectionsToExternalObjects()
     {
         var externalRelations = new List<IObjectRelation>();
-        var Vertex_List  = InitGraph.Vertices.ToList();
+        var Vertex_List = InitGraph.Vertices.ToList();
 
         foreach (var vertex in Vertex_List)
         {
-            if ((bool)vertex.isExternalComponent)
+            if (vertex.isExternalComponent != null && (bool)vertex.isExternalComponent)
             {
 
                 foreach (var relation in vertex.Relations)
@@ -63,7 +92,7 @@ public class GraphPartitionGreedyAlgorithm
 
             }
         }
-    return externalRelations;
+        return externalRelations;
 
     }
 }

@@ -10,6 +10,9 @@ namespace MA_GA.Models;
 
 public interface IObjectRelation : IEdge<DataObject>
 {
+
+    // Edge number for the relation
+    int EdgeNumber { get; set; }
     // Type of the relation
     RelationType RelationType { get; set; }
 
@@ -19,7 +22,10 @@ public interface IObjectRelation : IEdge<DataObject>
 
     // target object
 
-    IDataObject TargetObject { get; set; }
+    DataObject TargetObject { get; set; }
+
+    // weight of the relation
+    int Weight { get; set; }
 
 
 }
