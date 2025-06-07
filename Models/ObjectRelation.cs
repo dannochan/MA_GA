@@ -11,13 +11,13 @@ public class ObjectRelation : ModularisableElement, IObjectRelation
 
     public IDataObject TargetObject { get; set; }
 
-    public IDataObject Source { get; set; }
+    public DataObject Source { get; set; }
 
-    public IDataObject Target { get; set; }
+    public DataObject Target { get; set; }
 
     public ObjectRelation(RelationType relationType,
-    IDataObject sourceObject,
-    IDataObject targetObject)
+    DataObject sourceObject,
+    DataObject targetObject)
     {
         RelationType = relationType;
         SourceObject = sourceObject;

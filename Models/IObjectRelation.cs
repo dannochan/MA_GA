@@ -8,7 +8,7 @@ namespace MA_GA.Models;
 /// It includes properties for the type of relation, the source object, and the target object.
 /// </summary>
 
-public interface IObjectRelation : IEdge<IDataObject>
+public interface IObjectRelation : IEdge<DataObject>
 {
     // Type of the relation
     RelationType RelationType { get; set; }
@@ -18,7 +18,7 @@ public interface IObjectRelation : IEdge<IDataObject>
 
 
     // target object
-    
+
     IDataObject TargetObject { get; set; }
 
 
