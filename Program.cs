@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
+using MA_GA.domain;
 using MA_GA.domain.GreedyAlgorithm;
 using MA_GA.Models;
 using Microsoft.Extensions.Logging;
@@ -51,7 +52,14 @@ class MainApp
                     Console.WriteLine($"Graph contains {graph.VertexCount} vertices and {graph.EdgeCount} edges.");
                     var algorithm = new GraphPartitionGreedyAlgorithm(graph);
                     algorithm.CreatePriorityList();
-                    Console.WriteLine("Priority List created successfully.");
+                    Console.WriteLine("Priority List created successfully. now partitioning the graph.");
+                    // partition the graph
+                    logger.LogInformation("Starting graph partitioning.");
+                    var partitionResult = algorithm.PartitionGraph();
+                    logger.LogInformation("Graph partitioning completed successfully.");
+                    // output partition result
+                    Console.WriteLine(GraphService.DiplayGraphByComponents(partitionResult));
+
                 }
                 else
                 {

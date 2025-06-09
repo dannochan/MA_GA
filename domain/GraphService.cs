@@ -71,5 +71,30 @@ public static class GraphService
 
     }
 
+        public static string DiplayGraphByComponents(AdjacencyGraph<DataObject, IObjectRelation> graph)
+    {
+        if (graph == null || graph.VertexCount == 0)
+        {
+            return "Graph is empty.";
+        }
+
+        var components = graph.Vertices
+            .GroupBy(v => v.Component)
+            .Select(g => new { Component = g.Key, Vertices = g.ToList() })
+            .ToList();
+
+        var result = new System.Text.StringBuilder();
+        foreach (var component in components)
+        {
+            result.AppendLine($"Component: {component.Component}");
+            foreach (var vertex in component.Vertices)
+            {
+                result.AppendLine($" - Vertex: {vertex.Name}, Weight: {vertex.Weight}");
+            }
+        }
+
+        return result.ToString();
+    }
+
 
 }

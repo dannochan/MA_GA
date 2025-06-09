@@ -15,6 +15,7 @@ public class DataObject : ModularisableElement, IDataObject
     public bool? isExternalComponent { get; set; }
 
     public int Weight { get; set; } // Default weight, can be adjusted based on relation type
+    public string Component { get; set; } // Component name, if applicable
 
     public List<IObjectRelation> Relations { get; set; }
     public List<IDataObject> OriginObjects { get; set; }

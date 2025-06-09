@@ -32,6 +32,7 @@ public interface IDataObject
     List<IDataObject> TargetObjects { get; set; }
 
     int Weight { get; set; }
+    string Component { get; set; }
 
     string ToString();
 
