@@ -41,4 +41,6 @@ public interface IDataObject
 
     void UpdateWeight(int weight);
 
+    int GetIndex();
+
 }

@@ -89,6 +89,7 @@ public class GraphPartitionGreedyAlgorithm
             throw new InvalidOperationException("Graph is empty. Cannot partition an empty graph.");
         }
 
+
         // Example partitioning logic: assign each vertex to a component value based on the priority list
         int componentValue = 1;
         foreach (var edgeGroup in PriorityList.OrderByDescending(kvp => kvp.Key))
@@ -104,8 +105,6 @@ public class GraphPartitionGreedyAlgorithm
                 // Check if the source and target objects are already assigned to a component
                 if (sourceVertex.Component == null && targetVertex.Component == null)
                 {
-                    // check if their neighbors are already assigned to a component
-                   
 
                     // Assign both objects to the same component
                     sourceVertex.Component = $"Component_{componentValue}";

@@ -27,5 +27,7 @@ public interface IObjectRelation : IEdge<DataObject>
     // weight of the relation
     int Weight { get; set; }
 
+    int GetIndex();
+
 
 }

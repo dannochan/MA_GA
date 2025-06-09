@@ -71,7 +71,7 @@ public static class GraphService
 
     }
 
-        public static string DiplayGraphByComponents(AdjacencyGraph<DataObject, IObjectRelation> graph)
+    public static string DiplayGraphByComponents(AdjacencyGraph<DataObject, IObjectRelation> graph)
     {
         if (graph == null || graph.VertexCount == 0)
         {
@@ -94,6 +94,16 @@ public static class GraphService
         }
 
         return result.ToString();
+    }
+    
+        public static List<DataObject> GetVertexNeighbors(DataObject vertex, AdjacencyGraph<DataObject, IObjectRelation> graph)
+    {
+
+        return graph.Edges
+            .Where(e => e.SourceObject.Equals(vertex) || e.TargetObject.Equals(vertex))
+            .Select(e => e.SourceObject.Equals(vertex) ? (DataObject)e.TargetObject : (DataObject)e.SourceObject)
+            .ToList();
+
     }
 
 

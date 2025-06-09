@@ -1,4 +1,5 @@
 using System;
+using GeneticSharp;
 using MA_GA.domain;
 using QuikGraph;
 using QuikGraph.Graphviz;
@@ -19,10 +20,12 @@ public class Graph
     List<IObjectRelation> edgeObjects;
 
     // properties for creating graph using quikgraph
-    private readonly Dictionary<int, IDataObject> _nodeDictionary = [];
-    private readonly Dictionary<int, IObjectRelation> _edgeDictionary = [];
+    private readonly Dictionary<int, DataObject> _nodeDictionary = [];
+    private readonly Dictionary<int, ObjectRelation> _edgeDictionary = [];
 
     private readonly AdjacencyGraph<DataObject, IObjectRelation> _Graph;
+
+    private readonly Dictionary<ModularisableElement, List<ModularisableElement>> IncidentModularisableElements;
 
 
     public Graph()
@@ -30,6 +33,7 @@ public class Graph
         nodeObjects = new List<IDataObject>();
         edgeObjects = new List<IObjectRelation>();
         _Graph = GraphService.CreateAdjacencyGraph();
+        IncidentModularisableElements = new Dictionary<ModularisableElement, List<ModularisableElement>>();
 
     }
 
@@ -226,6 +230,58 @@ public class Graph
     {
         return _Graph;
     }
+
+    public List<ModularisableElement> GetModularisableElements()
+    {
+        var modularisableElements = new List<ModularisableElement>();
+        if (_Graph == null || _Graph.VertexCount == 0)
+        {
+            throw new InvalidOperationException("Graph is empty or not initialized");
+        }
+
+        // Add vertices that are modularisable elements
+        foreach (var vertex in _Graph.Vertices)
+        {
+            if (vertex is ModularisableElement modularisableElement)
+            {
+                modularisableElements.Add(vertex);
+            }
+        }
+        // Add edges that are modularisable elements
+        _Graph.Edges.ToList().ForEach(
+            edge =>
+            {
+                if (edge is ModularisableElement modularisableElement)
+                {
+                    modularisableElements.Add((ObjectRelation)edge);
+                }
+            }
+        );
+
+        return modularisableElements;
+    }
+
+    public ModularisableElement GetModularisableElementByIndex(int index)
+    {
+
+        if (_nodeDictionary.ContainsKey(index))
+        {
+            return _nodeDictionary[index];
+        }
+        else if (_edgeDictionary.ContainsKey(index))
+        {
+            return _edgeDictionary[index];
+        }
+        else
+        {
+            throw new KeyNotFoundException($"No ModularisableElement found with index {index}");
+        }
+
+
+    }
+
+
+
 
 
 

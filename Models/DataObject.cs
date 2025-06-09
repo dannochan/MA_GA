@@ -5,7 +5,7 @@ namespace MA_GA.Models;
 public class DataObject : ModularisableElement, IDataObject
 {
 
-    private int EdgeNumber { get; set; }
+    private int VertexNumber { get; set; }
     public ObjectType? ObjectType { get; set; }
 
     public string Name { get; set; }
@@ -147,7 +147,7 @@ public class DataObject : ModularisableElement, IDataObject
 
     public override int GetIndex()
     {
-        return EdgeNumber;
+        return VertexNumber;
     }
 
     public override bool Equals(object? obj)
