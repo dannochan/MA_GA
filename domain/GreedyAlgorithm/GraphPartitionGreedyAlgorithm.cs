@@ -51,6 +51,7 @@ public class GraphPartitionGreedyAlgorithm
                 {
                     var sortedGroup = group.OrderByDescending(edge => edge.SourceObject.Weight + edge.TargetObject.Weight).ToList();
 
+                    // TODO: how to handle information objects?
                     // remove edges that have vertices that are information objects
                     sortedGroup.RemoveAll(edge =>
                         edge.SourceObject.ObjectType == ObjectType.InformationObject ||
