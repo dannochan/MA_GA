@@ -50,6 +50,12 @@ public class GraphPartitionGreedyAlgorithm
                 group =>
                 {
                     var sortedGroup = group.OrderByDescending(edge => edge.SourceObject.Weight + edge.TargetObject.Weight).ToList();
+
+                    // remove edges that have vertices that are information objects
+                    sortedGroup.RemoveAll(edge =>
+                        edge.SourceObject.ObjectType == ObjectType.InformationObject ||
+                        edge.TargetObject.ObjectType == ObjectType.InformationObject);
+
                     foreach (var edge in sortedGroup)
                     {
                         if (!PriorityList.ContainsKey(edge.Weight))
@@ -76,6 +82,9 @@ public class GraphPartitionGreedyAlgorithm
     public AdjacencyGraph<DataObject, IObjectRelation> PartitionGraph()
     {
         var newGraph = InitGraph.Clone() ?? throw new ArgumentNullException(nameof(InitGraph), "Graph cannot be null");
+
+        // remove vertex that are information objects
+        newGraph.RemoveVertexIf(vertex => vertex.ObjectType == ObjectType.InformationObject);
 
 
         // Implement the partitioning logic here
