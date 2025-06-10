@@ -45,6 +45,11 @@ public class Graph
     public void AddNodeToGraph(DataObject dataObject)
     {
         nodeObjects.Add(dataObject);
+        // only add node to graph when it is not an information object
+        if (dataObject.ObjectType == ObjectType.InformationObject)
+        {
+            return ; 
+        }
         _Graph.AddVertex(dataObject);
         _nodeDictionary.Add(dataObject.GetIndex() + _Graph.VertexCount, dataObject);
     }
@@ -57,8 +62,8 @@ public class Graph
         {
             throw new ArgumentNullException(nameof(relation), "Relation cannot be null");
         }
-        // check if source and target objects are both information objects
-        if (relation.SourceObject.ObjectType == ObjectType.InformationObject &&
+        // check if either source or / both target objects are information objects
+        if (relation.SourceObject.ObjectType == ObjectType.InformationObject ||
             relation.TargetObject.ObjectType == ObjectType.InformationObject)
         {
             return; // do not add relation between two information objects
