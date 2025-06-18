@@ -17,7 +17,7 @@ public interface IObjectRelation : IEdge<DataObject>
     RelationType RelationType { get; set; }
 
     // Source object
-    IDataObject SourceObject { get; set; }
+    DataObject SourceObject { get; set; }
 
 
     // target object

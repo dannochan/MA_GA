@@ -7,7 +7,7 @@ public class ObjectRelation : ModularisableElement, IObjectRelation
     public int EdgeNumber { get; set; }
     public RelationType RelationType { get; set; }
 
-    public IDataObject SourceObject { get; set; }
+    public DataObject SourceObject { get; set; }
 
     public DataObject TargetObject { get; set; }
 

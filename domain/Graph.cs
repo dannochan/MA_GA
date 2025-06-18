@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using GeneticSharp;
 using MA_GA.domain;
 using QuikGraph;
@@ -15,7 +16,7 @@ namespace MA_GA.Models;
 
 public class Graph
 {
-
+    // List to hold node and edge objects, including information objects
     List<IDataObject> nodeObjects;
     List<IObjectRelation> edgeObjects;
 
@@ -25,7 +26,7 @@ public class Graph
 
     private readonly AdjacencyGraph<DataObject, IObjectRelation> _Graph;
 
-    private readonly Dictionary<ModularisableElement, List<ModularisableElement>> IncidentModularisableElements;
+    private readonly ConcurrentDictionary<ModularisableElement, List<ModularisableElement>> IncidentModularisableElements;
 
 
     public Graph()
@@ -33,13 +34,13 @@ public class Graph
         nodeObjects = new List<IDataObject>();
         edgeObjects = new List<IObjectRelation>();
         _Graph = GraphService.CreateAdjacencyGraph();
-        IncidentModularisableElements = new Dictionary<ModularisableElement, List<ModularisableElement>>();
+        IncidentModularisableElements = new ConcurrentDictionary<ModularisableElement, List<ModularisableElement>>();
 
     }
 
     public bool IsEmpty()
     {
-        return nodeObjects.Count == 0;
+        return _Graph.VertexCount == 0;
     }
 
     public void AddNodeToGraph(DataObject dataObject)
@@ -48,7 +49,7 @@ public class Graph
         // only add node to graph when it is not an information object
         if (dataObject.ObjectType == ObjectType.InformationObject)
         {
-            return ; 
+            return;
         }
         _Graph.AddVertex(dataObject);
         _nodeDictionary.Add(dataObject.GetIndex() + _Graph.VertexCount, dataObject);
@@ -78,34 +79,6 @@ public class Graph
 
     }
 
-    public void AddConnectionToNodes()
-    {
-
-        if (nodeObjects.Count == 0)
-        {
-            throw new InvalidOperationException("No data objects available to connect");
-        }
-        if (edgeObjects.Count == 0)
-        {
-            throw new InvalidOperationException("No relations available to connect nodes");
-        }
-        foreach (var relation in edgeObjects)
-        {
-            var sourceObject = GetNodeObjectByName(relation.SourceObject.Name);
-            var targetObject = GetNodeObjectByName(relation.TargetObject.Name);
-
-            if (sourceObject == null || targetObject == null)
-            {
-                throw new InvalidOperationException("Source or target object not found for relation");
-            }
-
-            sourceObject.TargetObjects.Add(targetObject);
-            targetObject.OriginObjects.Add(sourceObject);
-
-        }
-
-    }
-
 
     public DataObject GetNodeObjectByName(string name)
     {
@@ -132,58 +105,6 @@ public class Graph
 
     }
 
-    public void RemoveEdgeFromGraph(string sourceNode, string targetNode)
-    {
-        if (string.IsNullOrEmpty(sourceNode) || string.IsNullOrEmpty(targetNode))
-        {
-            throw new ArgumentNullException("Source or target node name cannot be null or empty");
-        }
-
-        var relationToRemove = edgeObjects.FirstOrDefault(r => r.SourceObject.Name.Equals(sourceNode, StringComparison.OrdinalIgnoreCase) &&
-                                                                r.TargetObject.Name.Equals(targetNode, StringComparison.OrdinalIgnoreCase));
-
-
-        if (relationToRemove == null)
-        {
-            throw new InvalidOperationException("Relation not found in the graph");
-        }
-
-        edgeObjects.Remove(relationToRemove);
-
-        var sourceObject = GetNodeObjectByName(sourceNode);
-        var targetObject = GetNodeObjectByName(targetNode);
-
-        sourceObject?.TargetObjects.Remove(targetObject);
-        targetObject?.OriginObjects.Remove(sourceObject);
-    }
-
-    public void RemoveNodeFromGraph(string dataObjectName)
-    {
-        var dataObject = GetNodeObjectByName(dataObjectName);
-        if (dataObject == null)
-        {
-            throw new InvalidOperationException("Data object not found in the graph");
-        }
-
-        if (dataObject.TargetObjects.Count == 0 && dataObject.OriginObjects.Count == 0)
-        {
-            nodeObjects.Remove(dataObject);
-            return;
-        }
-
-        foreach (var originNode in dataObject.OriginObjects.ToList())
-        {
-            this.RemoveEdgeFromGraph(originNode.Name, dataObject.Name);
-        }
-
-        foreach (var targetNode in dataObject.TargetObjects.ToList())
-        {
-            this.RemoveEdgeFromGraph(dataObject.Name, targetNode.Name);
-        }
-
-        this.nodeObjects.Remove(dataObject);
-
-    }
 
     public void ReadList()
     {
@@ -199,19 +120,6 @@ public class Graph
         }
     }
 
-    public void ReadNodeConnection()
-    {
-        if (nodeObjects.Count == 0)
-        {
-            throw new InvalidOperationException("No data objects available to read connections");
-        }
-        foreach (var dataObject in nodeObjects)
-        {
-            Console.WriteLine($"Data Object: {dataObject.Name}");
-            Console.WriteLine(dataObject.ReadOriginObjects());
-            Console.WriteLine(dataObject.ReadTargetObjects());
-        }
-    }
 
     public void ReadGraph()
     {
@@ -235,6 +143,13 @@ public class Graph
     {
         return _Graph;
     }
+
+    /// <summary>
+    /// Retrieves all modularisable elements from the graph, including both vertices and edges.
+    /// Throws an InvalidOperationException if the graph is empty or not initialized.
+    /// </summary>
+    /// <returns>A list of ModularisableElement objects representing the modularisable elements in the graph.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the graph is empty or not initialized.</exception>
 
     public List<ModularisableElement> GetModularisableElements()
     {
@@ -266,6 +181,16 @@ public class Graph
         return modularisableElements;
     }
 
+    /// <summary>
+    /// Retrieves a ModularisableElement by its index.
+    /// This method checks both node and edge dictionaries for the given index.
+    /// If the index is found in either dictionary, it returns the corresponding ModularisableElement.
+    /// If the index is not found, it throws a KeyNotFoundException.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+
     public ModularisableElement GetModularisableElementByIndex(int index)
     {
 
@@ -282,8 +207,25 @@ public class Graph
             throw new KeyNotFoundException($"No ModularisableElement found with index {index}");
         }
 
+    }
+
+    /// <summary>
+    /// Retrieves all incident modularisable elements for a given modularisable element.
+    /// </summary>
+    /// <param name="element">The modularisable element for which to find incident elements.</param>
+    /// <returns>A list of incident ModularisableElement objects.</returns>
+
+    public List<ModularisableElement> GetIncidentModularisableElements(ModularisableElement element)
+    {
+
+        return IncidentModularisableElements.GetOrAdd(
+            element,
+            key => GraphService.GetIncidentElements(key, this)
+        );
 
     }
+
+
 
 
 

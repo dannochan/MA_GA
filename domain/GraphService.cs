@@ -95,8 +95,8 @@ public static class GraphService
 
         return result.ToString();
     }
-    
-        public static List<DataObject> GetVertexNeighbors(DataObject vertex, AdjacencyGraph<DataObject, IObjectRelation> graph)
+
+    public static List<DataObject> GetVertexNeighbors(DataObject vertex, AdjacencyGraph<DataObject, IObjectRelation> graph)
     {
 
         return graph.Edges
@@ -104,6 +104,82 @@ public static class GraphService
             .Select(e => e.SourceObject.Equals(vertex) ? (DataObject)e.TargetObject : (DataObject)e.SourceObject)
             .ToList();
 
+    }
+
+    /// <summary>
+    /// Retrieves all incident elements (both vertices and edges) for a given modularisable element.
+    /// If the element is an ObjectRelation, it returns the source and target objects.
+    /// If the element is a DataObject, it retrieves all edges connected to that vertex.
+    /// </summary>
+    /// <param name="element">The modularisable element for which to find incident elements.</param>
+    /// <param name="graph">The graph containing the modularisable elements.</param>
+    /// <returns>A list of incident ModularisableElement objects.</returns>
+    public static List<ModularisableElement> GetIncidentElements(ModularisableElement element, Graph graph)
+    {
+        var incidentElements = new List<ModularisableElement>();
+        if (element is ObjectRelation)
+        {
+            var relation = (ObjectRelation)element;
+            incidentElements.Add(relation.SourceObject);
+            incidentElements.Add(relation.TargetObject);
+        }
+        else
+        {
+            var vertex = (DataObject)element;
+            var edges = graph.GetGraph().Edges
+                .Where(e => e.SourceObject.Equals(vertex) || e.TargetObject.Equals(vertex))
+                .ToList();
+            foreach (var edge in edges)
+            {
+                incidentElements.Add((ObjectRelation)edge);
+            }
+        }
+        return incidentElements;
+    }
+    
+    /// <summary>
+    /// Creates a subgraph from the original graph based on the provided indices.
+    /// The subgraph will include vertices and edges corresponding to the indices of modularisable elements.
+    /// </summary>
+    /// <param name="indices">List of indices representing the modularisable elements to include in the subgraph.</param>
+    /// <param name="originalGraph">The original graph from which to create the subgraph.</param>
+    /// <returns>A new AdjacencyGraph containing the subgraph.</returns>
+
+    public static AdjacencyGraph<DataObject, IObjectRelation> CreateSubgraphGraphFromIndices(
+    List<int> indices,
+    Graph originalGraph
+
+)
+    {
+
+        var modularisableElements = indices.Select(index => originalGraph.GetModularisableElementByIndex(index))
+            .ToList();
+        var vertices = modularisableElements.Select(me => me as DataObject)
+            .Where(v => v != null)
+            .Cast<DataObject>()
+            .ToList();
+        var edges = modularisableElements
+            .Select(me => me as ObjectRelation)
+            .Where(e => e != null)
+            .Cast<ObjectRelation>()
+            .ToList();
+
+        var subgraph = CreateAdjacencyGraph();
+
+        foreach (var vertex in vertices)
+        {
+            subgraph.AddVertex(vertex);
+        }
+
+        foreach (var edge in edges)
+        {
+            if (subgraph.ContainsVertex(edge.SourceObject) && subgraph.ContainsVertex(edge.TargetObject))
+            {
+                subgraph.AddEdge(edge);
+            }
+        }
+
+        return subgraph;
     }
 
 
