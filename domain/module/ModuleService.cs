@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using MA_GA.domain.GeneticAlgorithm.encoding;
 using MA_GA.Models;
 
@@ -65,7 +66,54 @@ public class ModuleService
 
     public static HashSet<Module> DivideModuleRandomly(Module module, Graph graph)
     {
-        return new HashSet<Module>();
+        if (module == null || graph == null)
+        {
+            throw new ArgumentNullException("Module or graph cannot be null.");
+        }
+
+        if (module.GetIndices().Count == 0)
+        {
+            throw new ArgumentException("Module must contain at least one index.");
+        }
+
+        var splitModules = new HashSet<Module>();
+
+        var indices = new ArrayList(module.GetIndices());
+
+
+
+        switch (indices.Count)
+        {
+            case 1:
+                splitModules.Add(module);
+                return splitModules;
+            case 2:
+                var newModule1 = new Module();
+                newModule1.AddIndex((int)indices[0]);
+                var newModule2 = new Module();
+                newModule2.AddIndex((int)indices[1]);
+                splitModules.Add(newModule1);
+                splitModules.Add(newModule2);
+                return splitModules;
+
+            default:
+                var halfSizeOfModule = indices.Count / 2;
+                var remainingIndices = new List<object>(module.GetIndices());
+                while (remainingIndices.Count > 0)
+                {
+                    var randomStartElementIndex = Random.Shared.Next(remainingIndices.Count);
+                    var startElement = graph.GetModularisableElementByIndex((int)remainingIndices[randomStartElementIndex]);
+                    var indicesOfSplitteModule = CreateIndicesOfSubGraphRandomly(startElement, graph, halfSizeOfModule, remainingIndices);
+
+                    Module newModule = new Module();
+                    newModule.AddIndices(indicesOfSplitteModule);
+                    splitModules.Add(module);
+                    remainingIndices.Clear();
+
+                }
+                return splitModules;
+        }
+
     }
 
     public static int DetermineSplittedModuleSize(List<object> indices)

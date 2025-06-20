@@ -60,11 +60,11 @@ public class Module
         }
     }
 
-    public void AddIndices(HashSet<int> indices)
+    public void AddIndices(HashSet<object> indices)
     {
         foreach (var index in indices)
         {
-            AddIndex(index);
+            AddIndex((int)index);
         }
     }
 
