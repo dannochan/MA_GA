@@ -3,6 +3,13 @@ using System.Dynamic;
 
 namespace MA_GA.domain.module;
 
+/// <summary>
+/// Module class represents a bundle of modularisable elements. 
+/// Indices are used to keep track of the modularisable elements in the module and is sorted in ascending order.
+/// The HashSet IndicesSet is used to quickly check if an index (modularisable element) exists in the module or if an element contains an index, this is only for utility performance.
+/// The last indext in the LinkedList is considered the ending node of the module.
+/// </summary>
+
 public class Module
 {
 
@@ -35,13 +42,13 @@ public class Module
         }
         else
         {
-            var indexList = Indices.ToList();
-            for (int i = 1; i < indexList.Count; i++)
+
+            for (int i = this.Indices.Count - 1; i >= 1; i--)
             {
-                if (!indexList.Contains(index))
+                if (!this.Indices.Contains(index))
                 {
-                    var currentIndex = (int)indexList[i];
-                    var previousIndex = (int)indexList[i - 1];
+                    var currentIndex = (int)this.Indices.ElementAt(i);
+                    var previousIndex = (int)this.Indices.ElementAt(i - 1);
                     if (currentIndex > index && previousIndex < index)
                     {
                         Indices.AddBefore(Indices.Find(currentIndex), index);
@@ -54,7 +61,7 @@ public class Module
     }
 
     public void AddIndices(HashSet<int> indices)
-    { 
+    {
         foreach (var index in indices)
         {
             AddIndex(index);
@@ -73,14 +80,14 @@ public class Module
         {
             Indices.Remove(node);
         }
-        
-         // Remove from the HashSet
+
+        // Remove from the HashSet
         this.IndexSet.Remove(index);
-     }
+    }
 
 
 
-    public Boolean ContainsIndex(int index)
+    public Boolean CheckIndexInModule(int index)
     {
         return IndexSet.Contains(index);
     }
@@ -101,5 +108,10 @@ public class Module
     public override int GetHashCode()
     {
         return HashCode.Combine(Indices, IndexSet);
+    }
+
+    public List<object> GetIndices()
+    {
+        return Indices.ToList();
     }
 }
