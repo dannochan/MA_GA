@@ -4,6 +4,8 @@ using MA_GA.domain;
 using MA_GA.domain.GreedyAlgorithm;
 using MA_GA.Models;
 using Microsoft.Extensions.Logging;
+using QuikGraph.Algorithms;
+using QuikGraph.Algorithms.ConnectedComponents;
 
 class MainApp
 {
@@ -59,6 +61,7 @@ class MainApp
                     logger.LogInformation("Graph partitioning completed successfully.");
                     // output partition result
                     Console.WriteLine(GraphService.DiplayGraphByComponents(partitionResult));
+
 
                 }
                 else

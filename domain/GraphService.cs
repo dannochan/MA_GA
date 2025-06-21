@@ -1,4 +1,5 @@
 using System;
+using MA_GA.domain.module;
 using MA_GA.Models;
 using QuikGraph;
 using QuikGraph.Algorithms;
@@ -136,7 +137,7 @@ public static class GraphService
         }
         return incidentElements;
     }
-    
+
     /// <summary>
     /// Creates a subgraph from the original graph based on the provided indices.
     /// The subgraph will include vertices and edges corresponding to the indices of modularisable elements.
@@ -181,6 +182,8 @@ public static class GraphService
 
         return subgraph;
     }
+
+
 
 
 }

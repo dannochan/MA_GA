@@ -8,10 +8,10 @@ namespace MA_GA.domain.GeneticAlgorithm.encoding;
 public class LinearLinkageEncoding : ChromosomeBase
 {
 
-    private readonly Module _module;
-    private readonly Graph _graph; 
+    private readonly List<Module> _modules;
+    private readonly Graph _graph;
 
-    
+
     public LinearLinkageEncoding(int length) : base(length)
     {
     }
@@ -24,5 +24,15 @@ public class LinearLinkageEncoding : ChromosomeBase
     public override Gene GenerateGene(int geneIndex)
     {
         throw new NotImplementedException();
+    }
+
+    public Graph GetGraph()
+    {
+        return _graph;
+    }
+
+    public List<Module> GetModules()
+    {
+        return _modules;
     }
 }

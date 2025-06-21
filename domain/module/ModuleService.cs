@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using MA_GA.domain.GeneticAlgorithm.encoding;
 using MA_GA.Models;
+using QuikGraph.Algorithms;
+using QuikGraph.Algorithms.ConnectedComponents;
 
 namespace MA_GA.domain.module;
 /// <summary>
@@ -59,9 +61,83 @@ public class ModuleService
 
     }
 
+    /// <summary>
+    /// Find indices in a module that are not fully connected, and then split them into smaller modules.
+    /// </summary>
+    /// <param name="module"></param>
+    /// <param name="encoding"></param>
+    /// <returns></returns> 
+
     public List<Module> SplitNonIncidentModule(Module module, LinearLinkageEncoding encoding)
     {
-        return new List<Module>();
+        var graph = encoding.GetGraph();
+        var subgraphOfModule = GraphService.CreateSubgraphGraphFromIndices(module.GetIndices().Select(i => (int)i).ToList(), graph);
+
+        // Extract Graph and connected sets
+        // get vertices of subgraph
+
+        var ccAlgor = new ConnectedComponentsAlgorithm<DataObject, ObjectRelation>((QuikGraph.IUndirectedGraph<DataObject, ObjectRelation>)subgraphOfModule);
+
+        ccAlgor.Compute();
+
+        var components = new Dictionary<int, HashSet<DataObject>>();
+        foreach (var kvp in ccAlgor.Components)
+        {
+            if (!components.ContainsKey(kvp.Value))
+            {
+                components[kvp.Value] = new HashSet<DataObject>();
+            }
+            components[kvp.Value].Add(kvp.Key);
+        }
+
+
+        var edgesOfModule = GetModuleEdges(module, graph);
+        var listOfConnectedSet = new List<HashSet<object>>();
+
+
+        //Related Edges to connected sets
+        foreach (var verticesOfConnectedSets in components.Values)
+        {
+
+            var edgesOfConnectedSet = edgesOfModule.Where(edge =>
+             verticesOfConnectedSets.Contains(edge.SourceObject) || verticesOfConnectedSets.Contains(edge.TargetObject)).ToList();
+
+            var indexOfConnectedSet = new HashSet<object>();
+            foreach (var edge in edgesOfConnectedSet)
+            {
+                indexOfConnectedSet.Add(edge.GetIndex());
+            }
+
+            foreach (var vertex in verticesOfConnectedSets)
+            {
+                indexOfConnectedSet.Add(vertex.GetIndex());
+            }
+
+            listOfConnectedSet.Add(indexOfConnectedSet);
+
+        }
+
+        // handle isolated edges by add them to separate modules
+        foreach (var edge in edgesOfModule)
+        {
+
+            bool sourceInAny = components.Values.Any(v => v.Contains(edge.SourceObject));
+           bool targetInAny = components.Values.Any(v => v.Contains(edge.TargetObject));
+
+            if (!sourceInAny && !targetInAny)
+            {
+                
+                listOfConnectedSet.Add(new HashSet<object> { edge.GetIndex() });
+            }
+        }
+
+        // Create new modules
+        return listOfConnectedSet.Select(indices => 
+        {
+            var newModule = new Module();
+            newModule.AddIndices(indices);
+            return newModule;
+        }).ToList();
     }
 
     public static HashSet<Module> DivideModuleRandomly(Module module, Graph graph)
@@ -183,5 +259,14 @@ public class ModuleService
 
 
         return selectedIndices;
+    }
+
+    public static List<ObjectRelation> GetModuleEdges(Module module, Graph graph)
+    {
+
+
+        return graph.GetGraph().Edges.Where(
+            edge => module.CheckIndexInModule(edge.GetIndex())
+        ).Select(e => (ObjectRelation)e).ToList();
     }
 }
