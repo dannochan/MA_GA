@@ -121,6 +121,15 @@ public class ModuleService
         return indices.Count / 2;
     }
 
+    /// <summary>
+    /// Creates a subgraph of the given modularisable element by randomly selecting indices from the graph.
+    /// It takes following parameters:
+    /// - modularisableElement: The starting point for the subgraph.
+    /// - graph: The graph from which the subgraph is created.
+    /// - subgraphSize: The desired size of the subgraph.
+    /// - indicesOfModule: The list of indices that are part of the module.
+    /// </summary>
+    /// /// <returns>A HashSet of selected indices representing the subgraph.</returns>
     public static HashSet<object> CreateIndicesOfSubGraphRandomly(ModularisableElement modularisableElement, Graph graph, int subgraphSize, List<object> indicesOfModule)
     {
         var selectedIndices = new HashSet<object>();
