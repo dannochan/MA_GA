@@ -35,13 +35,15 @@ public static class ObjectHelper
 
         if (rawObject.functions != null)
         {
+            var index = 0;
             foreach (var item in rawObject.functions)
             {
                 dataObjectCenter.AddNodeToGraph(new DataObject(
                     item.name,
                     ObjectType.FunctionObject,
                     item.nameShort,
-                    item.externalComponent
+                    item.externalComponent,
+                    index++ // Assigning an index to each function object
                 ));
             }
         }
@@ -56,7 +58,7 @@ public static class ObjectHelper
             foreach (var item in rawObject.relations)
             {
                 dataObjectCenter.AddRelationToGraph(new ObjectRelation(
-                    rawObject.relations.IndexOf(item),
+                    rawObject.relations.IndexOf(item) + rawObject.functions.Count,
                    convertIntToRelationTyp(item.type),
                     dataObjectCenter.GetNodeObjectByName(item.from),
                     dataObjectCenter.GetNodeObjectByName(item.to)

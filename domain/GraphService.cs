@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using MA_GA.domain.module;
 using MA_GA.Models;
 using QuikGraph;
@@ -43,6 +44,9 @@ public static class GraphService
 
         string graphviz = graph.ToGraphviz(algo =>
         {
+            algo.Generate();
+            algo.VisitedGraph = graph;
+
             algo.CommonVertexFormat.Shape = GraphvizVertexShape.Rectangle;
             algo.FormatVertex += (sender, args) =>
             {
@@ -52,6 +56,13 @@ public static class GraphService
                 args.VertexFormat.Shape = vertex.ObjectType == ObjectType.InformationObject
                     ? GraphvizVertexShape.Ellipse
                     : GraphvizVertexShape.Rectangle;
+
+                // Fix: Add "cluster_" prefix for GraphViz clusters
+                if (vertex.Component != null)
+                {
+                    args.VertexFormat.Group = $"cluster_{vertex.Component}";
+                }
+
 
             };
 
@@ -63,6 +74,75 @@ public static class GraphService
                     Value = edge.RelationType.ToString()
                 };
             };
+
+            algo.FormatCluster += (sender, args) =>
+                  {
+                      string clusterName = args.Cluster.Vertices.FirstOrDefault()?.Component;
+                      if (clusterName.StartsWith("cluster_"))
+                      {
+                          string componentName = clusterName.Substring("cluster_".Length);
+
+                          args.GraphFormat.Label = $"Component: {componentName}";
+
+                          args.GraphFormat.FontColor = GraphvizColor.Black;
+
+                          args.GraphFormat.PenWidth = 2;
+                      }
+                  };
+
+
+        }
+
+        );
+
+        return graphviz;
+
+
+    }
+
+
+    public static string GenerateClusteredGraphToDOT(ClusteredAdjacencyGraph<DataObject, IObjectRelation> graph)
+    {
+        if (graph == null)
+        {
+            throw new ArgumentNullException("Graph cannot be null");
+        }
+
+        string graphviz = graph.ToGraphviz(algo =>
+        {
+            algo.Generate();
+            algo.VisitedGraph = graph;
+
+            algo.CommonVertexFormat.Shape = GraphvizVertexShape.Rectangle;
+            algo.FormatVertex += (sender, args) =>
+            {
+                var vertex = args.Vertex;
+                args.VertexFormat.Label = vertex.Name + vertex.GetIndex();
+
+                args.VertexFormat.Shape = vertex.ObjectType == ObjectType.InformationObject
+                    ? GraphvizVertexShape.Ellipse
+                    : GraphvizVertexShape.Rectangle;
+
+                // Fix: Add "cluster_" prefix for GraphViz clusters
+                if (vertex.Component != null)
+                {
+                    args.VertexFormat.Group = $"cluster_{vertex.Component}";
+                }
+
+
+            };
+
+            algo.FormatEdge += (sender, args) =>
+            {
+                var edge = args.Edge;
+                args.EdgeFormat.Label = new GraphvizEdgeLabel
+                {
+                    //  Value = edge.RelationType.ToString()
+                    Value = edge.EdgeNumber.ToString()
+                };
+            };
+
+
         }
 
         );
@@ -90,12 +170,13 @@ public static class GraphService
             result.AppendLine($"Component: {component.Component}");
             foreach (var vertex in component.Vertices)
             {
-                result.AppendLine($" - Vertex: {vertex.Name}, Weight: {vertex.Weight}");
+                result.AppendLine($" - Vertex: {vertex.Name}, Index: {vertex.GetIndex()}, Weight: {vertex.Weight}");
             }
         }
 
         return result.ToString();
     }
+
 
     public static List<DataObject> GetVertexNeighbors(DataObject vertex, AdjacencyGraph<DataObject, IObjectRelation> graph)
     {
@@ -181,6 +262,36 @@ public static class GraphService
         }
 
         return subgraph;
+    }
+
+    public static ClusteredAdjacencyGraph<DataObject, IObjectRelation> CreateClusteredGraph(AdjacencyGraph<DataObject, IObjectRelation> graph)
+    {
+
+        var clusteredGraph = new ClusteredAdjacencyGraph<DataObject, IObjectRelation>(graph);
+        clusteredGraph.AddVertexRange(graph.Vertices);
+        clusteredGraph.AddEdgeRange(graph.Edges);
+
+        var vertexComponents = graph.Vertices.GroupBy(v => v.Component);
+
+
+        foreach (var component in vertexComponents)
+        {
+            var cluster = clusteredGraph.AddCluster();
+            foreach (var vertex in component)
+            {
+                cluster.AddVertex(vertex);
+            }
+
+            foreach (var edge in graph.Edges)
+            {
+                if (component.Contains(edge.Source) && component.Contains(edge.Target))
+                {
+                    cluster.AddEdge(edge);
+                }
+            }
+        }
+        return clusteredGraph;
+
     }
 
 

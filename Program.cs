@@ -4,6 +4,7 @@ using MA_GA.domain;
 using MA_GA.domain.GreedyAlgorithm;
 using MA_GA.Models;
 using Microsoft.Extensions.Logging;
+using QuikGraph;
 using QuikGraph.Algorithms;
 using QuikGraph.Algorithms.ConnectedComponents;
 
@@ -61,6 +62,14 @@ class MainApp
                     logger.LogInformation("Graph partitioning completed successfully.");
                     // output partition result
                     Console.WriteLine(GraphService.DiplayGraphByComponents(partitionResult));
+                    // generate DOT representation of the graph
+
+
+                    var newClusterGraph = GraphService.CreateClusteredGraph(partitionResult);
+                    Console.WriteLine(newClusterGraph.ClustersCount);
+                    var dotRepresentation = GraphService.GenerateClusteredGraphToDOT(newClusterGraph);
+                    Console.WriteLine("Graphviz DOT representation:");
+                    Console.WriteLine(dotRepresentation);
 
 
                 }

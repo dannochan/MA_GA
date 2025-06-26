@@ -32,6 +32,18 @@ public class DataObject : ModularisableElement, IDataObject
         this.TargetObjects = new List<IDataObject>();
         Weight = 0;
     }
+    public DataObject(string name, ObjectType objectType, string shortName, bool? isExternalComponent, int vertexNumber)
+    {
+        this.ObjectType = objectType;
+        this.Name = name;
+        this.ShortName = shortName;
+        this.isExternalComponent = isExternalComponent;
+        this.OriginObjects = new List<IDataObject>();
+        this.TargetObjects = new List<IDataObject>();
+        Weight = 0;
+        this.VertexNumber = vertexNumber;
+    }
+
 
 
     public string getName()
@@ -166,10 +178,10 @@ public class DataObject : ModularisableElement, IDataObject
     {
         return HashCode.Combine(ObjectType, Name, ShortName, isExternalComponent, Relations, OriginObjects, TargetObjects);
     }
-    
+
     public void UpdateWeight(int newWeight)
     {
-        
+
         Weight += newWeight;
     }
 }
