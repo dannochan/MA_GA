@@ -46,31 +46,31 @@ class MainApp
                 //  dataObjectCenter.ReadList();
                 //  Console.WriteLine("Graph after removal:");
                 //  dataObjectCenter.ReadNodeConnection();
+                
                 logger.LogInformation("DataObjects are not empty, proceeding with graph displaying.");
                 // dataObjectCenter.ReadGraph();
                 var graph = dataObjectCenter.GetGraph();
                 if (graph != null)
                 {
-                    // output edge count
-                    Console.WriteLine($"Graph contains {graph.VertexCount} vertices and {graph.EdgeCount} edges.");
-                    var algorithm = new GraphPartitionGreedyAlgorithm(graph);
-                    algorithm.CreatePriorityList();
-                    Console.WriteLine("Priority List created successfully. now partitioning the graph.");
-                    // partition the graph
-                    logger.LogInformation("Starting graph partitioning.");
-                    var partitionResult = algorithm.PartitionGraph();
-                    logger.LogInformation("Graph partitioning completed successfully.");
-                    // output partition result
-                    Console.WriteLine(GraphService.DiplayGraphByComponents(partitionResult));
-                    // generate DOT representation of the graph
+                    DisplayGraphInfo(graph, logger);
 
+                    void DisplayGraphInfo(AdjacencyGraph<DataObject, IObjectRelation> graph, ILogger logger)
+                    {
+                        // output edge count
+                        Console.WriteLine($"Graph contains {graph.VertexCount} vertices and {graph.EdgeCount} edges.");
+                        var algorithm = new GraphPartitionGreedyAlgorithm(graph);
+                        algorithm.CreatePriorityList();
+                        Console.WriteLine("Priority List created successfully. now partitioning the graph.");
+                        // partition the graph
+                        logger.LogInformation("Starting graph partitioning.");
+                        var partitionResult = algorithm.PartitionGraph();
+                        logger.LogInformation("Graph partitioning completed successfully.");
+                        // output partition result
+                        Console.WriteLine(GraphService.DiplayGraphByComponents(partitionResult));
+                        // generate DOT representation of the graph
 
-                    var newClusterGraph = GraphService.CreateClusteredGraph(partitionResult);
-                    Console.WriteLine(newClusterGraph.ClustersCount);
-                    var dotRepresentation = GraphService.GenerateClusteredGraphToDOT(newClusterGraph);
-                    Console.WriteLine("Graphviz DOT representation:");
-                    Console.WriteLine(dotRepresentation);
-
+                      //  CreateClusteredGraphAndDisplay(partitionResult);
+                    }
 
                 }
                 else
@@ -86,5 +86,14 @@ class MainApp
 
         }
 
+    }
+
+    private static void CreateClusteredGraphAndDisplay(AdjacencyGraph<DataObject, IObjectRelation> partitionResult)
+    {
+        var newClusterGraph = GraphService.CreateClusteredGraph(partitionResult);
+        Console.WriteLine(newClusterGraph.ClustersCount);
+        var dotRepresentation = GraphService.GenerateClusteredGraphToDOT(newClusterGraph);
+        Console.WriteLine("Graphviz DOT representation:");
+        Console.WriteLine(dotRepresentation);
     }
 }
