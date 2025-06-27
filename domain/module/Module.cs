@@ -87,7 +87,7 @@ public class Module
 
 
 
-    public Boolean CheckIndexInModule(int index)
+    public bool CheckIndexInModule(int index)
     {
         return IndexSet.Contains(index);
     }

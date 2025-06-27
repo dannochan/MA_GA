@@ -14,4 +14,13 @@ public sealed class LinearLinkageEncodingInformationService
         
     }
 
+    public static int GetNumberOfNonIsolatedModules(LinearLinkageEncoding encoding)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static bool IsValidLinearLinkageEncoding(LinearLinkageEncoding linearLinkageEncoding)
+    {
+        throw new NotImplementedException();
+    }
 }
