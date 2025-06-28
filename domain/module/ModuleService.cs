@@ -174,11 +174,11 @@ public class ModuleService
 
             default:
                 var halfSizeOfModule = indices.Count / 2;
-                var remainingIndices = new List<object>(module.GetIndices());
+                var remainingIndices = new List<int>(module.GetIndices());
                 while (remainingIndices.Count > 0)
                 {
                     var randomStartElementIndex = Random.Shared.Next(remainingIndices.Count);
-                    var startElement = graph.GetModularisableElementByIndex((int)remainingIndices[randomStartElementIndex]);
+                    var startElement = graph.GetModularisableElementByIndex(remainingIndices[randomStartElementIndex]);
                     var indicesOfSplitteModule = CreateIndicesOfSubGraphRandomly(startElement, graph, halfSizeOfModule, remainingIndices);
 
                     Module newModule = new Module();
@@ -206,7 +206,7 @@ public class ModuleService
     /// - indicesOfModule: The list of indices that are part of the module.
     /// </summary>
     /// /// <returns>A HashSet of selected indices representing the subgraph.</returns>
-    public static HashSet<object> CreateIndicesOfSubGraphRandomly(ModularisableElement modularisableElement, Graph graph, int subgraphSize, List<object> indicesOfModule)
+    public static HashSet<object> CreateIndicesOfSubGraphRandomly(ModularisableElement modularisableElement, Graph graph, int subgraphSize, List<int> indicesOfModule)
     {
         var selectedIndices = new HashSet<object>();
         var visitedModularisableElement = new HashSet<ModularisableElement>();

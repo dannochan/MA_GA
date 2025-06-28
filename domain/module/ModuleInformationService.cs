@@ -146,7 +146,7 @@ public class ModuleInformationService
     }
 
     public static bool CheckModuleConnectivityByIndices(
-        List<object> indices,
+        List<int> indices,
         Graph graph
     )
     {
