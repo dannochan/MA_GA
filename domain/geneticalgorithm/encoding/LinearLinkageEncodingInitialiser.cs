@@ -1,5 +1,5 @@
 using System;
-using MA_GA.domain.GeneticAlgorithm.encoding;
+using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.domain.module;
 using MA_GA.Models;
 using QuikGraph.Algorithms.ConnectedComponents;

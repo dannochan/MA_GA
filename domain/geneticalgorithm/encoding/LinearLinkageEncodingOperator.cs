@@ -1,5 +1,5 @@
 using GeneticSharp;
-using MA_GA.domain.GeneticAlgorithm.encoding;
+using MA_GA.domain.geneticalgorithm.encoding;
 using Module = MA_GA.domain.module.Module;
 
 namespace MA_GA.domain.geneticalgorithm.encoding;

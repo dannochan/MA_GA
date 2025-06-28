@@ -1,7 +1,7 @@
 using System;
 using MA_GA.domain.module;
 
-namespace MA_GA.domain.GeneticAlgorithm.encoding;
+namespace MA_GA.domain.geneticalgorithm.encoding;
 
 public sealed class LinearLinkageEncodingInformationService
 {
@@ -11,7 +11,7 @@ public sealed class LinearLinkageEncodingInformationService
         var result = new List<Module>();
 
         return result;
-        
+
     }
 
     public static int GetNumberOfNonIsolatedModules(LinearLinkageEncoding encoding)

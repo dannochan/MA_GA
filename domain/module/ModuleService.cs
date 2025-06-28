@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using MA_GA.domain.GeneticAlgorithm.encoding;
+using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.Models;
 using QuikGraph.Algorithms;
 using QuikGraph.Algorithms.ConnectedComponents;
@@ -122,17 +122,17 @@ public class ModuleService
         {
 
             bool sourceInAny = components.Values.Any(v => v.Contains(edge.SourceObject));
-           bool targetInAny = components.Values.Any(v => v.Contains(edge.TargetObject));
+            bool targetInAny = components.Values.Any(v => v.Contains(edge.TargetObject));
 
             if (!sourceInAny && !targetInAny)
             {
-                
+
                 listOfConnectedSet.Add(new HashSet<object> { edge.GetIndex() });
             }
         }
 
         // Create new modules
-        return listOfConnectedSet.Select(indices => 
+        return listOfConnectedSet.Select(indices =>
         {
             var newModule = new Module();
             newModule.AddIndices(indices);

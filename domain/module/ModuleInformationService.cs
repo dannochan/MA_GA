@@ -1,7 +1,7 @@
 using System;
 using System.Dynamic;
 using System.Runtime.CompilerServices;
-using MA_GA.domain.GeneticAlgorithm.encoding;
+using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.Models;
 using QuikGraph;
 using QuikGraph.Algorithms.ConnectedComponents;

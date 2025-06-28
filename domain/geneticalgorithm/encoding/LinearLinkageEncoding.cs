@@ -4,7 +4,7 @@ using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.domain.module;
 using MA_GA.Models;
 
-namespace MA_GA.domain.GeneticAlgorithm.encoding;
+namespace MA_GA.domain.geneticalgorithm.encoding;
 
 public class LinearLinkageEncoding : ChromosomeBase
 {
