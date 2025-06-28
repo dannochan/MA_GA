@@ -110,8 +110,8 @@ public class Module
         return HashCode.Combine(Indices, IndexSet);
     }
 
-    public List<object> GetIndices()
+    public List<int> GetIndices()
     {
-        return Indices.ToList();
+        return Indices.Select(index=>(int)index).ToList();
     }
 }
