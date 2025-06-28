@@ -12,7 +12,16 @@ public sealed class LinearLinkageEncodingInitialiser
     public static LinearLinkageEncoding InitializeLinearLinkageEncodingWithModulesForEachConnectedCompponent(Graph graph)
     {
         var targetGraph = graph.GetGraph();
-        var algorithm = new ConnectedComponentsAlgorithm<DataObject, IObjectRelation>((QuikGraph.IUndirectedGraph<DataObject, IObjectRelation>)targetGraph);
+        var undirectedGraph = new QuikGraph.UndirectedGraph<DataObject, IObjectRelation>(false);
+        foreach (var vertex in targetGraph.Vertices)
+        {
+            undirectedGraph.AddVertex(vertex);
+        }
+        foreach (var edge in targetGraph.Edges)
+        {
+            undirectedGraph.AddEdge(edge);
+        }
+        var algorithm = new ConnectedComponentsAlgorithm<DataObject, IObjectRelation>(undirectedGraph);
 
         algorithm.Compute();
         var connectedComponents = algorithm.Components;

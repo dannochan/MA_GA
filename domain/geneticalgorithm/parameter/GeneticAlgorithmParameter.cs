@@ -4,24 +4,25 @@ namespace MA_GA.domain.geneticalgorithm.parameter;
 
 public class GeneticAlgorithmParameter
 {
-    private string ChromosomeEncoding { get; set; }
-    private string OffspringSelection { get; set; }
-    private string SurvivalSelection { get; set; }
-    private string CrossoverType { get; set; }
-    private string MutationType { get; set; }
-    private int PopulationSize { get; set; }
-    private double CrossoverRate { get; set; }
-    private double MutationRate { get; set; }
-    private int MaxGenerations { get; set; }
-    private int TournamentSize { get; set; }
-    private int ElitismCount { get; set; }
+    private string _chromosomeEncoding;
+    public string ChromosomeEncoding { get { return _chromosomeEncoding; } }
+    public string OffspringSelection { get; set; }
+    public string SurvivalSelection { get; set; }
+    public string CrossoverType { get; set; }
+    public string MutationType { get; set; }
+    public int PopulationSize { get; set; }
+    public float CrossoverRate { get; set; }
+    public float MutationRate { get; set; }
+    public int MaxGenerations { get; set; }
+    public int TournamentSize { get; set; }
+    public int ElitismCount { get; set; }
 
-    private double ConvergedGeneRate { get; set; }
+    public double ConvergedGeneRate { get; set; }
 
-    private double ConvergenceRate { get; set; }
-    private int CountGeneration { get; set; }
-    private int MinimumParetoSetSize { get; set; }
-    private int MaximumParetoSetSize { get; set; }
+    public double ConvergenceRate { get; set; }
+    public int CountGeneration { get; set; }
+    public int MinimumParetoSetSize { get; set; }
+    public int MaximumParetoSetSize { get; set; }
 
     public GeneticAlgorithmParameter(
         string chromosomeEncoding,
@@ -30,8 +31,8 @@ public class GeneticAlgorithmParameter
         string crossoverType,
         string mutationType,
         int populationSize,
-        double crossoverRate,
-        double mutationRate,
+        float crossoverRate,
+        float mutationRate,
         int maxGenerations,
         int tournamentSize,
         int elitismCount,
@@ -41,7 +42,7 @@ public class GeneticAlgorithmParameter
         int minimumParetoSetSize,
         int maximumParetoSetSize)
     {
-        ChromosomeEncoding = chromosomeEncoding;
+        _chromosomeEncoding = chromosomeEncoding;
         OffspringSelection = offspringSelection;
         SurvivalSelection = survivalSelection;
         CrossoverType = crossoverType;
@@ -80,7 +81,7 @@ public class GeneticAlgorithmParameter
                $"MaximumParetoSetSize={MaximumParetoSetSize}";
     }
 
-    
-    
+
+
 
 }
