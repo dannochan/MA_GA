@@ -41,6 +41,18 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         // run the genetic algorithm
         geneticAlgorithmEngine.Start();
         Console.WriteLine($"Population Size: {geneticAlgorithmEngine.Population.GenerationsNumber}");
+        // print the best chromosome
+        Console.WriteLine($"Best Fitness: {geneticAlgorithmEngine.BestChromosome.Fitness.Value}");
+        // print modules of the best chromosome
+        foreach (var g in geneticAlgorithmEngine.BestChromosome.GetGenes())
+        {
+            Console.WriteLine($"Gene: {g.Value}");
+        }
+
+        foreach (var module in geneticAlgorithmEngine.BestChromosome.GetGenes())
+        {
+            
+        }
         var chromosome = geneticAlgorithmEngine.BestChromosome.ToString();
         Console.WriteLine($"Best Chromosome: {chromosome}");
 

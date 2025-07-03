@@ -49,12 +49,13 @@ public class LinearLinkageEncoding : ChromosomeBase
     public LinearLinkageEncoding(Graph graph, IReadOnlyList<Gene> genes) : base(genes.Count)
     {
         BaseGraph = graph ?? throw new ArgumentNullException(nameof(graph), "Graph cannot be null");
-        Modules = LinearLinkageEncodingInformationService.DetermineModules(this);
+
         IntegerGenes = genes.ToList().AsReadOnly();
         for (int i = 0; i < genes.Count; i++)
         {
             ReplaceGene(i, genes[i]);
         }
+        Modules = LinearLinkageEncodingInformationService.DetermineModules(this);
     }
 
     public override IChromosome CreateNew()
