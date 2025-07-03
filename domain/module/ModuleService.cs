@@ -68,7 +68,7 @@ public class ModuleService
     /// <param name="encoding"></param>
     /// <returns></returns> 
 
-    public List<Module> SplitNonIncidentModule(Module module, LinearLinkageEncoding encoding)
+    public static List<Module> SplitNonIncidentModule(Module module, LinearLinkageEncoding encoding)
     {
         var graph = encoding.GetGraph();
         var subgraphOfModule = GraphService.CreateSubgraphGraphFromIndices(module.GetIndices().Select(i => (int)i).ToList(), graph);
