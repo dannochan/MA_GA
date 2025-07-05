@@ -22,6 +22,13 @@ public class DataObject : ModularisableElement, IDataObject
     public List<IDataObject> TargetObjects { get; set; }
 
 
+    /// <summary>
+    /// Constructor for DataObject. especially used for Information Objects.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="objectType"></param>
+    /// <param name="shortName"></param>
+    /// <param name="isExternalComponent"></param>
     public DataObject(string name, ObjectType objectType, string shortName, bool? isExternalComponent)
     {
         this.ObjectType = objectType;
@@ -32,6 +39,15 @@ public class DataObject : ModularisableElement, IDataObject
         this.TargetObjects = new List<IDataObject>();
         Weight = 0;
     }
+
+    /// <summary>
+    /// constructor for DataObject. especially used for functions Objects with vertex number.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="objectType"></param>
+    /// <param name="shortName"></param>
+    /// <param name="isExternalComponent"></param>
+    /// <param name="vertexNumber"></param>
     public DataObject(string name, ObjectType objectType, string shortName, bool? isExternalComponent, int vertexNumber)
     {
         this.ObjectType = objectType;
@@ -159,6 +175,7 @@ public class DataObject : ModularisableElement, IDataObject
 
     public override int GetIndex()
     {
+        Console.WriteLine($"Getting index for DataObject: {Name}, VertexNumber: {VertexNumber}");
         return VertexNumber;
     }
 
