@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using MA_GA.Models;
+using Microsoft.Extensions.Logging;
 using QuikGraph;
 using QuikGraph.Algorithms;
 
@@ -14,6 +15,8 @@ public class GraphPartitionGreedyAlgorithm
     private Dictionary<string, int> VertexWeights { get; set; }
 
     private AdjacencyGraph<DataObject, IObjectRelation> InitGraph { get; set; }
+
+    private ILogger Logger { get; set; }
 
 
 
@@ -136,6 +139,40 @@ public class GraphPartitionGreedyAlgorithm
 
                 }
                 // If both objects already have a component, they are already connected
+            }
+
+            foreach (var edge in edgeGroup.Value)
+            {
+                if (edge.SourceObject.Component != null && edge.TargetObject.Component != null)
+                {
+                    // assig component to the edge
+                    if (edge.SourceObject.Component == edge.TargetObject.Component)
+                    {
+                        edge.Component = edge.SourceObject.Component;
+                    }
+                    else
+                    {
+                        // compare weight of the source and target objects
+                        if (edge.SourceObject.Weight > edge.TargetObject.Weight)
+                        {
+                            edge.Component = edge.SourceObject.Component;
+                        }
+                        else if (edge.SourceObject.Weight < edge.TargetObject.Weight)
+                        {
+                            edge.Component = edge.TargetObject.Component;
+                        }
+                        else
+                        {
+                            // if both weights are equal, assign the component of the source object
+                            edge.Component = edge.SourceObject.Component;
+                        }
+                    }
+
+                }
+                else
+                {
+                    Logger.LogWarning($"Edge {edge.EdgeNumber} has null component for source or target object: {edge.SourceObject.Name} or {edge.TargetObject.Name}");
+                }
             }
 
         }

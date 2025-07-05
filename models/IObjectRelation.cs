@@ -29,5 +29,7 @@ public interface IObjectRelation : IEdge<DataObject>
 
     int GetIndex();
 
+    string Component { get; set; }
+
 
 }

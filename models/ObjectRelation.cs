@@ -17,6 +17,8 @@ public class ObjectRelation : ModularisableElement, IObjectRelation
 
     public int Weight { get; set; }
 
+    public string Component { get; set; }
+
     public ObjectRelation(int edgeNumber, RelationType relationType,
     DataObject sourceObject,
     DataObject targetObject)
