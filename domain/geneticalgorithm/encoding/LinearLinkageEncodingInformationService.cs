@@ -10,12 +10,6 @@ public sealed class LinearLinkageEncodingInformationService
     {
         var chromosomes = encoding.GetGenes().Select(gene => gene.Value).ToList();
         var visitedNodes = new bool[chromosomes.Count];
-        Console.WriteLine("Determining modules...");
-        foreach (var chromosome in chromosomes)
-        {
-            Console.WriteLine($"Chromosomes :", chromosome.ToString());
-
-        }
 
         var modules = new List<Module>();
         for (int i = 0; i < chromosomes.Count; i++)

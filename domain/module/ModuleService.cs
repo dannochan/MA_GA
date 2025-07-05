@@ -76,7 +76,7 @@ public class ModuleService
         // Extract Graph and connected sets
         // get vertices of subgraph
 
-        var ccAlgor = new ConnectedComponentsAlgorithm<DataObject, ObjectRelation>((QuikGraph.IUndirectedGraph<DataObject, ObjectRelation>)subgraphOfModule);
+        var ccAlgor = GraphService.GetConnectedComponentsFromGraph(subgraphOfModule);
 
         ccAlgor.Compute();
 

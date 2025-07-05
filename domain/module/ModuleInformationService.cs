@@ -142,6 +142,14 @@ public class ModuleInformationService
 
     public static bool IsModuleConnected(Module module, Graph graph)
     {
+        var indices = module.GetIndices();
+        foreach (var index in indices)
+        {
+            Console.WriteLine($"Module index: {index}");
+        }
+
+
+
         return CheckModuleConnectivityByIndices(module.GetIndices(), graph);
     }
 
@@ -153,9 +161,7 @@ public class ModuleInformationService
         var indiceList = indices.Select(i => (int)i).ToList();
         var subgraph = GraphService.CreateSubgraphGraphFromIndices(indiceList, graph);
 
-        var ccAlgor = new ConnectedComponentsAlgorithm<DataObject, ObjectRelation>(
-            (QuikGraph.IUndirectedGraph<DataObject, ObjectRelation>)subgraph
-        );
+        var ccAlgor = GraphService.GetConnectedComponentsFromGraph(subgraph);
         ccAlgor.Compute();
 
         if (ccAlgor.ComponentCount > 1)

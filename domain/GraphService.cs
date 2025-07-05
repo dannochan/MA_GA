@@ -4,6 +4,7 @@ using MA_GA.domain.module;
 using MA_GA.Models;
 using QuikGraph;
 using QuikGraph.Algorithms;
+using QuikGraph.Algorithms.ConnectedComponents;
 using QuikGraph.Graphviz;
 using QuikGraph.Graphviz.Dot;
 
@@ -291,6 +292,27 @@ public static class GraphService
             }
         }
         return clusteredGraph;
+
+    }
+
+
+    public static ConnectedComponentsAlgorithm<DataObject, IObjectRelation> GetConnectedComponentsFromGraph(AdjacencyGraph<DataObject, IObjectRelation> graph)
+    {
+        // This method is a placeholder for future implementation.
+        // It will be used to retrieve connected components from the graph.
+        // Currently, it does not perform any operations.
+
+        var undirectedGraph = new QuikGraph.UndirectedGraph<DataObject, IObjectRelation>(false);
+        foreach (var vertex in graph.Vertices)
+        {
+            undirectedGraph.AddVertex(vertex);
+
+        }
+        foreach (var edge in graph.Edges)
+        {
+            undirectedGraph.AddEdge(edge);
+        }
+        return new ConnectedComponentsAlgorithm<DataObject, IObjectRelation>(undirectedGraph);
 
     }
 
