@@ -12,6 +12,7 @@ public static class ObjectHelper
 
     public static void MapDataObjects(GraphObject rawObject, Graph dataObjectCenter, ILogger logger)
     {
+        int elementIndex = 0;
         // map information objects
         if (rawObject.informationObjects != null)
         {
@@ -46,6 +47,8 @@ public static class ObjectHelper
                     index++ // Assigning an index to each function object
                 ));
             }
+
+            elementIndex += index; // Update the element index after adding function objects
         }
         else
         {
@@ -58,7 +61,7 @@ public static class ObjectHelper
             foreach (var item in rawObject.relations)
             {
                 dataObjectCenter.AddRelationToGraph(new ObjectRelation(
-                    rawObject.relations.IndexOf(item) + rawObject.functions.Count,
+                    elementIndex++,
                    convertIntToRelationTyp(item.type),
                     dataObjectCenter.GetNodeObjectByName(item.from),
                     dataObjectCenter.GetNodeObjectByName(item.to)
