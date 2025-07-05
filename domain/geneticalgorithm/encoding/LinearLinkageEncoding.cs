@@ -118,6 +118,35 @@ public class LinearLinkageEncoding : ChromosomeBase
 
     public string ToString()
     {
+
         return string.Join(", ", IntegerGenes.Select(g => g.Value));
+    }
+    public void DisplayChromosome()
+    {
+        // Display the encoding
+        Console.WriteLine("Linear Linkage Encoding:");
+        Console.WriteLine("Module Count: " + this.GetModules()?.Count);
+        Console.WriteLine("indices of modules:");
+        foreach (var module in this.GetModules())
+        {
+
+            foreach (var index in module.GetIndices())
+            {
+                Console.Write(index + " -> ");
+            }
+
+        }
+        Console.WriteLine("End of Module indices"); ;
+
+        // Display the genes
+        Console.WriteLine("Genes:");
+
+        foreach (var gene in this.GetGenes())
+        {
+            Console.Write(gene.Value + " -> ");
+        }
+
+        Console.WriteLine("End of Genes");
+
     }
 }

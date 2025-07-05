@@ -53,4 +53,59 @@ public sealed class LinearLinkageEncodingInitialiser
         return LinearLinkageEncodingOperator.UpdateIntegerGenes(modules, new LinearLinkageEncoding(graph, integerGenes));
     }
 
+    public static LinearLinkageEncoding InitializeLinearLinkageEncodingWithGreedyAlgorithm(Graph graph)
+    {
+        if (graph == null)
+        {
+            throw new ArgumentNullException(nameof(graph), "Graph cannot be null");
+        }
+        var targetGraph = graph.GetGraph();
+
+        var modularisableElements = graph.GetModularisableElements();
+
+        var sortedElements = new Dictionary<string, List<int>>();
+
+        var modules = new List<Module>();
+
+        foreach (var element in modularisableElements)
+        {
+            if (element is DataObject dataObject)
+            {
+                if (!sortedElements.ContainsKey(dataObject.Component))
+                {
+                    sortedElements[dataObject.Component] = new List<int>();
+                }
+                sortedElements[dataObject.Component].Add(dataObject.GetIndex());
+            }
+            else if (element is ObjectRelation objectRelation)
+            {
+                if (!sortedElements.ContainsKey(objectRelation.Component))
+                {
+                    sortedElements[objectRelation.Component] = new List<int>();
+                }
+                sortedElements[objectRelation.Component].Add(objectRelation.GetIndex());
+            }
+        }
+
+        foreach (var component in sortedElements)
+        {
+            var module = new Module();
+            foreach (var index in component.Value)
+            {
+                module.AddIndex(index);
+            }
+            modules.Add(module);
+        }
+
+        // create chromosome with list of modules
+        var modularisableElementSize = graph.GetModularisableElements().Count;
+        var integerGenes = Enumerable.Range(0, modularisableElementSize)
+            .Select(i => new GeneticSharp.Gene(i))
+            .ToList()
+            .AsReadOnly();
+
+        return LinearLinkageEncodingOperator.UpdateIntegerGenes(modules, new LinearLinkageEncoding(graph, integerGenes));
+
+    }
+
 }

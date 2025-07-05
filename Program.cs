@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using MA_GA.domain;
+using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.domain.geneticalgorithm.engine;
 using MA_GA.domain.geneticalgorithm.parameter;
 using MA_GA.domain.GreedyAlgorithm;
@@ -80,34 +81,14 @@ class MainApp
                     logger.LogError("Graph is null after creation.");
                 }
 
-                // create ga engine
-                var geneticAlgorithmParameter = new GeneticAlgorithmParameter(
-                    "Interger",
-                    "RouletteWheelSelection",
-                    "ElitismSelection",
-                    "UniformCrossover",
-                    "UniformMutation",
-                    100, // Population size
-                    0.8f, // Crossover rate
-                    0.1f, // Mutation rate
-                    100, // Max generations
-                    5, // Tournament size
-                    2, // Elitism count
-                    0.01, // Converged gene rate
-                    0.01, // Convergence rate
-                    0, // Count generation
-                    10, // Minimum Pareto set size
-                    100 // Maximum Pareto set size
-                )
-                {
-                    MaxGenerations = 100,
-                    CrossoverRate = 0.8f,
-                    MutationRate = 0.1f
-                };
-                var gaEngine = new MainGeneticAlgorithmEngine();
-                logger.LogInformation("Running genetic algorithm engine.");
-                var result = gaEngine.run(dataObjectCenter, geneticAlgorithmParameter);
-                logger.LogInformation("Genetic algorithm engine run completed.");
+                var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
+                logger.LogInformation("Linear linkage encoding initialized with modules for each connected component.");
+
+                // Display the encoding
+                encoding.DisplayChromosome();
+
+                // Run the genetic algorithm engine
+                //    RunGAEngine(logger, dataObjectCenter);
 
             }
             else
@@ -117,6 +98,39 @@ class MainApp
 
         }
 
+    }
+
+    private static void RunGAEngine(ILogger logger, Graph dataObjectCenter)
+    {
+
+        // create ga engine
+        var geneticAlgorithmParameter = new GeneticAlgorithmParameter(
+            "Interger",
+            "RouletteWheelSelection",
+            "ElitismSelection",
+            "UniformCrossover",
+            "UniformMutation",
+            100, // Population size
+            0.8f, // Crossover rate
+            0.1f, // Mutation rate
+            100, // Max generations
+            5, // Tournament size
+            2, // Elitism count
+            0.01, // Converged gene rate
+            0.01, // Convergence rate
+            0, // Count generation
+            10, // Minimum Pareto set size
+            100 // Maximum Pareto set size
+        )
+        {
+            MaxGenerations = 100,
+            CrossoverRate = 0.8f,
+            MutationRate = 0.1f
+        };
+        var gaEngine = new MainGeneticAlgorithmEngine();
+        logger.LogInformation("Running genetic algorithm engine.");
+        var result = gaEngine.run(dataObjectCenter, geneticAlgorithmParameter);
+        logger.LogInformation("Genetic algorithm engine run completed.");
     }
 
     private static void CreateClusteredGraphAndDisplay(AdjacencyGraph<DataObject, IObjectRelation> partitionResult)

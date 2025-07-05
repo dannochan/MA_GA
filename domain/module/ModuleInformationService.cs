@@ -178,8 +178,6 @@ public class ModuleInformationService
         });
 
 
-
-
     }
 
     public static List<ObjectRelation> GetModuleEdges(
@@ -358,7 +356,5 @@ public class ModuleInformationService
         throw new ArgumentException("Module must contain either a DataObject or an ObjectRelation.");
 
     }
-
-
 
 }
