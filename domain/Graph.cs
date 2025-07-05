@@ -52,7 +52,7 @@ public class Graph
             return;
         }
         _Graph.AddVertex(dataObject);
-        _nodeDictionary.Add(dataObject.GetIndex() + _Graph.VertexCount, dataObject);
+        _nodeDictionary.Add(dataObject.GetIndex(), dataObject);
     }
 
     public void AddRelationToGraph(ObjectRelation relation)
@@ -72,7 +72,7 @@ public class Graph
 
         edgeObjects.Add(relation);
         _Graph.AddEdge(relation);
-        _edgeDictionary.Add(relation.GetIndex() + _Graph.EdgeCount, relation);
+        _edgeDictionary.Add(relation.GetIndex(), relation);
         // update vertex weights based on relation type
         relation.SourceObject.UpdateWeight(ObjectHelper.ConvertRelationTypeToWeight(relation.RelationType));
         relation.TargetObject.UpdateWeight(ObjectHelper.ConvertRelationTypeToWeight(relation.RelationType));
