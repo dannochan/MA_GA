@@ -143,12 +143,6 @@ public class ModuleInformationService
     public static bool IsModuleConnected(Module module, Graph graph)
     {
         var indices = module.GetIndices();
-        foreach (var index in indices)
-        {
-            Console.WriteLine($"Module index: {index}");
-        }
-
-
 
         return CheckModuleConnectivityByIndices(module.GetIndices(), graph);
     }

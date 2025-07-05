@@ -175,7 +175,6 @@ public class DataObject : ModularisableElement, IDataObject
 
     public override int GetIndex()
     {
-        Console.WriteLine($"Getting index for DataObject: {Name}, VertexNumber: {VertexNumber}");
         return VertexNumber;
     }
 
