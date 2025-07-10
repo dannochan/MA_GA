@@ -121,11 +121,15 @@ public class GeneticAlgorithmEngineBuilder
 
         }
 
-        private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter)
+
+        // Create a population with the given graph and genetic algorithm parameters
+        private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter, bool isGreedyAlgoResult=false )
         {
-            IChromosome chromosome = Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
+            IChromosome chromosome = isGreedyAlgoResult ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph) : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
             return new Population(geneticAlgorithmParameter.PopulationSize, geneticAlgorithmParameter.PopulationSize, chromosome);
         }
+
+
     }
 
 }
