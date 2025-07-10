@@ -86,6 +86,8 @@ class MainApp
 
                 // Display the encoding
                 encoding.DisplayChromosome();
+                var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
+                Console.WriteLine($"Is the encoding valid? {validationResult}");
 
                 // Run the genetic algorithm engine
                 //    RunGAEngine(logger, dataObjectCenter);

@@ -9,6 +9,11 @@ namespace MA_GA.domain.geneticalgorithm.encoding;
 public sealed class LinearLinkageEncodingInitialiser
 {
 
+    /// <summary>
+    /// Initializes a LinearLinkageEncoding with modules for each connected component in the graph.
+    /// </summary>
+    /// <param name="graph"></param>
+    /// <returns></returns>
     public static LinearLinkageEncoding InitializeLinearLinkageEncodingWithModulesForEachConnectedCompponent(Graph graph)
     {
         var targetGraph = graph.GetGraph();
@@ -52,6 +57,13 @@ public sealed class LinearLinkageEncodingInitialiser
 
         return LinearLinkageEncodingOperator.UpdateIntegerGenes(modules, new LinearLinkageEncoding(graph, integerGenes));
     }
+
+    /// <summary>
+    /// Initializes a LinearLinkageEncoding Chromosome using to convert the result of a greedy algorithm into a LinearLinkageEncoding.
+    /// </summary>
+    /// <param name="graph"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
 
     public static LinearLinkageEncoding InitializeLinearLinkageEncodingWithGreedyAlgorithm(Graph graph)
     {
@@ -100,9 +112,10 @@ public sealed class LinearLinkageEncodingInitialiser
         // create chromosome with list of modules
         var modularisableElementSize = graph.GetModularisableElements().Count;
         var integerGenes = Enumerable.Range(0, modularisableElementSize)
-            .Select(i => new GeneticSharp.Gene(i))
-            .ToList()
-            .AsReadOnly();
+    .Select(i => new GeneticSharp.Gene(i))
+    .ToList()
+    .AsReadOnly();
+
 
         return LinearLinkageEncodingOperator.UpdateIntegerGenes(modules, new LinearLinkageEncoding(graph, integerGenes));
 

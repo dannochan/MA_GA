@@ -123,15 +123,16 @@ public class LinearLinkageEncoding : ChromosomeBase
     }
     public void DisplayChromosome()
     {
+        var indices = new List<int>();
         // Display the encoding
         Console.WriteLine("Linear Linkage Encoding:");
         Console.WriteLine("Module Count: " + this.GetModules()?.Count);
         Console.WriteLine("indices of modules:");
         foreach (var module in this.GetModules())
         {
-
             foreach (var index in module.GetIndices())
             {
+                indices.Add(index);
                 Console.Write(index + " -> ");
             }
 
@@ -140,13 +141,15 @@ public class LinearLinkageEncoding : ChromosomeBase
 
         // Display the genes
         Console.WriteLine("Genes:");
-
-        foreach (var gene in this.GetGenes())
+        var geneIndices = this.GetGenes().Select(g => g.Value).ToList();
+        for (int i = 0; i < indices.Count; i++)
         {
-            Console.Write(gene.Value + " -> ");
+            var geneIndex = indices[i];
+            Console.Write(geneIndices[geneIndex] + " -> ");
         }
 
-        Console.WriteLine("End of Genes");
+        Console.WriteLine("End of Gene Indices ");
+
 
     }
 }
