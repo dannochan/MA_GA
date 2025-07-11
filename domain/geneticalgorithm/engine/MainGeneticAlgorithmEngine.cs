@@ -1,5 +1,8 @@
 using System;
 using GeneticSharp;
+using MA_GA.domain.geneticalgorithm.encoding;
+using MA_GA.domain.geneticalgorithm.fitnessfunction;
+using MA_GA.domain.geneticalgorithm.objective;
 using MA_GA.domain.geneticalgorithm.parameter;
 using MA_GA.models.optimizationresult;
 using MA_GA.Models;
@@ -17,6 +20,10 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
 
         BasicRandomization.ResetSeed((int)RANDOM_GENERTATED_SEED);
         RandomizationProvider.Current = new BasicRandomization();
+        if (geneticAlgorithmParameter.UseWeightedSumMethod)
+        {
+            return ModularisewithWeightedSumFitnessFunction(geneticAlgorithmParameter, graph);
+        }
 
         return ModularisewithMultiObjectiveFitnessFunction(geneticAlgorithmParameter, graph);
 
@@ -51,7 +58,7 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
 
         foreach (var module in geneticAlgorithmEngine.BestChromosome.GetGenes())
         {
-            
+
         }
         var chromosome = geneticAlgorithmEngine.BestChromosome.ToString();
         Console.WriteLine($"Best Chromosome: {chromosome}");
@@ -61,7 +68,48 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
 
         return new GeneticAlgorithmExecutionResult();
     }
+
+    private GeneticAlgorithmExecutionResult ModularisewithWeightedSumFitnessFunction(GeneticAlgorithmParameter geneticAlgorithmParameter, Graph graph)
+    {
+
+        // TODO: move to genetic parameter settings
+        var objectives = new List<Objective>
+        {
+            new CohesionObjective(graph, 0.5),
+            new CouplingObjective(graph, 0.5)
+        };
+
+        // TODO: ADD objective when available
+
+        var fitnessFunction = new FitnessFunction(objectives, graph);
+
+        // build genetic algorithm engine
+        var geneticAlgorithmEngine = new GeneticAlgorithmEngineBuilder.Builder()
+            .Graph(graph)
+            .GeneticAlgorithmParameter(geneticAlgorithmParameter)
+            .Fitness(fitnessFunction)
+            .CreatingEngineForWeightedSumProblem();
+
+
+        // run the genetic algorithm
+        geneticAlgorithmEngine.Start();
+        Console.WriteLine($"Population Size: {geneticAlgorithmEngine.Population.GenerationsNumber}");
+        // print the best chromosome
+        Console.WriteLine($"Best Fitness: {geneticAlgorithmEngine.BestChromosome.Fitness.Value}");
+        // print modules of the best chromosome
+        var BestChromosome = (LinearLinkageEncoding)geneticAlgorithmEngine.BestChromosome;
+        BestChromosome.DisplayChromosome();
+
+        // run the genetic algorithm
+        //  geneticAlgorithmEngine.Start();
+
+        return new GeneticAlgorithmExecutionResult();
+    }
+
 }
+
+
+
 
 internal class MultiObjectiveFitnessFunction : IFitness
 {

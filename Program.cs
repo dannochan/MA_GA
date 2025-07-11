@@ -81,16 +81,16 @@ class MainApp
                     logger.LogError("Graph is null after creation.");
                 }
 
-                var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
-                logger.LogInformation("Linear linkage encoding initialized with modules for each connected component.");
+                //    var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
+                //    logger.LogInformation("Linear linkage encoding initialized with modules for each connected component.");
 
                 // Display the encoding
-                encoding.DisplayChromosome();
-                var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
-                Console.WriteLine($"Is the encoding valid? {validationResult}");
+                //    encoding.DisplayChromosome();
+                //    var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
+                //    Console.WriteLine($"Is the encoding valid? {validationResult}");
 
                 // Run the genetic algorithm engine
-                //    RunGAEngine(logger, dataObjectCenter);
+                RunGAEngine(logger, dataObjectCenter);
 
             }
             else
@@ -122,7 +122,8 @@ class MainApp
             0.01, // Convergence rate
             0, // Count generation
             10, // Minimum Pareto set size
-            100 // Maximum Pareto set size
+            100, // Maximum Pareto set size
+             true // Set to true to use weighted sum method
         )
         {
             MaxGenerations = 100,
@@ -131,7 +132,7 @@ class MainApp
         };
         var gaEngine = new MainGeneticAlgorithmEngine();
         logger.LogInformation("Running genetic algorithm engine.");
-        var result = gaEngine.run(dataObjectCenter, geneticAlgorithmParameter);
+        gaEngine.run(dataObjectCenter, geneticAlgorithmParameter);
         logger.LogInformation("Genetic algorithm engine run completed.");
     }
 

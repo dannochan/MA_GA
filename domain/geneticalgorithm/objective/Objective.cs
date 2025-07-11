@@ -10,7 +10,7 @@ using Module = MA_GA.domain.module.Module;
 
 namespace MA_GA.domain.geneticalgorithm.objective;
 
-public abstract class Objective : IFitness
+public abstract class Objective
 {
 
     protected double weight;

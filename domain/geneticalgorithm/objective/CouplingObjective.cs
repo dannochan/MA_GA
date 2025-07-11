@@ -1,12 +1,18 @@
 using System;
 using MA_GA.domain.module;
 using MA_GA.models.enums;
+using MA_GA.Models;
 using QuikGraph;
 
 namespace MA_GA.domain.geneticalgorithm.objective;
 
 public class CouplingObjective : Objective
 {
+    public CouplingObjective(Graph graph, double weight)
+    {
+        SetGraph(graph ?? throw new ArgumentNullException(nameof(graph)));
+        SetWeight(weight);
+    }
     public override double CalculateValue(List<Module> modules)
     {
         return modules.Where(module => !ModuleInformationService.IsIsolated(module, graph)).Sum(

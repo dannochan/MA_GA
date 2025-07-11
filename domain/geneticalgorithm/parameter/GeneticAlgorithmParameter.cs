@@ -24,6 +24,8 @@ public class GeneticAlgorithmParameter
     public int MinimumParetoSetSize { get; set; }
     public int MaximumParetoSetSize { get; set; }
 
+    public bool UseWeightedSumMethod { get; set; }
+
     public GeneticAlgorithmParameter(
         string chromosomeEncoding,
         string offspringSelection,
@@ -40,7 +42,8 @@ public class GeneticAlgorithmParameter
         double convergenceRate,
         int countGeneration,
         int minimumParetoSetSize,
-        int maximumParetoSetSize)
+        int maximumParetoSetSize,
+        bool useWeightedSumMethod = false)
     {
         _chromosomeEncoding = chromosomeEncoding;
         OffspringSelection = offspringSelection;
@@ -58,6 +61,7 @@ public class GeneticAlgorithmParameter
         CountGeneration = countGeneration;
         MinimumParetoSetSize = minimumParetoSetSize;
         MaximumParetoSetSize = maximumParetoSetSize;
+        UseWeightedSumMethod = useWeightedSumMethod; // Default value, can be set to true if needed
     }
 
     public override string ToString()
@@ -78,7 +82,8 @@ public class GeneticAlgorithmParameter
                $"ConvergenceRate={ConvergenceRate}, " +
                $"CountGeneration={CountGeneration}, " +
                $"MinimumParetoSetSize={MinimumParetoSetSize}, " +
-               $"MaximumParetoSetSize={MaximumParetoSetSize}";
+               $"MaximumParetoSetSize={MaximumParetoSetSize}" +
+                $", UseWeightedSumMethod={UseWeightedSumMethod}";
     }
 
 
