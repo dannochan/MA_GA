@@ -158,7 +158,7 @@ public class ModuleInformationService
         var ccAlgor = GraphService.GetConnectedComponentsFromGraph(subgraph);
         ccAlgor.Compute();
 
-        if (ccAlgor.ComponentCount > 1)
+        if (ccAlgor.ComponentCount == 0)
         {
             return false;
         }
@@ -174,7 +174,7 @@ public class ModuleInformationService
 
         return remainingEdges.All(edge =>
         {
-            return subgraphVertexSet.Contains(edge.Source) && subgraphVertexSet.Contains(edge.Target);
+            return subgraphVertexSet.Contains(edge.Source) || subgraphVertexSet.Contains(edge.Target);
         });
 
 
