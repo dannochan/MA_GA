@@ -8,6 +8,7 @@ namespace MA_GA.domain.geneticalgorithm.encoding;
 
 public sealed class LinearLinkageEncodingOperator
 {
+    public static int COUNT_LOOP_TERMINATION = 100;
 
     public static IChromosome DivideRandomModule(LinearLinkageEncoding encoding)
     {
@@ -210,24 +211,175 @@ public sealed class LinearLinkageEncodingOperator
         var random = RandomizationProvider.Current;
         var selectedModule = modulesToSplit[random.GetInt(0, modulesToSplit.Count)];
 
-        var splitupModule = ModuleService.divideModuleRandomWalk2(selectedModule,lle.GetGraph());
-        return UpdateIntegerGenes(splitupModule,lle);
+        var splitupModule = ModuleService.divideModuleRandomWalk2(selectedModule, lle.GetGraph());
+        return UpdateIntegerGenes(splitupModule, lle);
     }
 
 
 
     private static LinearLinkageEncoding repairInvalidGeneAssignment(LinearLinkageEncoding repairedLinearLinkageEncoding)
     {
-        throw new NotImplementedException();
+        var genes = repairedLinearLinkageEncoding.GetGenes().Select(g => g.Value).ToList();
+        var alleleCounts = new Dictionary<int, int>();
+        var unusedAlleles = new List<int>();
+        int numGenes = genes.Count;
+
+        // Count occurrences
+        foreach (int allele in genes)
+        {
+            if (!alleleCounts.ContainsKey(allele))
+                alleleCounts[allele] = 0;
+            alleleCounts[allele]++;
+        }
+
+        // Build list of all possible alleles (assuming alleles are 0..numGenes-1)
+        for (int i = 0; i < numGenes; i++)
+        {
+            if (!alleleCounts.ContainsKey(i) || alleleCounts[i] < LinearLinkageEncodingConstant.ALLOWED_AMOUNT_OF_SAME_ALLELES)
+            {
+                for (int cnt = alleleCounts.ContainsKey(i) ? alleleCounts[i] : 0;
+                     cnt < LinearLinkageEncodingConstant.ALLOWED_AMOUNT_OF_SAME_ALLELES; cnt++)
+                {
+                    unusedAlleles.Add(i);
+                }
+            }
+        }
+
+        // Shuffle unusedAlleles for random assignment
+        var random = RandomizationProvider.Current;
+        unusedAlleles = unusedAlleles.OrderBy(x => random.GetInt(0, int.MaxValue)).ToList();
+
+        // Replace overused alleles
+        for (int i = 0; i < genes.Count; i++)
+        {
+            int allele = (int)genes[i];
+            if (alleleCounts[allele] > LinearLinkageEncodingConstant.ALLOWED_AMOUNT_OF_SAME_ALLELES)
+            {
+                // Replace with an unused allele
+                if (unusedAlleles.Count > 0)
+                {
+                    genes[i] = unusedAlleles[0];
+                    alleleCounts[allele]--;
+                    alleleCounts[unusedAlleles[0]] = alleleCounts.GetValueOrDefault(unusedAlleles[0], 0) + 1;
+                    unusedAlleles.RemoveAt(0);
+                }
+            }
+        }
+
+        // Assume you have a constructor like: new LinearLinkageEncoding(List<int> genes, KnowledgeGraph knowledgeGraph)
+        return new LinearLinkageEncoding(repairedLinearLinkageEncoding.GetGraph(), genes.Select(g => new Gene(g)).ToList());
     }
 
     private static LinearLinkageEncoding repairModulesWithOnlyOneVertexOrEdge(LinearLinkageEncoding repairedLinearLinkageEncoding)
     {
-        throw new NotImplementedException();
+        var knowledgeGraph = repairedLinearLinkageEncoding.GetGraph();
+        var modules = new HashSet<Module>(repairedLinearLinkageEncoding.GetModules());
+
+        // Identify modules with 1 or 2 elements that are not isolated
+        var invalidModules = repairedLinearLinkageEncoding.GetModules().Where(m => m.GetIndices().Count <= 2 && !ModuleInformationService.IsIsolated(m, knowledgeGraph))
+            .ToList();
+
+        var rnd = RandomizationProvider.Current;
+        foreach (var module in invalidModules)
+        {
+            // Find neighbors (modules sharing an edge in the knowledge graph)
+            var neighbors = ModuleInformationService.GetModuleNeighbors(module, repairedLinearLinkageEncoding)
+                .Where(neighbor => neighbor != module)
+                .ToList();
+
+            if (!neighbors.Any())
+                continue;
+
+            // Randomly select a neighbor module to merge with
+            var selectedNeighbor = neighbors[rnd.GetInt(0, neighbors.Count)];
+
+            // Merge modules
+            ModuleService.MergeModules(module, selectedNeighbor);
+            modules.Remove(module);
+        }
+
+        // Update the LinearLinkageEncoding with the repaired modules
+        return UpdateIntegerGenes(modules.ToList(), repairedLinearLinkageEncoding);
     }
 
-    private static LinearLinkageEncoding repairNonConnectedModules2(LinearLinkageEncoding repairedLinearLinkageEncoding)
+
+    public static LinearLinkageEncoding repairNonConnectedModules2(LinearLinkageEncoding linearLinkageEncoding)
     {
-        throw new NotImplementedException();
+        var knowledgeGraph = linearLinkageEncoding.GetGraph();
+        var modules = new List<Module>(linearLinkageEncoding.GetModules());
+        var invalidModules = modules
+            .Where(module => module.GetIndices().Count > 1 &&
+                             !ModuleInformationService.IsModuleConnected(module, knowledgeGraph))
+            .ToList();
+
+        int iterations = 0;
+
+        while (invalidModules.Any())
+        {
+            foreach (var invalidModule in invalidModules.ToList())
+            {
+                var nonConnectedModularisableElements =
+                    ModuleInformationService.GetNonConnectedModularisableElements(invalidModule, knowledgeGraph);
+
+                foreach (var nonConnectedModularisableElement in nonConnectedModularisableElements)
+                {
+                    var incidentModules = ModuleInformationService.GetIncidentModules(
+                        nonConnectedModularisableElement, linearLinkageEncoding);
+
+                    if (!incidentModules.Any())
+                        continue;
+
+                    var random = new Random();
+                    var randomIncidentModule = incidentModules[random.Next(incidentModules.Count)];
+
+                    // Move index to target module and remove from current module
+                    invalidModule.RemoveIndex(nonConnectedModularisableElement.GetIndex());
+                    randomIncidentModule.AddIndex(nonConnectedModularisableElement.GetIndex());
+
+                    if (!invalidModule.GetIndices().Any())
+                        modules.Remove(invalidModule);
+                }
+            }
+
+            invalidModules = modules
+                .Where(module => module.GetIndices().Count > 1 &&
+                                 !ModuleInformationService.IsModuleConsistOfSoloVertex(module, knowledgeGraph) &&
+                                 !ModuleInformationService.IsModuleConnected(module, knowledgeGraph))
+                .ToList();
+
+            iterations++;
+
+            if (iterations >= COUNT_LOOP_TERMINATION)
+            {
+                // fallback logic, e.g. split each connected component into its own module
+                var initialLinearLinkageEncoding =
+                    LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithModulesForEachConnectedCompponent(knowledgeGraph);
+
+                var randomlySplitUpLinearLinkageEncoding =
+                    RandomlySplitUpModules(initialLinearLinkageEncoding);
+
+                return randomlySplitUpLinearLinkageEncoding;
+            }
+        }
+
+        return UpdateIntegerGenes(modules, linearLinkageEncoding);
+    }
+
+    private static LinearLinkageEncoding RandomlySplitUpModules(LinearLinkageEncoding initialLinearLinkageEncoding)
+    {
+        var possibleModules = initialLinearLinkageEncoding.GetModules().Where(m => m.GetIndices().Count > 1).ToList();
+
+        if (possibleModules.Count == 0)
+        {
+            return initialLinearLinkageEncoding;
+        }
+
+        var random = RandomizationProvider.Current;
+        var selectedModule = possibleModules[random.GetInt(0, possibleModules.Count)];
+
+        var splitupModule = ModuleService.divideModuleRandomWalk2(selectedModule, initialLinearLinkageEncoding.GetGraph());
+        return UpdateIntegerGenes(splitupModule, initialLinearLinkageEncoding);
+
+
     }
 }
