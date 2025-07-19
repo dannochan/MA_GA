@@ -271,7 +271,7 @@ public class ModuleService
         ).Select(e => (ObjectRelation)e).ToList();
     }
 
-    public static List<Module> divideModuleRandomWalk2(Module selectedModule, Graph graph)
+    public static List<Module> DivideModuleRandomWalk2(Module selectedModule, Graph graph)
     {
 
         var resultSet = new HashSet<Module>();

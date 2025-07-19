@@ -165,7 +165,7 @@ public sealed class LinearLinkageEncodingOperator
 
         if (!LinearLinkageEncodingInformationService.IsAllElementsInModuleConnected(repairedLinearLinkageEncoding))
         {
-            repairedLinearLinkageEncoding = repairNonConnectedModules2(repairedLinearLinkageEncoding);
+            repairedLinearLinkageEncoding = RepairNonConnectedModules2(repairedLinearLinkageEncoding);
 
         }
 
@@ -173,20 +173,20 @@ public sealed class LinearLinkageEncodingOperator
         {
 
             repairedLinearLinkageEncoding =
-                    repairModulesWithOnlyOneVertexOrEdge(repairedLinearLinkageEncoding);
+                    RepairModulesWithOnlyOneVertexOrEdge(repairedLinearLinkageEncoding);
 
         }
 
         if (!LinearLinkageEncodingInformationService.IsValidAlleleValues(repairedLinearLinkageEncoding))
         {
             repairedLinearLinkageEncoding =
-                    repairInvalidGeneAssignment(repairedLinearLinkageEncoding);
+                    RepairInvalidGeneAssignment(repairedLinearLinkageEncoding);
 
         }
 
         if (LinearLinkageEncodingInformationService.IsMonolith(repairedLinearLinkageEncoding))
         {
-            repairedLinearLinkageEncoding = randomlySplitUpModules(lle);
+            repairedLinearLinkageEncoding = RandomlySplitUpModulesV2(lle);
 
         }
 
@@ -196,7 +196,7 @@ public sealed class LinearLinkageEncodingOperator
         return repairedLinearLinkageEncoding;
     }
 
-    private static LinearLinkageEncoding randomlySplitUpModules(LinearLinkageEncoding lle)
+    private static LinearLinkageEncoding RandomlySplitUpModulesV2(LinearLinkageEncoding lle)
     {
         // Get modules with more than one element
         var modulesToSplit = lle.GetModules().Where(m => m.GetIndices().Count > 1).ToList();
@@ -211,20 +211,20 @@ public sealed class LinearLinkageEncodingOperator
         var random = RandomizationProvider.Current;
         var selectedModule = modulesToSplit[random.GetInt(0, modulesToSplit.Count)];
 
-        var splitupModule = ModuleService.divideModuleRandomWalk2(selectedModule, lle.GetGraph());
+        var splitupModule = ModuleService.DivideModuleRandomWalk2(selectedModule, lle.GetGraph());
         return UpdateIntegerGenes(splitupModule, lle);
     }
 
 
 
-    private static LinearLinkageEncoding repairInvalidGeneAssignment(LinearLinkageEncoding repairedLinearLinkageEncoding)
+    private static LinearLinkageEncoding RepairInvalidGeneAssignment(LinearLinkageEncoding repairedLinearLinkageEncoding)
     {
         var genes = repairedLinearLinkageEncoding.GetGenes().Select(g => g.Value).ToList();
         var alleleCounts = new Dictionary<int, int>();
         var unusedAlleles = new List<int>();
         int numGenes = genes.Count;
 
-        // Count occurrences
+        // Count occurrencesgit c
         foreach (int allele in genes)
         {
             if (!alleleCounts.ContainsKey(allele))
@@ -270,7 +270,7 @@ public sealed class LinearLinkageEncodingOperator
         return new LinearLinkageEncoding(repairedLinearLinkageEncoding.GetGraph(), genes.Select(g => new Gene(g)).ToList());
     }
 
-    private static LinearLinkageEncoding repairModulesWithOnlyOneVertexOrEdge(LinearLinkageEncoding repairedLinearLinkageEncoding)
+    private static LinearLinkageEncoding RepairModulesWithOnlyOneVertexOrEdge(LinearLinkageEncoding repairedLinearLinkageEncoding)
     {
         var knowledgeGraph = repairedLinearLinkageEncoding.GetGraph();
         var modules = new HashSet<Module>(repairedLinearLinkageEncoding.GetModules());
@@ -303,7 +303,7 @@ public sealed class LinearLinkageEncodingOperator
     }
 
 
-    public static LinearLinkageEncoding repairNonConnectedModules2(LinearLinkageEncoding linearLinkageEncoding)
+    public static LinearLinkageEncoding RepairNonConnectedModules2(LinearLinkageEncoding linearLinkageEncoding)
     {
         var knowledgeGraph = linearLinkageEncoding.GetGraph();
         var modules = new List<Module>(linearLinkageEncoding.GetModules());
@@ -377,7 +377,7 @@ public sealed class LinearLinkageEncodingOperator
         var random = RandomizationProvider.Current;
         var selectedModule = possibleModules[random.GetInt(0, possibleModules.Count)];
 
-        var splitupModule = ModuleService.divideModuleRandomWalk2(selectedModule, initialLinearLinkageEncoding.GetGraph());
+        var splitupModule = ModuleService.DivideModuleRandomWalk2(selectedModule, initialLinearLinkageEncoding.GetGraph());
         return UpdateIntegerGenes(splitupModule, initialLinearLinkageEncoding);
 
 
