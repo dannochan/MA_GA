@@ -1,6 +1,7 @@
 using GeneticSharp;
 using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.domain.module;
+using MA_GA.Models;
 using Module = MA_GA.domain.module.Module;
 
 namespace MA_GA.domain.geneticalgorithm.encoding;
@@ -157,35 +158,76 @@ public sealed class LinearLinkageEncodingOperator
         integerGenes[indices.Last()] = updatedLastGene;
     }
 
-        public static LinearLinkageEncoding RepairNonConnectedModules(LinearLinkageEncoding lle)
+    public static LinearLinkageEncoding RepairNonConnectedModules(LinearLinkageEncoding lle)
     {
         var repairedLinearLinkageEncoding = new LinearLinkageEncoding(lle.GetGraph(), lle.GetGenes().ToList());
 
         if (!LinearLinkageEncodingInformationService.IsAllElementsInModuleConnected(repairedLinearLinkageEncoding))
         {
-            
+            repairedLinearLinkageEncoding = repairNonConnectedModules2(repairedLinearLinkageEncoding);
+
         }
 
-        if (!LinearLinkageEncodingInformationService.IsOneModuleConsistOfOneEdge(repairedLinearLinkageEncoding))
+        if (LinearLinkageEncodingInformationService.IsOneModuleConsistOfOneEdge(repairedLinearLinkageEncoding))
         {
-            
+
+            repairedLinearLinkageEncoding =
+                    repairModulesWithOnlyOneVertexOrEdge(repairedLinearLinkageEncoding);
+
         }
 
         if (!LinearLinkageEncodingInformationService.IsValidAlleleValues(repairedLinearLinkageEncoding))
         {
-            
+            repairedLinearLinkageEncoding =
+                    repairInvalidGeneAssignment(repairedLinearLinkageEncoding);
+
         }
 
-        if (!LinearLinkageEncodingInformationService.IsMonolith(repairedLinearLinkageEncoding))
+        if (LinearLinkageEncodingInformationService.IsMonolith(repairedLinearLinkageEncoding))
         {
-            
+            repairedLinearLinkageEncoding = randomlySplitUpModules(lle);
+
         }
 
 
 
         // Add logic to check for connectivity and repair, similar to Jav
-        return lle;
+        return repairedLinearLinkageEncoding;
+    }
+
+    private static LinearLinkageEncoding randomlySplitUpModules(LinearLinkageEncoding lle)
+    {
+        // Get modules with more than one element
+        var modulesToSplit = lle.GetModules().Where(m => m.GetIndices().Count > 1).ToList();
+
+        if (modulesToSplit.Count == 0)
+        {
+            // Nothing to split
+            return lle;
+        }
+
+        // Select a random module to split
+        var random = RandomizationProvider.Current;
+        var selectedModule = modulesToSplit[random.GetInt(0, modulesToSplit.Count)];
+
+        var splitupModule = ModuleService.divideModuleRandomWalk2(selectedModule,lle.GetGraph());
+        return UpdateIntegerGenes(splitupModule,lle);
     }
 
 
+
+    private static LinearLinkageEncoding repairInvalidGeneAssignment(LinearLinkageEncoding repairedLinearLinkageEncoding)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static LinearLinkageEncoding repairModulesWithOnlyOneVertexOrEdge(LinearLinkageEncoding repairedLinearLinkageEncoding)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static LinearLinkageEncoding repairNonConnectedModules2(LinearLinkageEncoding repairedLinearLinkageEncoding)
+    {
+        throw new NotImplementedException();
+    }
 }

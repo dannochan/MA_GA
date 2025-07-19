@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using GeneticSharp;
 using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.Models;
 using QuikGraph.Algorithms;
@@ -268,5 +269,53 @@ public class ModuleService
         return graph.GetGraph().Edges.Where(
             edge => module.CheckIndexInModule(edge.GetIndex())
         ).Select(e => (ObjectRelation)e).ToList();
+    }
+
+    public static List<Module> divideModuleRandomWalk2(Module selectedModule, Graph graph)
+    {
+
+        var resultSet = new HashSet<Module>();
+        var indices = new List<int>(selectedModule.GetIndices());
+
+        if (indices.Count == 1)
+        {
+            resultSet.Add(selectedModule);
+            return resultSet.ToList();
+        }
+
+        if (indices.Count == 2)
+        {
+            var module1 = new Module();
+            module1.AddIndex(indices[0]);
+            var module2 = new Module();
+            module2.AddIndex(indices[1]);
+            resultSet.Add(module1);
+            resultSet.Add(module2);
+            return resultSet.ToList();
+        }
+
+        var randomSizeOfModule1 = indices.Count / 2;
+        var remainingIndices = new List<int>(indices);
+
+        while (remainingIndices.Count != 0)
+        {
+            var randomIndex = RandomizationProvider.Current.GetInt(0, remainingIndices.Count);
+            var startElement = graph.GetModularisableElementByIndex(remainingIndices[randomIndex]);
+            var indicesOfSubGraph = CreateIndicesOfSubGraphRandomly(startElement, graph, randomSizeOfModule1, remainingIndices);
+
+            var newModule = new Module();
+            newModule.AddIndices(indicesOfSubGraph);
+            resultSet.Add(newModule);
+
+            // Remove the indices of the newly created module from the remaining indices
+            foreach (var index in indicesOfSubGraph)
+            {
+                remainingIndices.Remove((int)index);
+            }
+
+        }
+
+        return resultSet.ToList();
+
     }
 }
