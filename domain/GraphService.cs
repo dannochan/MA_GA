@@ -261,6 +261,7 @@ public static class GraphService
                 subgraph.AddEdge(edge);
             }
         }
+        GraphService.DiplayGraphByComponents(subgraph);
 
         return subgraph;
     }
@@ -302,7 +303,7 @@ public static class GraphService
         // It will be used to retrieve connected components from the graph.
         // Currently, it does not perform any operations.
 
-        var undirectedGraph = new QuikGraph.UndirectedGraph<DataObject, IObjectRelation>(false);
+        var undirectedGraph = new UndirectedGraph<DataObject, IObjectRelation>(false);
         foreach (var vertex in graph.Vertices)
         {
             undirectedGraph.AddVertex(vertex);

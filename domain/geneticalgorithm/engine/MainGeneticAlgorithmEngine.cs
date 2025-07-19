@@ -51,15 +51,7 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         // print the best chromosome
         Console.WriteLine($"Best Fitness: {geneticAlgorithmEngine.BestChromosome.Fitness.Value}");
         // print modules of the best chromosome
-        foreach (var g in geneticAlgorithmEngine.BestChromosome.GetGenes())
-        {
-            Console.WriteLine($"Gene: {g.Value}");
-        }
 
-        foreach (var module in geneticAlgorithmEngine.BestChromosome.GetGenes())
-        {
-
-        }
         var chromosome = geneticAlgorithmEngine.BestChromosome.ToString();
         Console.WriteLine($"Best Chromosome: {chromosome}");
 
@@ -75,11 +67,9 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         // TODO: move to genetic parameter settings
         var objectives = new List<Objective>
         {
-            new CohesionObjective(graph, 0.5),
-            new CouplingObjective(graph, 0.5)
+            new CohesionObjective(graph, 1),
+            new CouplingObjective(graph, 1)
         };
-
-        // TODO: ADD objective when available
 
         var fitnessFunction = new FitnessFunction(objectives, graph);
 
@@ -99,6 +89,9 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         // print modules of the best chromosome
         var BestChromosome = (LinearLinkageEncoding)geneticAlgorithmEngine.BestChromosome;
         BestChromosome.DisplayChromosome();
+
+        var time = geneticAlgorithmEngine.TimeEvolving;
+        Console.WriteLine($"Time taken: {time.TotalSeconds} seconds");
 
         // run the genetic algorithm
         //  geneticAlgorithmEngine.Start();

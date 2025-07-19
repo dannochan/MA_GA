@@ -1,4 +1,5 @@
 using System;
+using MA_GA.domain.geneticalgorithm.objective;
 
 namespace MA_GA.domain.geneticalgorithm.parameter;
 
@@ -25,6 +26,7 @@ public class GeneticAlgorithmParameter
     public int MaximumParetoSetSize { get; set; }
 
     public bool UseWeightedSumMethod { get; set; }
+
 
     public GeneticAlgorithmParameter(
         string chromosomeEncoding,

@@ -81,13 +81,13 @@ class MainApp
                     logger.LogError("Graph is null after creation.");
                 }
 
-                //    var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
-                //    logger.LogInformation("Linear linkage encoding initialized with modules for each connected component.");
+                    var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
+                    logger.LogInformation("Linear linkage encoding initialized with modules for each connected component.");
 
                 // Display the encoding
-                //    encoding.DisplayChromosome();
-                //    var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
-                //    Console.WriteLine($"Is the encoding valid? {validationResult}");
+                    encoding.DisplayChromosome();
+                    var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
+                    Console.WriteLine($"Is the encoding valid? {validationResult}");
 
                 // Run the genetic algorithm engine
                 RunGAEngine(logger, dataObjectCenter);
@@ -108,7 +108,7 @@ class MainApp
         // create ga engine
         var geneticAlgorithmParameter = new GeneticAlgorithmParameter(
             "Interger",
-            "RouletteWheelSelection",
+            "Tournament",
             "ElitismSelection",
             "UniformCrossover",
             "UniformMutation",
@@ -116,7 +116,7 @@ class MainApp
             0.8f, // Crossover rate
             0.1f, // Mutation rate
             100, // Max generations
-            5, // Tournament size
+            1, // Tournament size
             2, // Elitism count
             0.01, // Converged gene rate
             0.01, // Convergence rate

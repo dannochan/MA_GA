@@ -1,4 +1,5 @@
 using System;
+using GeneticSharp;
 using MA_GA.domain.module;
 
 namespace MA_GA.domain.geneticalgorithm.encoding;
@@ -8,7 +9,7 @@ public sealed class LinearLinkageEncodingInformationService
 
     public static List<Module> DetermineModules(LinearLinkageEncoding encoding)
     {
-        var chromosomes = encoding.GetGenes().Select(gene => gene.Value).ToList();
+        var chromosomes = encoding.GetGenes().ToList();
         var visitedNodes = new bool[chromosomes.Count];
 
         var modules = new List<Module>();
@@ -16,12 +17,13 @@ public sealed class LinearLinkageEncodingInformationService
         {
             if (!visitedNodes[i])
             {
-                int indext = (int)chromosomes[i];
+                int indext = (int)chromosomes[i].Value;
+
                 bool isAlleleAlreadyInModule = modules.Any(module => module.GetIndices().Contains(indext));
 
                 if (isAlleleAlreadyInModule)
                 {
-                    var module = modules.Where(m => m.GetIndices().Contains(indext)).FirstOrDefault();
+                    var module = modules.Where(m => m.GetIndices().Contains(indext)).First();
                     BuildModuleDFS(module, chromosomes, visitedNodes, i);
                 }
                 else
@@ -45,10 +47,13 @@ public sealed class LinearLinkageEncodingInformationService
     /// <param name="chromosomes"></param>
     /// <param name="visitedNodes"></param>
     /// <param name="index"></param>
-    private static void BuildModuleDFS(Module newModule, List<object> chromosomes, bool[] visitedNodes, int index)
+    private static void BuildModuleDFS(Module newModule, List<Gene> chromosomes, bool[] visitedNodes, int index)
     {
+        // Console.WriteLine($"Visiting index: {index}, value: {chromosomes[index]}");
         visitedNodes[index] = true;
-        var nextNode = (int)chromosomes[index];
+
+        var nextNode = (int)chromosomes.ElementAt(index).Value;
+
 
 
         if (nextNode != index && !visitedNodes[nextNode])
@@ -66,9 +71,27 @@ public sealed class LinearLinkageEncodingInformationService
 
     public static bool IsValidLinearLinkageEncoding(LinearLinkageEncoding linearLinkageEncoding)
     {
-
-        if (!IsValidAlleleValues(linearLinkageEncoding) || !IsAllElementsInModuleConnected(linearLinkageEncoding) || IsOneModuleConsistOfOneEdge(linearLinkageEncoding) || IsMonolith(linearLinkageEncoding))
+        if (!IsValidAlleleValues(linearLinkageEncoding))
         {
+            Console.WriteLine("Invalid Linear Linkage Encoding: Invalid allele values.");
+            return false;
+        }
+
+        if (!IsAllElementsInModuleConnected(linearLinkageEncoding))
+        {
+            Console.WriteLine("Invalid Linear Linkage Encoding: Not all elements in modules are connected.");
+            return false;
+        }
+
+        if (IsOneModuleConsistOfOneEdge(linearLinkageEncoding))
+        {
+            Console.WriteLine("Invalid Linear Linkage Encoding: One module consists of only one edge.");
+            return false;
+        }
+
+        if (IsMonolith(linearLinkageEncoding))
+        {
+            Console.WriteLine("Invalid Linear Linkage Encoding: Encoding is monolithic.");
             return false;
         }
 
@@ -88,6 +111,7 @@ public sealed class LinearLinkageEncodingInformationService
             {
                 if (alleleDictionary[currentAllele] > 2)
                 {
+                    Console.WriteLine($"Allele {currentAllele} appears more than twice in the encoding.");
                     return false; // Allele value appears more than once
                 }
                 alleleDictionary[currentAllele]++;

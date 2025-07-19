@@ -26,7 +26,7 @@ public class LinearLinkageEncoding : ChromosomeBase
     public LinearLinkageEncoding(Graph graph, int length) : base(length)
     {
         BaseGraph = graph ?? throw new ArgumentNullException(nameof(graph), "Graph cannot be null");
-
+        IntegerGenes = new List<Gene>(length).AsReadOnly();
         Modules = new List<Module>();
     }
 
@@ -111,12 +111,17 @@ public class LinearLinkageEncoding : ChromosomeBase
         return Modules;
     }
 
-    public List<Module> GetModulesOfAllele(int allele)
+    public Module GetModuleOfAllele(int allele)
     {
-        return Modules.Where(m => m.CheckIndexInModule(allele)).ToList();
+        Module module = Modules.First(m => m.CheckIndexInModule(allele));
+        if (module == null)
+        {
+            throw new NullReferenceException($"Module not found for allele {allele}. Ensure the allele is part of the encoding.");
+        }
+        return module;
     }
 
-    public string ToString()
+    public override string ToString()
     {
 
         return string.Join(", ", IntegerGenes.Select(g => g.Value));

@@ -3,6 +3,9 @@ using GeneticSharp;
 using MA_GA.Models;
 using MA_GA.domain.geneticalgorithm.parameter;
 using MA_GA.domain.geneticalgorithm.encoding;
+using System.Text.RegularExpressions;
+using MA_GA.domain.geneticalgorithm.crossover;
+using MA_GA.domain.geneticalgorithm.selection;
 
 
 namespace MA_GA.domain.geneticalgorithm.engine;
@@ -62,6 +65,7 @@ public class GeneticAlgorithmEngineBuilder
         {
             var geneticAlgorithmParameter = _geneticAlgorithmParameter;
             var population = CreatePopulation(_graph, geneticAlgorithmParameter);
+
             var selector = SingleObjectiveSelector();
             var crossover = CreateCrossover();
             var mutation = CreateMutatorn();
@@ -95,7 +99,7 @@ public class GeneticAlgorithmEngineBuilder
             var geneticAlgorithmParameter = _geneticAlgorithmParameter;
             switch (geneticAlgorithmParameter.CrossoverType)
             {
-                default: return new UniformCrossover();
+                default: return new GroupCrossover(_graph);
             }
         }
 
@@ -105,7 +109,7 @@ public class GeneticAlgorithmEngineBuilder
             switch (geneticAlgorithmParameter.OffspringSelection)
             {
                 default:
-                    return new TournamentSelection(geneticAlgorithmParameter.TournamentSize);
+                    return new TournamentSelection(geneticAlgorithmParameter.TournamentSize, true);
             }
         }
 
@@ -113,17 +117,18 @@ public class GeneticAlgorithmEngineBuilder
         {
 
             var geneticAlgorithmParameter = _geneticAlgorithmParameter;
+            Console.WriteLine($"Offspring Selection: {geneticAlgorithmParameter.OffspringSelection}");
             switch (geneticAlgorithmParameter.OffspringSelection)
             {
                 default:
-                    return new RouletteWheelSelection();
+                    return new GaTournamentSelection(geneticAlgorithmParameter.TournamentSize, true);
             }
 
         }
 
 
         // Create a population with the given graph and genetic algorithm parameters
-        private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter, bool isGreedyAlgoResult=false )
+        private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter, bool isGreedyAlgoResult = true)
         {
             IChromosome chromosome = isGreedyAlgoResult ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph) : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
             return new Population(geneticAlgorithmParameter.PopulationSize, geneticAlgorithmParameter.PopulationSize, chromosome);

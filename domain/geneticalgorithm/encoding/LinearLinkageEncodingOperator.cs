@@ -157,4 +157,35 @@ public sealed class LinearLinkageEncodingOperator
         integerGenes[indices.Last()] = updatedLastGene;
     }
 
+        public static LinearLinkageEncoding RepairNonConnectedModules(LinearLinkageEncoding lle)
+    {
+        var repairedLinearLinkageEncoding = new LinearLinkageEncoding(lle.GetGraph(), lle.GetGenes().ToList());
+
+        if (!LinearLinkageEncodingInformationService.IsAllElementsInModuleConnected(repairedLinearLinkageEncoding))
+        {
+            
+        }
+
+        if (!LinearLinkageEncodingInformationService.IsOneModuleConsistOfOneEdge(repairedLinearLinkageEncoding))
+        {
+            
+        }
+
+        if (!LinearLinkageEncodingInformationService.IsValidAlleleValues(repairedLinearLinkageEncoding))
+        {
+            
+        }
+
+        if (!LinearLinkageEncodingInformationService.IsMonolith(repairedLinearLinkageEncoding))
+        {
+            
+        }
+
+
+
+        // Add logic to check for connectivity and repair, similar to Jav
+        return lle;
+    }
+
+
 }

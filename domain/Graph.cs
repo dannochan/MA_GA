@@ -225,6 +225,12 @@ public class Graph
 
     }
 
+    public bool IsIsolatedVertex(DataObject dataObject)
+    {
+        return _Graph.OutDegree(dataObject) == 0;
+
+    }
+
 
 
 

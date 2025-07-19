@@ -11,6 +11,18 @@ public class ObjectiveSetup
 
     private List<Objective> objectives;
 
+    public ObjectiveSetup(int numberOfElementsPerModule, bool isUseWeightSumMethod, List<Objective> objectives)
+    {
+        this.numberOfElementsPerModule = numberOfElementsPerModule;
+        this.isUseWeightSumMethod = isUseWeightSumMethod;
+        this.objectives = objectives ?? new List<Objective>();
+    }
+
+    public List<Objective> GetObjectives()
+    {
+        return this.objectives;
+    }
+
     public override string ToString()
     {
         string objectiveString = "";

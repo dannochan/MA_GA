@@ -43,16 +43,21 @@ public class Module
         else
         {
 
-            for (int i = this.Indices.Count - 1; i >= 1; i--)
+            for (int i = 1; i < Indices.Count; i++)
             {
-                if (!this.Indices.Contains(index))
+                if (!Indices.Select(x => (int)x).Contains(index))
                 {
-                    var currentIndex = (int)this.Indices.ElementAt(i);
-                    var previousIndex = (int)this.Indices.ElementAt(i - 1);
+                    var currentIndex = (int)Indices.ElementAt(i);
+                    var previousIndex = (int)Indices.ElementAt(i - 1);
                     if (currentIndex > index && previousIndex < index)
                     {
-                        Indices.AddBefore(Indices.Find(currentIndex), index);
-                        break;
+                        var node = Indices.Find(currentIndex);
+                        if (node != null)
+                        {
+                            Indices.AddBefore(node, index);
+                            return;
+                        }
+                        throw new InvalidOperationException($"Node with index {currentIndex} not found in the linked list.");
                     }
                 }
             }
@@ -112,6 +117,6 @@ public class Module
 
     public List<int> GetIndices()
     {
-        return Indices.Select(index=>(int)index).ToList();
+        return Indices.Select(index => (int)index).ToList();
     }
 }
