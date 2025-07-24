@@ -19,7 +19,7 @@ public sealed class LinearLinkageEncodingInformationService
             {
                 int indext = (int)chromosomes[i].Value;
 
-                bool isAlleleAlreadyInModule = modules.Any(module => module.GetIndices().Contains(indext));
+                bool isAlleleAlreadyInModule = modules.Any(module => module.CheckIndexInModule(indext));
 
                 if (isAlleleAlreadyInModule)
                 {
@@ -83,25 +83,21 @@ public sealed class LinearLinkageEncodingInformationService
     {
         if (!IsValidAlleleValues(linearLinkageEncoding))
         {
-            Console.WriteLine("Invalid Linear Linkage Encoding: Invalid allele values.");
             return false;
         }
 
         if (!IsAllElementsInModuleConnected(linearLinkageEncoding))
         {
-            Console.WriteLine("Invalid Linear Linkage Encoding: Not all elements in modules are connected.");
             return false;
         }
 
         if (IsOneModuleConsistOfOneEdge(linearLinkageEncoding))
         {
-            Console.WriteLine("Invalid Linear Linkage Encoding: One module consists of only one edge.");
             return false;
         }
 
         if (IsMonolith(linearLinkageEncoding))
         {
-            Console.WriteLine("Invalid Linear Linkage Encoding: Encoding is monolithic.");
             return false;
         }
 

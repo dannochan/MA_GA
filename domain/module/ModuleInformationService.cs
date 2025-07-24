@@ -349,9 +349,7 @@ public class ModuleInformationService
         }
         else if (modularisableElement is DataObject vertex)
         {
-            return new IsolatedVertexPredicate<DataObject, ObjectRelation>(
-                (QuikGraph.IBidirectionalGraph<DataObject, ObjectRelation>)graph.GetGraph()
-            ).Test(vertex);
+            return graph.IsIsolatedVertex(vertex);
         }
         throw new ArgumentException("Module must contain either a DataObject or an ObjectRelation.");
 

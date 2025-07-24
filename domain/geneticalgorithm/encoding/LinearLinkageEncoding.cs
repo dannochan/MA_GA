@@ -111,6 +111,14 @@ public class LinearLinkageEncoding : ChromosomeBase
         return Modules;
     }
 
+    public override LinearLinkageEncoding Clone()
+    {
+        var clonedGenes = IntegerGenes.Select(g => new Gene(g.Value)).ToList();
+        var clonedEncoding = new LinearLinkageEncoding(BaseGraph, clonedGenes);
+        clonedEncoding.Modules.AddRange(Modules.Select(m => m.Clone()));
+        return clonedEncoding;
+    }
+
     public Module GetModuleOfAllele(int allele)
     {
         Module module = Modules.First(m => m.CheckIndexInModule(allele));

@@ -16,30 +16,41 @@ public class GroupCrossover : CrossoverBase
     }
     protected override IList<IChromosome> PerformCross(IList<IChromosome> parents)
     {
-
-        var parent1 = (LinearLinkageEncoding)parents[0];
-        var parent2 = (LinearLinkageEncoding)parents[1];
-
-        var encodingParent1 = new LinearLinkageEncoding(parent1, baseGraph);
-        var encodingParent2 = new LinearLinkageEncoding(parent2, baseGraph);
-
-        var offspring1 = !encodingParent1.IsValid() ? parent1.Clone() : parent1.CreateNew();
-        var offspring2 = !encodingParent2.IsValid() ? parent2.Clone() : parent2.CreateNew();
+        var parent1 = new LinearLinkageEncoding(parents[0], baseGraph);
+        var parent2 = new LinearLinkageEncoding(parents[1], baseGraph);
 
 
+        LinearLinkageEncoding offspring1;
+        LinearLinkageEncoding offspring2;
 
-        var newModulesForOffspring1 = DetermineNewModulesForOffspring(encodingParent1, encodingParent2);
-        var newModulesForOffspring2 = new Dictionary<int, Module>(newModulesForOffspring1);
+        if (!parent1.IsValid() || !parent2.IsValid())
+        {
+            offspring1 = (LinearLinkageEncoding)parent1.Clone();
+            offspring2 = (LinearLinkageEncoding)parent2.Clone();
+
+            return new List<IChromosome> { offspring1, offspring2 };
+        }
+        else
+        {
+            offspring1 = (LinearLinkageEncoding)parent1.CreateNew();
+            offspring2 = (LinearLinkageEncoding)parent2.CreateNew();
+        }
+
+
+        var newModulesForOffspring1 = DetermineNewModulesForOffspring(parent1, parent2);
+        var newModulesForOffspring2 = newModulesForOffspring1
+                                  .ToDictionary(kvp => kvp.Key,
+                                                kvp => (Module)kvp.Value.Clone());
 
         for (int i = 0; i < parent1.Length; i++)
         {
-            var geneInParent1 = encodingParent1.GetGene(i);
-            var geneInParent2 = encodingParent2.GetGene(i);
+            var geneInParent1 = parent1.GetGene(i);
+            var geneInParent2 = parent2.GetGene(i);
 
             if (IsEndingNode(geneInParent1, i) && IsEndingNode(geneInParent2, i)) continue;
 
-            AssignGeneToOneOfNewModules(encodingParent1, newModulesForOffspring1, i);
-            AssignGeneToOneOfNewModules(encodingParent2, newModulesForOffspring2, i);
+            AssignGeneToOneOfNewModules(parent1, newModulesForOffspring1, i);
+            AssignGeneToOneOfNewModules(parent2, newModulesForOffspring2, i);
 
         }
 
@@ -64,7 +75,6 @@ public class GroupCrossover : CrossoverBase
 
     private void UpdateparentToOffspring(LinearLinkageEncoding offspring, List<Module> modules)
     {
-        Console.WriteLine($"Updating offspring with {modules.Count} modules.");
         foreach (var module in modules)
         {
             var indicesOfModule = module.GetIndices();

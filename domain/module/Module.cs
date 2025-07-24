@@ -119,4 +119,14 @@ public class Module
     {
         return Indices.Select(index => (int)index).ToList();
     }
+
+    public Module Clone()
+    {
+        var clonedModule = new Module();
+        foreach (var index in this.Indices)
+        {
+            clonedModule.AddIndex((int)index);
+        }
+        return clonedModule;
+    }
 }
