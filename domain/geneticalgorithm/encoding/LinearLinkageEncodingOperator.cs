@@ -159,7 +159,7 @@ public sealed class LinearLinkageEncodingOperator
         integerGenes[indices.Last()] = updatedLastGene;
     }
 
-    public static LinearLinkageEncoding RepairNonConnectedModules(LinearLinkageEncoding lle)
+    public static LinearLinkageEncoding FixLinearLinkageEncoding(LinearLinkageEncoding lle)
     {
         var repairedLinearLinkageEncoding = new LinearLinkageEncoding(lle.GetGraph(), lle.GetGenes().ToList());
 

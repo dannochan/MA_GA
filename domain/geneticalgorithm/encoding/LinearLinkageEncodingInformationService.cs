@@ -69,6 +69,16 @@ public sealed class LinearLinkageEncodingInformationService
             .Count(module => ModuleInformationService.IsModuleConnected(module, encoding.GetGraph()));
     }
 
+    public static bool IsValidChromose(IChromosome chromosome)
+    {
+        if (chromosome is not LinearLinkageEncoding encoding)
+        {
+            throw new ArgumentException("The provided chromosome is not a LinearLinkageEncoding.");
+        }
+
+        return IsValidLinearLinkageEncoding(encoding);
+    }
+
     public static bool IsValidLinearLinkageEncoding(LinearLinkageEncoding linearLinkageEncoding)
     {
         if (!IsValidAlleleValues(linearLinkageEncoding))

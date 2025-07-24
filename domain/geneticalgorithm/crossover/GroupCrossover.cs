@@ -20,17 +20,13 @@ public class GroupCrossover : CrossoverBase
         var parent1 = (LinearLinkageEncoding)parents[0];
         var parent2 = (LinearLinkageEncoding)parents[1];
 
-        var offspring1 = parent1.CreateNew();
-        var offspring2 = parent2.CreateNew();
-
         var encodingParent1 = new LinearLinkageEncoding(parent1, baseGraph);
         var encodingParent2 = new LinearLinkageEncoding(parent2, baseGraph);
 
-        if (!encodingParent1.IsValid() || !encodingParent2.IsValid())
-        {
+        var offspring1 = !encodingParent1.IsValid() ? parent1.Clone() : parent1.CreateNew();
+        var offspring2 = !encodingParent2.IsValid() ? parent2.Clone() : parent2.CreateNew();
 
-            return new List<IChromosome> { parent1.Clone(), parent2.Clone() };
-        }
+
 
         var newModulesForOffspring1 = DetermineNewModulesForOffspring(encodingParent1, encodingParent2);
         var newModulesForOffspring2 = new Dictionary<int, Module>(newModulesForOffspring1);
@@ -48,13 +44,25 @@ public class GroupCrossover : CrossoverBase
         }
 
 
-        UpdateparentToOffspring(offspring1, newModulesForOffspring1.Values.ToList());
-        UpdateparentToOffspring(offspring2, newModulesForOffspring2.Values.ToList());
+        UpdateparentToOffspring((LinearLinkageEncoding)offspring1, newModulesForOffspring1.Values.ToList());
+        UpdateparentToOffspring((LinearLinkageEncoding)offspring2, newModulesForOffspring2.Values.ToList());
+
+        if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring1))
+        {
+            offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding((LinearLinkageEncoding)offspring1);
+        }
+        ;
+        if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring2))
+        {
+            offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding((LinearLinkageEncoding)offspring2);
+        }
+
 
         return new List<IChromosome> { offspring1, offspring2 };
     }
 
-    private void UpdateparentToOffspring(IChromosome offspring, List<Module> modules)
+
+    private void UpdateparentToOffspring(LinearLinkageEncoding offspring, List<Module> modules)
     {
         Console.WriteLine($"Updating offspring with {modules.Count} modules.");
         foreach (var module in modules)
