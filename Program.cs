@@ -110,12 +110,12 @@ class MainApp
             "Interger",
             "Tournament",
             "ElitismSelection",
-            "UniformCrossover",
-            "UniformMutation",
+            "GroupCrossover",
+            "GraftMutation",
             100, // Population size
             0.5f, // Crossover rate
-            0.1f, // Mutation rate
-            100, // Max generations
+            0.01f, // Mutation rate
+            500, // Max generations
             1, // Tournament size
             2, // Elitism count
             0.01, // Converged gene rate

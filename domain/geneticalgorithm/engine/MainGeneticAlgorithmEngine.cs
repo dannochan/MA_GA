@@ -15,22 +15,26 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
     private static readonly float RANDOM_GENERTATED_SEED = 12345f;
 
 
-    public GeneticAlgorithmExecutionResult run(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter)
+    public GeneticAlgorithmExecutionResult run(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter, MutationWeight? mutationWeight = null)
     {
+        if (mutationWeight == null)
+        {
+            mutationWeight = new MutationWeight();
+        }
 
         BasicRandomization.ResetSeed((int)RANDOM_GENERTATED_SEED);
         RandomizationProvider.Current = new BasicRandomization();
         if (geneticAlgorithmParameter.UseWeightedSumMethod)
         {
-            return ModularisewithWeightedSumFitnessFunction(geneticAlgorithmParameter, graph);
+            return ModularisewithWeightedSumFitnessFunction(geneticAlgorithmParameter, graph, mutationWeight);
         }
 
-        return ModularisewithMultiObjectiveFitnessFunction(geneticAlgorithmParameter, graph);
+        return ModularisewithMultiObjectiveFitnessFunction(geneticAlgorithmParameter, graph, mutationWeight);
 
 
     }
 
-    private GeneticAlgorithmExecutionResult ModularisewithMultiObjectiveFitnessFunction(GeneticAlgorithmParameter geneticAlgorithmParameter, Graph graph)
+    private GeneticAlgorithmExecutionResult ModularisewithMultiObjectiveFitnessFunction(GeneticAlgorithmParameter geneticAlgorithmParameter, Graph graph, MutationWeight mutationWeight)
     {
 
         // TODO: ADD objective when available
@@ -42,6 +46,7 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
             .Graph(graph)
             .GeneticAlgorithmParameter(geneticAlgorithmParameter)
             .Fitness(new MultiObjectiveFitnessFunction())
+            .MutationWeight(mutationWeight)
             .CreatingEngineForMultiObjectiveProblem();
 
 
@@ -61,7 +66,7 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         return new GeneticAlgorithmExecutionResult();
     }
 
-    private GeneticAlgorithmExecutionResult ModularisewithWeightedSumFitnessFunction(GeneticAlgorithmParameter geneticAlgorithmParameter, Graph graph)
+    private GeneticAlgorithmExecutionResult ModularisewithWeightedSumFitnessFunction(GeneticAlgorithmParameter geneticAlgorithmParameter, Graph graph, MutationWeight? mutationWeight)
     {
 
         // TODO: move to genetic parameter settings
@@ -77,6 +82,7 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         var geneticAlgorithmEngine = new GeneticAlgorithmEngineBuilder.Builder()
             .Graph(graph)
             .GeneticAlgorithmParameter(geneticAlgorithmParameter)
+            .MutationWeight(mutationWeight)
             .Fitness(fitnessFunction)
             .CreatingEngineForWeightedSumProblem();
 

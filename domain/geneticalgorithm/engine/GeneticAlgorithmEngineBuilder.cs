@@ -6,6 +6,7 @@ using MA_GA.domain.geneticalgorithm.encoding;
 using System.Text.RegularExpressions;
 using MA_GA.domain.geneticalgorithm.crossover;
 using MA_GA.domain.geneticalgorithm.selection;
+using MA_GA.domain.geneticalgorithm.mutation;
 
 
 namespace MA_GA.domain.geneticalgorithm.engine;
@@ -16,6 +17,7 @@ public class GeneticAlgorithmEngineBuilder
     {
         private Graph _graph;
         private GeneticAlgorithmParameter _geneticAlgorithmParameter;
+        private MutationWeight _mutationWeight;
 
         private IFitness _fitness;
 
@@ -28,6 +30,13 @@ public class GeneticAlgorithmEngineBuilder
         public Builder GeneticAlgorithmParameter(GeneticAlgorithmParameter geneticAlgorithmParameter)
         {
             _geneticAlgorithmParameter = geneticAlgorithmParameter;
+            return this;
+        }
+        public Builder MutationWeight(MutationWeight mutationWeight)
+        {
+
+            _mutationWeight = mutationWeight;
+
             return this;
         }
 
@@ -90,7 +99,7 @@ public class GeneticAlgorithmEngineBuilder
             var geneticAlgorithmParameter = _geneticAlgorithmParameter;
             switch (geneticAlgorithmParameter.MutationType)
             {
-                default: return new UniformMutation();
+                default: return new GraftMutator(_mutationWeight, _graph);
             }
         }
 
@@ -131,7 +140,7 @@ public class GeneticAlgorithmEngineBuilder
         private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter, bool isGreedyAlgoResult = true)
         {
             IChromosome chromosome = isGreedyAlgoResult ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph) : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
-            return new Population(geneticAlgorithmParameter.PopulationSize, geneticAlgorithmParameter.PopulationSize, chromosome);
+            return new Population(geneticAlgorithmParameter.PopulationSize, geneticAlgorithmParameter.PopulationSize * 2, chromosome);
         }
 
 

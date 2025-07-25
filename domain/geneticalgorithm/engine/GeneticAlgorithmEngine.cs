@@ -7,6 +7,6 @@ namespace MA_GA.domain.geneticalgorithm.engine;
 
 public interface GeneticAlgorithmEngine
 {
-    GeneticAlgorithmExecutionResult run(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter);
+    GeneticAlgorithmExecutionResult run(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter, MutationWeight? mutationWeight);
 
 }
