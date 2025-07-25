@@ -25,8 +25,8 @@ public class GroupCrossover : CrossoverBase
 
         if (!parent1.IsValid() || !parent2.IsValid())
         {
-            offspring1 = (LinearLinkageEncoding)parent1.Clone();
-            offspring2 = (LinearLinkageEncoding)parent2.Clone();
+            offspring1 = parent1.Clone();
+            offspring2 = parent2.Clone();
 
             return new List<IChromosome> { offspring1, offspring2 };
         }
@@ -55,17 +55,17 @@ public class GroupCrossover : CrossoverBase
         }
 
 
-        UpdateparentToOffspring((LinearLinkageEncoding)offspring1, newModulesForOffspring1.Values.ToList());
-        UpdateparentToOffspring((LinearLinkageEncoding)offspring2, newModulesForOffspring2.Values.ToList());
+        UpdateparentToOffspring(offspring1, newModulesForOffspring1.Values.ToList());
+        UpdateparentToOffspring(offspring2, newModulesForOffspring2.Values.ToList());
 
         if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring1))
         {
-            offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding((LinearLinkageEncoding)offspring1);
+            offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
         }
         ;
         if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring2))
         {
-            offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding((LinearLinkageEncoding)offspring2);
+            offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
         }
 
 

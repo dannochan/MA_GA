@@ -81,13 +81,13 @@ class MainApp
                     logger.LogError("Graph is null after creation.");
                 }
 
-                    var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
-                    logger.LogInformation("Linear linkage encoding initialized with modules for each connected component.");
+                var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
+                logger.LogInformation("Linear linkage encoding initialized with modules for each connected component.");
 
                 // Display the encoding
-                    encoding.DisplayChromosome();
-                    var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
-                    Console.WriteLine($"Is the encoding valid? {validationResult}");
+                encoding.DisplayChromosome();
+                var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
+                Console.WriteLine($"Is the encoding valid? {validationResult}");
 
                 // Run the genetic algorithm engine
                 RunGAEngine(logger, dataObjectCenter);
@@ -113,7 +113,7 @@ class MainApp
             "UniformCrossover",
             "UniformMutation",
             100, // Population size
-            0.8f, // Crossover rate
+            0.5f, // Crossover rate
             0.1f, // Mutation rate
             100, // Max generations
             1, // Tournament size
@@ -127,8 +127,8 @@ class MainApp
         )
         {
             MaxGenerations = 100,
-            CrossoverRate = 0.8f,
-            MutationRate = 0.1f
+            CrossoverRate = 0.5f,
+            MutationRate = 0.01f
         };
         var gaEngine = new MainGeneticAlgorithmEngine();
         logger.LogInformation("Running genetic algorithm engine.");

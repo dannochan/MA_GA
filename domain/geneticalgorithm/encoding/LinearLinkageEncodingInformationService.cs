@@ -66,7 +66,7 @@ public sealed class LinearLinkageEncodingInformationService
     public static int GetNumberOfNonIsolatedModules(LinearLinkageEncoding encoding)
     {
         return encoding.GetModules()
-            .Count(module => ModuleInformationService.IsModuleConnected(module, encoding.GetGraph()));
+            .Count(module => ModuleInformationService.IsIsolated(module, encoding.GetGraph()));
     }
 
     public static bool IsValidChromose(IChromosome chromosome)
@@ -108,19 +108,20 @@ public sealed class LinearLinkageEncodingInformationService
     {
         var genes = encoding.GetGenes();
 
-        var alleleDictionary = new Dictionary<object, int>();
+        var alleleDictionary = new Dictionary<int, int>();
 
         foreach (var gene in genes)
         {
-            var currentAllele = gene.Value;
+            var currentAllele = (int)gene.Value;
             if (alleleDictionary.ContainsKey(currentAllele))
             {
+                alleleDictionary[currentAllele]++;
                 if (alleleDictionary[currentAllele] > 2)
                 {
                     Console.WriteLine($"Allele {currentAllele} appears more than twice in the encoding.");
-                    return false; // Allele value appears more than once
+                    return false; // Allele value appears more than onc
                 }
-                alleleDictionary[currentAllele]++;
+
             }
             else
             {
