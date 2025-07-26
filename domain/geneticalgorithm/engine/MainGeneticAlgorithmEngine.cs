@@ -61,7 +61,7 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         Console.WriteLine($"Best Chromosome: {chromosome}");
 
         // run the genetic algorithm
-        geneticAlgorithmEngine.Start();
+
 
         return new GeneticAlgorithmExecutionResult();
     }
@@ -85,6 +85,11 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
             .MutationWeight(mutationWeight)
             .Fitness(fitnessFunction)
             .CreatingEngineForWeightedSumProblem();
+
+        var taskExecutor = new ParallelTaskExecutor();
+        taskExecutor.MinThreads = 1;
+        taskExecutor.MaxThreads = 20;
+        geneticAlgorithmEngine.TaskExecutor = taskExecutor;
 
 
         // run the genetic algorithm

@@ -9,9 +9,9 @@ namespace MA_GA.domain.geneticalgorithm.encoding;
 public class LinearLinkageEncoding : ChromosomeBase
 {
 
-    private readonly List<Module> Modules;
-    private IReadOnlyList<Gene> IntegerGenes { get; }
-    private readonly Graph BaseGraph;
+    public List<Module> Modules { get; set; }
+    public List<Gene> IntegerGenes { get; }
+    public Graph BaseGraph { get; }
 
 
     /// <summary>
@@ -26,8 +26,8 @@ public class LinearLinkageEncoding : ChromosomeBase
     public LinearLinkageEncoding(Graph graph, int length) : base(length)
     {
         BaseGraph = graph ?? throw new ArgumentNullException(nameof(graph), "Graph cannot be null");
-        IntegerGenes = new List<Gene>(length).AsReadOnly();
-        Modules = new List<Module>();
+        IntegerGenes = new List<Gene>(length);
+        Modules = LinearLinkageEncodingInformationService.DetermineModules(this);
     }
 
 
@@ -41,7 +41,7 @@ public class LinearLinkageEncoding : ChromosomeBase
     /// <param name="chromosome"></param>
     /// <param name="graph"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public LinearLinkageEncoding(IChromosome chromosome, Graph graph) : this(graph, chromosome.GetGenes().ToList())
+    public LinearLinkageEncoding(IChromosome chromosome, Graph graph) : this(graph, [.. chromosome.GetGenes()])
     {
 
     }
@@ -50,30 +50,53 @@ public class LinearLinkageEncoding : ChromosomeBase
     {
         BaseGraph = graph ?? throw new ArgumentNullException(nameof(graph), "Graph cannot be null");
 
-        IntegerGenes = genes.ToList().AsReadOnly();
-        for (int i = 0; i < genes.Count; i++)
-        {
-            ReplaceGene(i, genes[i]);
-        }
+        IntegerGenes = [.. genes.Select(g => new Gene(g.Value))];
         Modules = LinearLinkageEncodingInformationService.DetermineModules(this);
+        CreateGenes();
+
     }
 
     public override IChromosome CreateNew()
     {
         var CloneGenes = IntegerGenes.Select(g => new Gene(g.Value)).ToList();
+
         var encoding = new LinearLinkageEncoding(BaseGraph, CloneGenes);
+
         return MutateLinearLinkageEncoding(encoding);
+    }
+
+    public List<Gene> GetIntegerGenes()
+    {
+        return IntegerGenes;
+    }
+
+    protected override void CreateGene(int index)
+    {
+        if (index < 0 || index >= IntegerGenes.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+        }
+
+        ReplaceGene(index, GenerateGene(index));
+    }
+
+    protected override void CreateGenes()
+    {
+        for (int i = 0; i < Length; i++)
+        {
+            ReplaceGene(i, GenerateGene(i));
+        }
     }
 
     private IChromosome MutateLinearLinkageEncoding(LinearLinkageEncoding encoding)
     {
         var random = RandomizationProvider.Current;
         var value = random.GetDouble();
-        if (value < 1.0d / 3.0d)
+        if (value < 1.0 / 3.0)
         {
             return LinearLinkageEncodingOperator.DivideRandomModule(encoding);
         }
-        else if (value < 2.0d / 3.0d)
+        else if (value < 2.0 / 3.0)
         {
             if (LinearLinkageEncodingInformationService.GetNumberOfNonIsolatedModules(encoding) > 2)
             {
@@ -87,7 +110,7 @@ public class LinearLinkageEncoding : ChromosomeBase
 
     public override Gene GenerateGene(int geneIndex)
     {
-        return new Gene(IntegerGenes[geneIndex]);
+        return new Gene(IntegerGenes[geneIndex].Value);
     }
 
     public int GetChromosomeLength()
@@ -113,9 +136,9 @@ public class LinearLinkageEncoding : ChromosomeBase
 
     public override LinearLinkageEncoding Clone()
     {
-        var clonedGenes = IntegerGenes.Select(g => new Gene(g.Value)).ToList();
-        var clonedEncoding = new LinearLinkageEncoding(BaseGraph, clonedGenes);
-        clonedEncoding.Modules.AddRange(Modules.Select(m => m.Clone()));
+
+        var clonedEncoding = base.Clone() as LinearLinkageEncoding;
+
         return clonedEncoding;
     }
 
@@ -154,7 +177,7 @@ public class LinearLinkageEncoding : ChromosomeBase
 
         // Display the genes
         Console.WriteLine("Genes:");
-        var geneIndices = this.GetGenes().Select(g => g.Value).ToList();
+        var geneIndices = this.GetIntegerGenes().Select(g => g.Value).ToList();
         for (int i = 0; i < indices.Count; i++)
         {
             var geneIndex = indices[i];

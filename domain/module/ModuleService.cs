@@ -178,13 +178,13 @@ public class ModuleService
                 var remainingIndices = new List<int>(module.GetIndices());
                 while (remainingIndices.Count > 0)
                 {
-                    var randomStartElementIndex = Random.Shared.Next(remainingIndices.Count);
+                    var randomStartElementIndex = RandomizationProvider.Current.GetInt(0, remainingIndices.Count);
                     var startElement = graph.GetModularisableElementByIndex(remainingIndices[randomStartElementIndex]);
                     var indicesOfSplitteModule = CreateIndicesOfSubGraphRandomly(startElement, graph, halfSizeOfModule, remainingIndices);
 
                     Module newModule = new Module();
                     newModule.AddIndices(indicesOfSplitteModule);
-                    splitModules.Add(module);
+                    splitModules.Add(newModule);
                     remainingIndices.Clear();
 
                 }
@@ -210,7 +210,7 @@ public class ModuleService
     public static HashSet<object> CreateIndicesOfSubGraphRandomly(ModularisableElement modularisableElement, Graph graph, int subgraphSize, List<int> indicesOfModule)
     {
         var selectedIndices = new HashSet<object>();
-        var visitedModularisableElement = new HashSet<ModularisableElement>();
+        var visitedModularisableElement = new HashSet<object>();
 
         var queue = new Stack<ModularisableElement>();
         queue.Push(modularisableElement);
@@ -222,16 +222,27 @@ public class ModuleService
 
             if (currentElement is DataObject vertex)
             {
-                var currentVertex = (DataObject)currentElement;
-                var edgesOfCurrentVertex = graph.GetGraph().Edges
-                    .Where(e => (e.SourceObject.Equals(currentVertex) || e.TargetObject.Equals(currentVertex)) &&
-                                selectedIndices.Contains(e.GetIndex()) &&
-                                !visitedModularisableElement.Contains((ObjectRelation)e)).OrderBy(e => e.GetIndex());
 
-                edgesOfCurrentVertex.ToList().ForEach(edge =>
+                var edgesOfCurrentVertex = new List<IObjectRelation>();
+                foreach (var edge in graph.GetGraph().Edges)
                 {
-                    queue.Push((ObjectRelation)edge);
-                });
+                    if (edge.SourceObject.GetIndex() == vertex.GetIndex() || edge.TargetObject.GetIndex() == vertex.GetIndex())
+                    {
+                        edgesOfCurrentVertex.Add(edge);
+                    }
+                }
+                ;
+
+                var edgesInModuleAndNotVisited = edgesOfCurrentVertex
+                                .Select(e => (ObjectRelation)e)
+                                .Where(e =>
+                                    indicesOfModule.Contains(e.GetIndex()) &&
+                                    !visitedModularisableElement.Contains(e));
+
+                foreach (var edge in edgesInModuleAndNotVisited)
+                {
+                    queue.Push(edge);
+                }
 
 
             }
@@ -241,16 +252,19 @@ public class ModuleService
                 var sourceVertex = currentEdge.SourceObject;
                 var targetVertex = currentEdge.TargetObject;
 
-                if (!visitedModularisableElement.Contains(sourceVertex) && indicesOfModule.Contains(sourceVertex.GetIndex())
-                && indicesOfModule.Contains(currentEdge.GetIndex()))
+                if (!visitedModularisableElement.Contains(sourceVertex) &&
+                         indicesOfModule.Contains(sourceVertex.GetIndex()) &&
+                          indicesOfModule.Contains(currentEdge.GetIndex())
+                          )
                 {
-                    queue.Push(sourceVertex);
+                    queue.Push(currentEdge.SourceObject);
                 }
 
-                if (!visitedModularisableElement.Contains(targetVertex) && indicesOfModule.Contains(targetVertex.GetIndex())
+                if (!visitedModularisableElement.Contains(targetVertex) &&
+                 indicesOfModule.Contains(targetVertex.GetIndex())
                 && indicesOfModule.Contains(currentEdge.GetIndex()))
                 {
-                    queue.Push(targetVertex);
+                    queue.Push(currentEdge.TargetObject);
                 }
 
             }

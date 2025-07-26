@@ -22,7 +22,9 @@ public sealed class LinearLinkageEncodingInitialiser
 
         algorithm.Compute();
         var connectedComponents = algorithm.Components;
-        var groupedComponents = connectedComponents.GroupBy(kvp => kvp.Value, kvp => kvp.Key);
+        var groupedComponents = connectedComponents.Keys
+            .GroupBy(vertex => string.IsNullOrEmpty(vertex.Component) ? "default" : vertex.Component)
+            .ToList();
 
         // module for each connected component
         var modules = new List<Module>();
@@ -52,9 +54,7 @@ public sealed class LinearLinkageEncodingInitialiser
         var modularisableElementSize = graph.GetModularisableElements().Count;
         var integerGenes = Enumerable.Range(0, modularisableElementSize)
             .Select(i => new GeneticSharp.Gene(i))
-            .ToList()
-            .AsReadOnly();
-
+            .ToList();
         return LinearLinkageEncodingOperator.UpdateIntegerGenes(modules, new LinearLinkageEncoding(graph, integerGenes));
     }
 

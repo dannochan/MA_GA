@@ -9,7 +9,8 @@ public sealed class LinearLinkageEncodingInformationService
 
     public static List<Module> DetermineModules(LinearLinkageEncoding encoding)
     {
-        var chromosomes = encoding.GetGenes().ToList();
+        var chromosomes = encoding.GetIntegerGenes();
+
         var visitedNodes = new bool[chromosomes.Count];
 
         var modules = new List<Module>();
@@ -17,13 +18,13 @@ public sealed class LinearLinkageEncodingInformationService
         {
             if (!visitedNodes[i])
             {
-                int indext = (int)chromosomes[i].Value;
+                int indext = (int)chromosomes.ElementAt(i).Value;
 
                 bool isAlleleAlreadyInModule = modules.Any(module => module.CheckIndexInModule(indext));
 
                 if (isAlleleAlreadyInModule)
                 {
-                    var module = modules.Where(m => m.GetIndices().Contains(indext)).First();
+                    var module = modules.Where(m => m.CheckIndexInModule(indext)).First();
                     BuildModuleDFS(module, chromosomes, visitedNodes, i);
                 }
                 else
@@ -106,7 +107,7 @@ public sealed class LinearLinkageEncodingInformationService
 
     public static bool IsValidAlleleValues(LinearLinkageEncoding encoding)
     {
-        var genes = encoding.GetGenes();
+        var genes = encoding.GetIntegerGenes();
 
         var alleleDictionary = new Dictionary<int, int>();
 

@@ -55,39 +55,23 @@ class MainApp
                 var graph = dataObjectCenter.GetGraph();
                 if (graph != null)
                 {
-                    DisplayGraphInfo(graph, logger);
-
-                    void DisplayGraphInfo(AdjacencyGraph<DataObject, IObjectRelation> graph, ILogger logger)
-                    {
-                        // output edge count
-                        Console.WriteLine($"Graph contains {graph.VertexCount} vertices and {graph.EdgeCount} edges.");
-                        var algorithm = new GraphPartitionGreedyAlgorithm(graph);
-                        algorithm.CreatePriorityList();
-                        Console.WriteLine("Priority List created successfully. now partitioning the graph.");
-                        // partition the graph
-                        logger.LogInformation("Starting graph partitioning.");
-                        var partitionResult = algorithm.PartitionGraph();
-                        logger.LogInformation("Graph partitioning completed successfully.");
-                        // output partition result
-                        Console.WriteLine(GraphService.DiplayGraphByComponents(partitionResult));
-                        // generate DOT representation of the graph
-
-                        //  CreateClusteredGraphAndDisplay(partitionResult);
-                    }
-
+                   // ProcessGraphPartitioning(logger, graph);
+                    // Run the genetic algorithm engine
+                    RunGAEngine(logger, dataObjectCenter);
                 }
+                // ProcessGraphPartitioning(logger, graph);
                 else
                 {
                     logger.LogError("Graph is null after creation.");
                 }
 
-                var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
+                //   var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
                 logger.LogInformation("Linear linkage encoding initialized with modules for each connected component.");
 
                 // Display the encoding
-                encoding.DisplayChromosome();
-                var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
-                Console.WriteLine($"Is the encoding valid? {validationResult}");
+                //  encoding.DisplayChromosome();
+                //  var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
+                //   Console.WriteLine($"Is the encoding valid? {validationResult}");
 
                 // Run the genetic algorithm engine
                 RunGAEngine(logger, dataObjectCenter);
@@ -98,6 +82,30 @@ class MainApp
                 Console.WriteLine("DataObjects is null");
             }
 
+        }
+
+    }
+
+    private static void ProcessGraphPartitioning(ILogger logger, AdjacencyGraph<DataObject, IObjectRelation> graph)
+    {
+        DisplayGraphInfo(graph, logger);
+
+        void DisplayGraphInfo(AdjacencyGraph<DataObject, IObjectRelation> graph, ILogger logger)
+        {
+            // output edge count
+            Console.WriteLine($"Graph contains {graph.VertexCount} vertices and {graph.EdgeCount} edges.");
+            var algorithm = new GraphPartitionGreedyAlgorithm(graph);
+            algorithm.CreatePriorityList();
+            Console.WriteLine("Priority List created successfully. now partitioning the graph.");
+            // partition the graph
+            logger.LogInformation("Starting graph partitioning.");
+            var partitionResult = algorithm.PartitionGraph();
+            logger.LogInformation("Graph partitioning completed successfully.");
+            // output partition result
+            Console.WriteLine(GraphService.DiplayGraphByComponents(partitionResult));
+            // generate DOT representation of the graph
+
+            //  CreateClusteredGraphAndDisplay(partitionResult);
         }
 
     }
@@ -115,7 +123,7 @@ class MainApp
             100, // Population size
             0.5f, // Crossover rate
             0.01f, // Mutation rate
-            500, // Max generations
+            800, // Max generations
             1, // Tournament size
             2, // Elitism count
             0.01, // Converged gene rate

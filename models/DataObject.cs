@@ -38,6 +38,7 @@ public class DataObject : ModularisableElement, IDataObject
         this.OriginObjects = new List<IDataObject>();
         this.TargetObjects = new List<IDataObject>();
         Weight = 0;
+        
     }
 
     /// <summary>

@@ -135,33 +135,39 @@ public sealed class LinearLinkageEncodingOperator
         var integerGenes = encoding.GetGenes().ToList();
         effectedModules.ForEach(module => UpdateModule(module, integerGenes));
 
-        return new LinearLinkageEncoding(encoding.GetGraph(), integerGenes.AsReadOnly());
+        return new LinearLinkageEncoding(encoding.GetGraph(), integerGenes);
 
     }
 
     public static void UpdateModule(Module module, List<Gene> integerGenes)
     {
+        // get a list of index of element in module
         var indices = module.GetIndices();
 
-        var affectedIntegerGenes = indices.Select(index => integerGenes[index]).ToList();
-
-        for (int i = 0; i < affectedIntegerGenes.Count - 1; i++)
+        // retrieve the genes based on the indices
+        var affectedGenes = new List<Gene>();
+        foreach (var index in indices)
         {
-            var gene = affectedIntegerGenes[i];
+            affectedGenes.Add(integerGenes[index]);
+        }
+
+        for (int i = 0; i < affectedGenes.Count - 1; i++)
+        {
+
             var indexOfModule = indices[i];
             var successor = indices[i + 1];
             var updatedGene = new Gene(successor);
             integerGenes[indexOfModule] = updatedGene;
         }
 
-        var lastAffectedGene = affectedIntegerGenes.Last();
+        var lastAffectedGene = affectedGenes.Last();
         var updatedLastGene = new Gene(lastAffectedGene.Value);
         integerGenes[indices.Last()] = updatedLastGene;
     }
 
     public static LinearLinkageEncoding FixLinearLinkageEncoding(LinearLinkageEncoding lle)
     {
-        var repairedLinearLinkageEncoding = new LinearLinkageEncoding(lle.GetGraph(), lle.GetGenes().ToList());
+        var repairedLinearLinkageEncoding = new LinearLinkageEncoding(lle.GetGraph(), lle.GetIntegerGenes());
 
         if (!LinearLinkageEncodingInformationService.IsAllElementsInModuleConnected(repairedLinearLinkageEncoding))
         {
@@ -219,7 +225,7 @@ public sealed class LinearLinkageEncodingOperator
 
     private static LinearLinkageEncoding RepairInvalidGeneAssignment(LinearLinkageEncoding repairedLinearLinkageEncoding)
     {
-        var genes = repairedLinearLinkageEncoding.GetGenes().Select(g => g.Value).ToList();
+        var genes = repairedLinearLinkageEncoding.GetIntegerGenes().Select(g => g.Value).ToList();
         var alleleCounts = new Dictionary<int, int>();
         var unusedAlleles = new List<int>();
         int numGenes = genes.Count;
