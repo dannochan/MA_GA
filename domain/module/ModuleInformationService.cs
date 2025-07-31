@@ -155,10 +155,11 @@ public class ModuleInformationService
         var indiceList = indices.Select(i => (int)i).ToList();
         var subgraph = GraphService.CreateSubgraphGraphFromIndices(indiceList, graph);
 
-        var ccAlgor = GraphService.GetConnectedComponentsFromGraph(subgraph);
-        ccAlgor.Compute();
+        var connectedComponents = GraphService.GetConnectedComponentsFromGraph(subgraph);
 
-        if (ccAlgor.ComponentCount == 0)
+
+
+        if (connectedComponents.Count == 0)
         {
             return false;
         }

@@ -1,10 +1,8 @@
-using System;
+
 using System.Collections;
 using GeneticSharp;
 using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.Models;
-using QuikGraph.Algorithms;
-using QuikGraph.Algorithms.ConnectedComponents;
 
 namespace MA_GA.domain.module;
 /// <summary>
@@ -65,34 +63,28 @@ public class ModuleService
     /// <summary>
     /// Find indices in a module that are not fully connected, and then split them into smaller modules.
     /// </summary>
-    /// <param name="NonConnectedModule"></param>
+    /// <param name="nonConnectedModule"></param>
     /// <param name="encoding"></param>
     /// <returns></returns> 
 
-    public static List<Module> SplitNonIncidentModule(Module NonConnectedModule, LinearLinkageEncoding encoding)
+    public static List<Module> SplitNonIncidentModule(Module nonConnectedModule, LinearLinkageEncoding encoding)
     {
         var graph = encoding.GetGraph();
-        var subgraphOfModule = GraphService.CreateSubgraphGraphFromIndices(NonConnectedModule.GetIndices(), graph);
+        var subgraphOfModule = GraphService.CreateSubgraphGraphFromIndices(nonConnectedModule.GetIndices(), graph);
 
         // Extract Graph and connected sets
         // get vertices of subgraph
 
-        var ccAlgor = GraphService.GetConnectedComponentsFromGraph(subgraphOfModule);
 
-        ccAlgor.Compute();
-
+        var connectedComponents = GraphService.GetConnectedComponentsFromGraph(subgraphOfModule); // List<HashSet<DataObject>>
         var components = new Dictionary<int, HashSet<DataObject>>();
-        foreach (var kvp in ccAlgor.Components)
+        for (int i = 0; i < connectedComponents.Count; i++)
         {
-            if (!components.ContainsKey(kvp.Value))
-            {
-                components[kvp.Value] = new HashSet<DataObject>();
-            }
-            components[kvp.Value].Add(kvp.Key);
+            components[i] = connectedComponents[i];
         }
 
 
-        var edgesOfModule = GetModuleEdges(NonConnectedModule, graph);
+        var edgesOfModule = GetModuleEdges(nonConnectedModule, graph);
         var listOfConnectedSet = new List<HashSet<object>>();
 
 
@@ -119,6 +111,7 @@ public class ModuleService
         }
 
         // handle isolated edges by add them to separate modules
+        // TODO: How handle isolated edges?
         foreach (var edge in edgesOfModule)
         {
 
@@ -128,7 +121,7 @@ public class ModuleService
             if (!sourceInAny && !targetInAny)
             {
 
-                listOfConnectedSet.Add(new HashSet<object> { edge.GetIndex() });
+                listOfConnectedSet.Add([edge.GetIndex()]);
             }
         }
 
@@ -148,7 +141,7 @@ public class ModuleService
             throw new ArgumentNullException("Module or graph cannot be null.");
         }
 
-        if (module.GetIndices().Count == 0)
+        if (module.GetIndices().Count < 1)
         {
             throw new ArgumentException("Module must contain at least one index.");
         }
@@ -193,11 +186,12 @@ public class ModuleService
 
     }
 
+/*
     public static int DetermineSplittedModuleSize(List<object> indices)
     {
         return indices.Count / 2;
     }
-
+*/
     /// <summary>
     /// Creates a subgraph of the given modularisable element by randomly selecting indices from the graph.
     /// It takes following parameters:
@@ -210,7 +204,7 @@ public class ModuleService
     public static HashSet<object> CreateIndicesOfSubGraphRandomly(ModularisableElement modularisableElement, Graph graph, int subgraphSize, List<int> indicesOfModule)
     {
         var selectedIndices = new HashSet<object>();
-        var visitedModularisableElement = new HashSet<object>();
+        var visitedModularisableElement = new HashSet<int>();
 
         var queue = new Stack<ModularisableElement>();
         queue.Push(modularisableElement);
@@ -231,13 +225,12 @@ public class ModuleService
                         edgesOfCurrentVertex.Add(edge);
                     }
                 }
-                ;
 
                 var edgesInModuleAndNotVisited = edgesOfCurrentVertex
                                 .Select(e => (ObjectRelation)e)
                                 .Where(e =>
                                     indicesOfModule.Contains(e.GetIndex()) &&
-                                    !visitedModularisableElement.Contains(e));
+                                    !visitedModularisableElement.Contains(e.GetIndex())).ToList();
 
                 foreach (var edge in edgesInModuleAndNotVisited)
                 {
@@ -248,27 +241,27 @@ public class ModuleService
             }
             else if (currentElement is ObjectRelation relation)
             {
-                var currentEdge = (ObjectRelation)currentElement;
-                var sourceVertex = currentEdge.SourceObject;
-                var targetVertex = currentEdge.TargetObject;
+                
+                var sourceVertex = relation.SourceObject;
+                var targetVertex = relation.TargetObject;
 
-                if (!visitedModularisableElement.Contains(sourceVertex) &&
+                if (!visitedModularisableElement.Contains(sourceVertex.GetIndex()) &&
                          indicesOfModule.Contains(sourceVertex.GetIndex()) &&
-                          indicesOfModule.Contains(currentEdge.GetIndex())
+                          indicesOfModule.Contains(relation.GetIndex())
                           )
                 {
-                    queue.Push(currentEdge.SourceObject);
+                    queue.Push(relation.SourceObject);
                 }
 
-                if (!visitedModularisableElement.Contains(targetVertex) &&
+                if (!visitedModularisableElement.Contains(targetVertex.GetIndex()) &&
                  indicesOfModule.Contains(targetVertex.GetIndex())
-                && indicesOfModule.Contains(currentEdge.GetIndex()))
+                && indicesOfModule.Contains(relation.GetIndex()))
                 {
-                    queue.Push(currentEdge.TargetObject);
+                    queue.Push(relation.TargetObject);
                 }
 
             }
-            visitedModularisableElement.Add(currentElement);
+            visitedModularisableElement.Add(currentElement.GetIndex());
 
         }
 

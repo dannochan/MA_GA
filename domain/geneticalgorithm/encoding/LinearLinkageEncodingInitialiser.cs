@@ -17,25 +17,20 @@ public sealed class LinearLinkageEncodingInitialiser
     public static LinearLinkageEncoding InitializeLinearLinkageEncodingWithModulesForEachConnectedCompponent(Graph graph)
     {
         var targetGraph = graph.GetGraph();
+        var targetGraphEdges = graph.GetGraph().Edges.ToList(); 
 
-        var algorithm = GraphService.GetConnectedComponentsFromGraph(targetGraph);
-
-        algorithm.Compute();
-        var connectedComponents = algorithm.Components;
-        var groupedComponents = connectedComponents.Keys
-            .GroupBy(vertex => string.IsNullOrEmpty(vertex.Component) ? "default" : vertex.Component)
-            .ToList();
+        var connectedComponents = GraphService.GetConnectedComponentsFromGraph(targetGraph);
 
         // module for each connected component
         var modules = new List<Module>();
 
-        foreach (var component in groupedComponents)
+        foreach (var component in connectedComponents)
         {
             var module = new Module();
 
             var verticesOfComponent = component.ToHashSet();
 
-            var edgesOfComponent = targetGraph.Edges.Where(edge => verticesOfComponent.Contains(edge.Source) || verticesOfComponent.Contains(edge.Target)).Distinct().ToList();
+            var edgesOfComponent = targetGraphEdges.Where(edge => verticesOfComponent.Any(v => v.GetIndex()==edge.Source.GetIndex() || v.GetIndex()==edge.Target.GetIndex())).Distinct().ToList();
 
             foreach (var vertex in verticesOfComponent)
             {
@@ -71,7 +66,7 @@ public sealed class LinearLinkageEncodingInitialiser
         {
             throw new ArgumentNullException(nameof(graph), "Graph cannot be null");
         }
-        var targetGraph = graph.GetGraph();
+
 
         var modularisableElements = graph.GetModularisableElements();
 

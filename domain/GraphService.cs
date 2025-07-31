@@ -297,7 +297,7 @@ public static class GraphService
     }
 
 
-    public static ConnectedComponentsAlgorithm<DataObject, IObjectRelation> GetConnectedComponentsFromGraph(AdjacencyGraph<DataObject, IObjectRelation> graph)
+    public static List<HashSet<DataObject>> GetConnectedComponentsFromGraph(AdjacencyGraph<DataObject, IObjectRelation> graph)
     {
         // This method is a placeholder for future implementation.
         // It will be used to retrieve connected components from the graph.
@@ -313,7 +313,9 @@ public static class GraphService
         {
             undirectedGraph.AddEdge(edge);
         }
-        return new ConnectedComponentsAlgorithm<DataObject, IObjectRelation>(undirectedGraph);
+
+
+        return new GraphConnectivityInSpector<DataObject, IObjectRelation>(undirectedGraph).ConnectedSets(); // new ConnectedComponentsAlgorithm<DataObject, IObjectRelation>(undirectedGraph);
 
     }
 
