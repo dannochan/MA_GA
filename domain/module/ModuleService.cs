@@ -30,15 +30,15 @@ public class ModuleService
             if (index1 < indices1.Count && index2 < indices2.Count)
             {
                 // compare the current indices of both modules
-                if ((int)indices1[index1] < (int)indices2[index2])
+                if (indices1[index1] < indices2[index2])
                 {
                     // add index from module1 to merged module
-                    mergedModule.AddIndex((int)indices1[index1]);
+                    mergedModule.AddIndex(indices1[index1]);
                     index1++;
                 }
                 else
                 {
-                    mergedModule.AddIndex((int)indices2[index2]);
+                    mergedModule.AddIndex(indices2[index2]);
                     index2++;
                 }
             }
@@ -47,12 +47,12 @@ public class ModuleService
                 // if one of the indices is exhausted, add the remaining indices from the other module
                 while (index1 < indices1.Count)
                 {
-                    mergedModule.AddIndex((int)indices1[index1]);
+                    mergedModule.AddIndex(indices1[index1]);
                     index1++;
                 }
                 while (index2 < indices2.Count)
                 {
-                    mergedModule.AddIndex((int)indices2[index2]);
+                    mergedModule.AddIndex(indices2[index2]);
                     index2++;
                 }
                 isNewModuleBuilt = true;
@@ -65,14 +65,14 @@ public class ModuleService
     /// <summary>
     /// Find indices in a module that are not fully connected, and then split them into smaller modules.
     /// </summary>
-    /// <param name="module"></param>
+    /// <param name="NonConnectedModule"></param>
     /// <param name="encoding"></param>
     /// <returns></returns> 
 
-    public static List<Module> SplitNonIncidentModule(Module module, LinearLinkageEncoding encoding)
+    public static List<Module> SplitNonIncidentModule(Module NonConnectedModule, LinearLinkageEncoding encoding)
     {
         var graph = encoding.GetGraph();
-        var subgraphOfModule = GraphService.CreateSubgraphGraphFromIndices(module.GetIndices().Select(i => (int)i).ToList(), graph);
+        var subgraphOfModule = GraphService.CreateSubgraphGraphFromIndices(NonConnectedModule.GetIndices(), graph);
 
         // Extract Graph and connected sets
         // get vertices of subgraph
@@ -92,7 +92,7 @@ public class ModuleService
         }
 
 
-        var edgesOfModule = GetModuleEdges(module, graph);
+        var edgesOfModule = GetModuleEdges(NonConnectedModule, graph);
         var listOfConnectedSet = new List<HashSet<object>>();
 
 
