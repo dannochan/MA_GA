@@ -116,12 +116,12 @@ public sealed class LinearLinkageEncodingInformationService
             var currentAllele = (int)gene.Value;
             if (alleleDictionary.ContainsKey(currentAllele))
             {
-                alleleDictionary[currentAllele]++;
                 if (alleleDictionary[currentAllele] > 2)
                 {
                     Console.WriteLine($"Allele {currentAllele} appears more than twice in the encoding.");
                     return false; // Allele value appears more than onc
                 }
+                 alleleDictionary[currentAllele]++;
 
             }
             else
