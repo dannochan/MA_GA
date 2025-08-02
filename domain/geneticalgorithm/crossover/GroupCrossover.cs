@@ -28,6 +28,18 @@ public class GroupCrossover : CrossoverBase
             offspring1 = parent1.Clone();
             offspring2 = parent2.Clone();
 
+
+            if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring1))
+            {
+                offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
+            }
+        ;
+            if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring2))
+            {
+                offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
+            }
+
+
             return new List<IChromosome> { offspring1, offspring2 };
         }
         else

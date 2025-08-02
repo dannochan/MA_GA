@@ -79,6 +79,7 @@ public class LinearLinkageEncoding : ChromosomeBase
         }
 
         IntegerGenes[index] = gene;
+        ReplaceGene(index, gene);
 
     }
 
@@ -120,12 +121,12 @@ public class LinearLinkageEncoding : ChromosomeBase
 
     }
 
-    
-        public override Gene GenerateGene(int geneIndex)
-        {
-            return new Gene(IntegerGenes[geneIndex].Value);
-        }
-    
+
+    public override Gene GenerateGene(int geneIndex)
+    {
+        return new Gene(IntegerGenes[geneIndex].Value);
+    }
+
 
     public int GetChromosomeLength()
     {
@@ -153,7 +154,10 @@ public class LinearLinkageEncoding : ChromosomeBase
 
         var clonedEncoding = base.Clone() as LinearLinkageEncoding;
         //  clonedEncoding.Modules = new List<Module>(Modules.Select(m => m.Clone()));
-        // clonedEncoding.IntegerGenes = IntegerGenes.Select(g => new Gene(g.Value)).ToList();
+        for (int i = 0; i < clonedEncoding.IntegerGenes.Count; i++)
+        {
+            clonedEncoding.ReplaceIntegerGene(i, new Gene(IntegerGenes[i].Value));
+        }
         clonedEncoding.Modules = Modules.Select(m => m.Clone()).ToList();
 
         return clonedEncoding;

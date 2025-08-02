@@ -72,7 +72,7 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         // TODO: move to genetic parameter settings
         var objectives = new List<Objective>
         {
-            //  new CohesionObjective(graph, 1),
+              new CohesionObjective(graph, 1),
             //  new CouplingObjective(graph, 1)
         };
 
