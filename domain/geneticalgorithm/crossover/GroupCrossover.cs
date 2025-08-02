@@ -81,10 +81,13 @@ public class GroupCrossover : CrossoverBase
             for (int i = 0; i < indicesOfModule.Count - 1; i++)
             {
                 offspring.ReplaceGene(indicesOfModule[i], new Gene(indicesOfModule[i + 1]));
+                offspring.ReplaceIntegerGene(indicesOfModule[i], new Gene(indicesOfModule[i + 1]));
+
             }
             var lastIndex = indicesOfModule[indicesOfModule.Count - 1];
 
             offspring.ReplaceGene(lastIndex, new Gene(lastIndex));
+            offspring.ReplaceIntegerGene(lastIndex, new Gene(lastIndex));
         }
 
 

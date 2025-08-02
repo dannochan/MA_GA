@@ -9,7 +9,9 @@ public sealed class LinearLinkageEncodingInformationService
 
     public static List<Module> DetermineModules(LinearLinkageEncoding encoding)
     {
-        var chromosomes = encoding.GetIntegerGenes();
+        var chromosomes = encoding.GetIntegerGenes()
+            .Select(g => (int)g.Value)
+            .ToList();
 
         var visitedNodes = new bool[chromosomes.Count];
 
@@ -18,7 +20,7 @@ public sealed class LinearLinkageEncodingInformationService
         {
             if (!visitedNodes[i])
             {
-                int indext = (int)chromosomes.ElementAt(i).Value;
+                int indext = chromosomes[i];
 
                 bool isAlleleAlreadyInModule = modules.Any(module => module.CheckIndexInModule(indext));
 
@@ -48,12 +50,12 @@ public sealed class LinearLinkageEncodingInformationService
     /// <param name="chromosomes"></param>
     /// <param name="visitedNodes"></param>
     /// <param name="index"></param>
-    private static void BuildModuleDFS(Module newModule, List<Gene> chromosomes, bool[] visitedNodes, int index)
+    private static void BuildModuleDFS(Module newModule, List<int> chromosomes, bool[] visitedNodes, int index)
     {
         // Console.WriteLine($"Visiting index: {index}, value: {chromosomes[index]}");
         visitedNodes[index] = true;
 
-        var nextNode = (int)chromosomes.ElementAt(index).Value;
+        var nextNode = chromosomes[index];
 
 
 
@@ -116,12 +118,13 @@ public sealed class LinearLinkageEncodingInformationService
             var currentAllele = (int)gene.Value;
             if (alleleDictionary.ContainsKey(currentAllele))
             {
+                alleleDictionary[currentAllele]++;
                 if (alleleDictionary[currentAllele] > 2)
                 {
                     Console.WriteLine($"Allele {currentAllele} appears more than twice in the encoding.");
                     return false; // Allele value appears more than onc
                 }
-                 alleleDictionary[currentAllele]++;
+
 
             }
             else

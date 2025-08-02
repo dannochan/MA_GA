@@ -32,9 +32,9 @@ public class GeneticAlgorithmEngineBuilder
             _geneticAlgorithmParameter = geneticAlgorithmParameter;
             return this;
         }
+
         public Builder MutationWeight(MutationWeight mutationWeight)
         {
-
             _mutationWeight = mutationWeight;
 
             return this;
@@ -65,7 +65,6 @@ public class GeneticAlgorithmEngineBuilder
                 CrossoverProbability = geneticAlgorithmParameter.CrossoverRate,
                 MutationProbability = geneticAlgorithmParameter.MutationRate
             };
-
         }
 
         // TODO: Termination need to be corrected for correct building 
@@ -89,9 +88,7 @@ public class GeneticAlgorithmEngineBuilder
                 Termination = new GenerationNumberTermination(geneticAlgorithmParameter.MaxGenerations),
                 CrossoverProbability = geneticAlgorithmParameter.CrossoverRate,
                 MutationProbability = geneticAlgorithmParameter.MutationRate
-
             };
-
         }
 
         private IMutation CreateMutatorn()
@@ -99,6 +96,7 @@ public class GeneticAlgorithmEngineBuilder
             var geneticAlgorithmParameter = _geneticAlgorithmParameter;
             switch (geneticAlgorithmParameter.MutationType)
             {
+                // default: return new UniformMutation();
                 default: return new GraftMutator(_mutationWeight, _graph);
             }
         }
@@ -108,6 +106,7 @@ public class GeneticAlgorithmEngineBuilder
             var geneticAlgorithmParameter = _geneticAlgorithmParameter;
             switch (geneticAlgorithmParameter.CrossoverType)
             {
+                //  default: return new UniformCrossover();
                 default: return new GroupCrossover(_graph);
             }
         }
@@ -124,26 +123,27 @@ public class GeneticAlgorithmEngineBuilder
 
         private ISelection SingleObjectiveSelector()
         {
-
             var geneticAlgorithmParameter = _geneticAlgorithmParameter;
             Console.WriteLine($"Offspring Selection: {geneticAlgorithmParameter.OffspringSelection}");
             switch (geneticAlgorithmParameter.OffspringSelection)
             {
                 default:
-                    return new GaTournamentSelection(geneticAlgorithmParameter.TournamentSize, true);
+                    return new TournamentSelection(geneticAlgorithmParameter.TournamentSize, true);
             }
-
         }
 
 
         // Create a population with the given graph and genetic algorithm parameters
-        private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter, bool isGreedyAlgoResult = false)
+        private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter,
+            bool isGreedyAlgoResult = false)
         {
-            IChromosome chromosome = isGreedyAlgoResult ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph) : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
-            return new Population(30, geneticAlgorithmParameter.PopulationSize, chromosome);
+            IChromosome chromosome = isGreedyAlgoResult
+                ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph)
+                : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
+            //    var initialChrome = Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
+            //    var lle = (LinearLinkageEncoding)initialChrome;
+            //    lle.DisplayChromosome();
+            return new Population(2, 4, chromosome);
         }
-
-
     }
-
 }

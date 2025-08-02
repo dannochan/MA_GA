@@ -1,4 +1,5 @@
 using System;
+using GeneticSharp;
 using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.domain.module;
 using MA_GA.Models;
@@ -17,7 +18,7 @@ public sealed class LinearLinkageEncodingInitialiser
     public static LinearLinkageEncoding InitializeLinearLinkageEncodingWithModulesForEachConnectedCompponent(Graph graph)
     {
         var targetGraph = graph.GetGraph();
-        var targetGraphEdges = graph.GetGraph().Edges.ToList(); 
+        var targetGraphEdges = graph.GetGraph().Edges.ToList();
 
         var connectedComponents = GraphService.GetConnectedComponentsFromGraph(targetGraph);
 
@@ -28,11 +29,10 @@ public sealed class LinearLinkageEncodingInitialiser
         {
             var module = new Module();
 
-            var verticesOfComponent = component.ToHashSet();
 
-            var edgesOfComponent = targetGraphEdges.Where(edge => verticesOfComponent.Any(v => v.GetIndex()==edge.Source.GetIndex() || v.GetIndex()==edge.Target.GetIndex())).Distinct().ToList();
+            var edgesOfComponent = targetGraphEdges.Where(edge => component.Contains(edge.Source) || component.Contains(edge.Target)).Distinct().ToList();
 
-            foreach (var vertex in verticesOfComponent)
+            foreach (var vertex in component)
             {
                 module.AddIndex(vertex.GetIndex());
             }
@@ -47,10 +47,15 @@ public sealed class LinearLinkageEncodingInitialiser
 
         // create chromosome with list of modules
         var modularisableElementSize = graph.GetModularisableElements().Count;
-        var integerGenes = Enumerable.Range(0, modularisableElementSize)
-            .Select(i => new GeneticSharp.Gene(i))
-            .ToList();
-        return LinearLinkageEncodingOperator.UpdateIntegerGenes(modules, new LinearLinkageEncoding(graph, integerGenes));
+        var genes = new List<Gene>(); 
+        for (int i = 0; i < modularisableElementSize; i++)
+        {
+            genes.Add(new Gene(i));
+        }
+        var integerGenes = genes.AsReadOnly();
+        var linearLinkageEncoding = new LinearLinkageEncoding(graph, integerGenes);
+
+        return LinearLinkageEncodingOperator.UpdateIntegerGenes(modules, linearLinkageEncoding);
     }
 
     /// <summary>

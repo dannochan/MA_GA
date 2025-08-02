@@ -31,13 +31,15 @@ public class GaTournamentSelection : SelectionBase
             throw new SelectionException(this, "The tournament size is greater than available chromosomes. Tournament size is {0} and generation {1} available chromosomes are {2}.".With(Size, generation.Number, generation.Chromosomes.Count));
         }
 
-        List<LinearLinkageEncoding> list = generation.Chromosomes.OfType<LinearLinkageEncoding>().ToList();
-        List<LinearLinkageEncoding> list2 = new List<LinearLinkageEncoding>();
+        var list = generation.Chromosomes.OfType<LinearLinkageEncoding>().ToList();
+        var list2 = new List<LinearLinkageEncoding>();
         while (list2.Count < number)
         {
             int[] randomIndexes = RandomizationProvider.Current.GetUniqueInts(Size, 0, list.Count);
-            LinearLinkageEncoding chromosome = (from c in list.Where((LinearLinkageEncoding c, int i) => randomIndexes.Contains((int)i)).OrderByDescending(c => c.Fitness)
-                                                select c).First();
+            LinearLinkageEncoding chromosome = list
+                .Where((c, i) => randomIndexes.Contains(i))
+                .OrderByDescending(c => c.Fitness)
+                .First();
 
             list2.Add(chromosome.Clone());
             if (!AllowWinnerCompeteNextTournament)
@@ -46,6 +48,6 @@ public class GaTournamentSelection : SelectionBase
             }
         }
 
-        return list2.OfType<IChromosome>().ToList();
+        return list2.Cast<IChromosome>().ToList();
     }
 }

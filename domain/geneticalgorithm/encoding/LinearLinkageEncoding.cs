@@ -10,7 +10,7 @@ public class LinearLinkageEncoding : ChromosomeBase
 {
 
     public List<Module> Modules { get; set; }
-    public List<Gene> IntegerGenes { get; }
+    public List<Gene> IntegerGenes { get; set; }
     public Graph BaseGraph { get; }
 
 
@@ -23,13 +23,14 @@ public class LinearLinkageEncoding : ChromosomeBase
     /// <param name="graph"></param>
     /// <param name="length"></param>
     /// <exception cref="ArgumentNullException"></exception>
+    /*
     public LinearLinkageEncoding(Graph graph, int length) : base(length)
     {
         BaseGraph = graph ?? throw new ArgumentNullException(nameof(graph), "Graph cannot be null");
         IntegerGenes = new List<Gene>(length);
         Modules = LinearLinkageEncodingInformationService.DetermineModules(this);
     }
-
+    */
 
     /// <summary>
     ///  Initializes a new instance of the <see cref="LinearLinkageEncoding"/> class.
@@ -46,11 +47,11 @@ public class LinearLinkageEncoding : ChromosomeBase
 
     }
 
-    public LinearLinkageEncoding(Graph graph, IReadOnlyList<Gene> genes) : base(genes.Count)
+    public LinearLinkageEncoding(Graph graph, IList<Gene> genes) : base(genes.Count)
     {
         BaseGraph = graph ?? throw new ArgumentNullException(nameof(graph), "Graph cannot be null");
 
-        IntegerGenes = [.. genes.Select(g => new Gene(g.Value))];
+        IntegerGenes = genes.ToList();
         Modules = LinearLinkageEncodingInformationService.DetermineModules(this);
         CreateGenes();
 
@@ -68,6 +69,17 @@ public class LinearLinkageEncoding : ChromosomeBase
     public List<Gene> GetIntegerGenes()
     {
         return IntegerGenes;
+    }
+
+    public void ReplaceIntegerGene(int index, Gene gene)
+    {
+        if (index < 0 || index >= IntegerGenes.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+        }
+
+        IntegerGenes[index] = gene;
+
     }
 
     protected override void CreateGene(int index)
@@ -108,10 +120,12 @@ public class LinearLinkageEncoding : ChromosomeBase
 
     }
 
-    public override Gene GenerateGene(int geneIndex)
-    {
-        return new Gene(IntegerGenes[geneIndex].Value);
-    }
+    
+        public override Gene GenerateGene(int geneIndex)
+        {
+            return new Gene(IntegerGenes[geneIndex].Value);
+        }
+    
 
     public int GetChromosomeLength()
     {
@@ -138,6 +152,9 @@ public class LinearLinkageEncoding : ChromosomeBase
     {
 
         var clonedEncoding = base.Clone() as LinearLinkageEncoding;
+        //  clonedEncoding.Modules = new List<Module>(Modules.Select(m => m.Clone()));
+        // clonedEncoding.IntegerGenes = IntegerGenes.Select(g => new Gene(g.Value)).ToList();
+        clonedEncoding.Modules = Modules.Select(m => m.Clone()).ToList();
 
         return clonedEncoding;
     }
@@ -162,9 +179,9 @@ public class LinearLinkageEncoding : ChromosomeBase
         var indices = new List<int>();
         // Display the encoding
         Console.WriteLine("Linear Linkage Encoding:");
-        Console.WriteLine("Module Count: " + this.GetModules()?.Count);
+        Console.WriteLine("Module Count: " + GetModules()?.Count);
         Console.WriteLine("indices of modules:");
-        foreach (var module in this.GetModules())
+        foreach (var module in GetModules())
         {
             foreach (var index in module.GetIndices())
             {
@@ -177,7 +194,7 @@ public class LinearLinkageEncoding : ChromosomeBase
 
         // Display the genes
         Console.WriteLine("Genes:");
-        var geneIndices = this.GetIntegerGenes().Select(g => g.Value).ToList();
+        var geneIndices = GetGenes().Select(g => g.Value).ToList();
         for (int i = 0; i < indices.Count; i++)
         {
             var geneIndex = indices[i];
@@ -186,6 +203,19 @@ public class LinearLinkageEncoding : ChromosomeBase
 
         Console.WriteLine("End of Gene Indices ");
 
+        Console.WriteLine("IntergeGenes:");
+        var intergeGeneIndices = GetIntegerGenes().Select(g => g.Value).ToList();
+        for (int i = 0; i < indices.Count; i++)
+        {
+            var geneIndex = indices[i];
+            Console.Write(intergeGeneIndices[geneIndex] + " -> ");
+        }
+
+        Console.WriteLine("End of Gene Indices ");
+
+
 
     }
+
+
 }

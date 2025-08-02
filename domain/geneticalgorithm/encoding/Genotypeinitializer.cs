@@ -14,7 +14,7 @@ public class Genotypeinitializer
 
         return new LinearLinkageEncoding(
             graph,
-            linearLinkageEncoding.GetGenes()
+            linearLinkageEncoding.GetIntegerGenes()
         );
     }
 

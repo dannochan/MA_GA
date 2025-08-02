@@ -155,19 +155,19 @@ public class ModuleInformationService
         var indiceList = indices.Select(i => (int)i).ToList();
         var subgraph = GraphService.CreateSubgraphGraphFromIndices(indiceList, graph);
 
-        var connectedComponents = GraphService.GetConnectedComponentsFromGraph(subgraph);
+        var graphConnectivityInspector = GraphService.GetConnectivityInspector(subgraph);
 
 
 
-        if (connectedComponents.Count == 0)
+        if (!graphConnectivityInspector.IsConnected())
         {
             return false;
         }
 
-        var remainingEdges = indices.Select(i => graph.GetModularisableElementByIndex((int)i))
-            .OfType<ObjectRelation>()
-            .Where(edge => !subgraph.ContainsEdge(edge))
+        var remainingEdges = indices.Select(i => graph.GetModularisableElementByIndex(i)).OfType<ObjectRelation>()
+            .Where(edge => !subgraph.Edges.Contains(edge))
             .ToList();
+
 
         var subgraphVertexSet = new HashSet<DataObject>(
             subgraph.Vertices.Select(v => v as DataObject).Where(v => v != null)
@@ -211,9 +211,13 @@ public class ModuleInformationService
 
         foreach (var module in modules)
         {
+            Console.WriteLine($"Processing module with indices: {string.Join(", ", module.GetIndices())}");
             var edges = GetBoundaryEdgesOfModule(module, graph);
             boundaryEdges.UnionWith(edges);
+
         }
+
+
 
         return boundaryEdges;
     }
@@ -338,6 +342,10 @@ public class ModuleInformationService
     public static bool IsIsolated(Module module, Graph graph)
     {
         var indices = module.GetIndices().ToList();
+        if (indices.Count == 0)
+        {
+            return true; // An empty module is considered isolated
+        }
 
         if (indices.Count > 1)
         {

@@ -319,5 +319,28 @@ public static class GraphService
 
     }
 
+    public static GraphConnectivityInSpector<DataObject, IObjectRelation> GetConnectivityInspector(AdjacencyGraph<DataObject, IObjectRelation> graph)
+    {
+        // This method is a placeholder for future implementation.
+        // It will be used to retrieve connected components from the graph.
+        // Currently, it does not perform any operations.
+
+        var undirectedGraph = new UndirectedGraph<DataObject, IObjectRelation>(false);
+        foreach (var vertex in graph.Vertices)
+        {
+            undirectedGraph.AddVertex(vertex);
+
+        }
+        foreach (var edge in graph.Edges)
+        {
+            undirectedGraph.AddEdge(edge);
+        }
+
+
+        return new GraphConnectivityInSpector<DataObject, IObjectRelation>(undirectedGraph); // new ConnectedComponentsAlgorithm<DataObject, IObjectRelation>(undirectedGraph);
+
+    }
+
+
 
 }

@@ -21,10 +21,10 @@ public sealed class LinearLinkageEncodingOperator
             return encoding;
         }
 
-        var random = new Random();
-        moduleWithMultipleGenes = moduleWithMultipleGenes.OrderBy(_ => random.Next()).ToList();
+        var random = RandomizationProvider.Current;
+        var randomModule = random.GetInt(0, moduleWithMultipleGenes.Count - 1);
 
-        var selectedModule = moduleWithMultipleGenes.First();
+        var selectedModule = moduleWithMultipleGenes[randomModule];
 
         var splittedModules = ModuleService.DivideModuleRandomly(selectedModule, encoding.GetGraph()).ToList();
 
@@ -75,8 +75,8 @@ public sealed class LinearLinkageEncodingOperator
             return encoding;
         }
 
-        var random = new Random();
-        var sourceModuleIndex = random.Next(moduleWithIncidenModules.Count);
+        var random = RandomizationProvider.Current;
+        var sourceModuleIndex = random.GetInt(0, moduleWithIncidenModules.Count);
         var sourceModule = moduleWithIncidenModules[sourceModuleIndex];
 
         var graph = encoding.GetGraph();
@@ -92,11 +92,11 @@ public sealed class LinearLinkageEncodingOperator
             return encoding;
         }
 
-        var modularisableElemToMove = candidateElements.Keys.ToList()[random.Next(candidateElements.Count)];
+        var modularisableElemToMove = candidateElements.Keys.ToList()[random.GetInt(0, candidateElements.Count)];
 
         // target module 
         var targetModules = candidateElements[modularisableElemToMove];
-        var targetModule = targetModules[random.Next(targetModules.Count)];
+        var targetModule = targetModules[random.GetInt(0, targetModules.Count)];
 
         // move the element 
         var elementIndex = modularisableElemToMove.GetIndex();
@@ -132,8 +132,13 @@ public sealed class LinearLinkageEncodingOperator
             return encoding;
         }
 
-        var integerGenes = encoding.GetGenes().ToList();
+        var integerGenes = encoding.GetIntegerGenes().ToList();
         effectedModules.ForEach(module => UpdateModule(module, integerGenes));
+        //   var newIntegergenes = new List<Gene>(integerGenes.Count);
+        //   foreach (var module in effectedModules)
+        //   {
+        //       UpdateModule(module, integerGenes);
+        //   }
 
         return new LinearLinkageEncoding(encoding.GetGraph(), integerGenes);
 
@@ -145,11 +150,8 @@ public sealed class LinearLinkageEncodingOperator
         var indices = module.GetIndices();
 
         // retrieve the genes based on the indices
-        var affectedGenes = new List<Gene>();
-        foreach (var index in indices)
-        {
-            affectedGenes.Add(integerGenes[index]);
-        }
+        var affectedGenes = indices.Select(index => integerGenes[index]).ToList();
+
 
         for (int i = 0; i < affectedGenes.Count - 1; i++)
         {
@@ -160,8 +162,8 @@ public sealed class LinearLinkageEncodingOperator
             integerGenes[indexOfModule] = updatedGene;
         }
 
-        var lastAffectedGene = affectedGenes.Last();
-        var updatedLastGene = new Gene(lastAffectedGene.Value);
+        var lastAffectedGene = indices.Last();
+        var updatedLastGene = new Gene(lastAffectedGene);
         integerGenes[indices.Last()] = updatedLastGene;
     }
 
@@ -223,9 +225,9 @@ public sealed class LinearLinkageEncodingOperator
 
 
 
-    private static LinearLinkageEncoding RepairInvalidGeneAssignment(LinearLinkageEncoding repairedLinearLinkageEncoding)
+    private static LinearLinkageEncoding RepairInvalidGeneAssignment2(LinearLinkageEncoding repairedLinearLinkageEncoding)
     {
-        var genes = repairedLinearLinkageEncoding.GetIntegerGenes().Select(g => g.Value).ToList();
+        var genes = repairedLinearLinkageEncoding.GetIntegerGenes().Select(g => (int)g.Value).ToList();
         var alleleCounts = new Dictionary<int, int>();
         var unusedAlleles = new List<int>();
         int numGenes = genes.Count;
@@ -239,7 +241,7 @@ public sealed class LinearLinkageEncodingOperator
         }
 
         // Build list of all possible alleles (assuming alleles are 0..numGenes-1)
-        for (int i = 0; i < numGenes; i++)
+        for (int i = 0; i < numGenes - 1; i++)
         {
             if (!alleleCounts.ContainsKey(i) || alleleCounts[i] < LinearLinkageEncodingConstant.ALLOWED_AMOUNT_OF_SAME_ALLELES)
             {
@@ -274,6 +276,73 @@ public sealed class LinearLinkageEncodingOperator
 
         // Assume you have a constructor like: new LinearLinkageEncoding(List<int> genes, KnowledgeGraph knowledgeGraph)
         return new LinearLinkageEncoding(repairedLinearLinkageEncoding.GetGraph(), genes.Select(g => new Gene(g)).ToList());
+    }
+    public static LinearLinkageEncoding RepairInvalidGeneAssignment(LinearLinkageEncoding linearLinkageEncoding)
+    {
+        var interGenes = linearLinkageEncoding.GetIntegerGenes().Select(g => (int)g.Value).ToList();
+
+        // Create a list of remaining allele values, which should be assigned afterwards
+        var remainingUnassignedAlleles = Enumerable.Range(0, linearLinkageEncoding.Length).ToList();
+
+        // Create a map to track the number of already existing allele values.
+        var alleleCountMap = new Dictionary<int, int>();
+
+        // Keep track of number of alleles and determine the remaining unused alleles
+        foreach (var integerGene in interGenes)
+        {
+            var allele = integerGene;
+            if (alleleCountMap.ContainsKey(allele))
+                alleleCountMap[allele]++;
+            else
+                alleleCountMap[allele] = 1;
+
+            // Remove alleles to keep unassigned alleles for later assignment
+            remainingUnassignedAlleles.Remove(allele);
+        }
+
+        // Create a map for the remaining unused alleles
+        var remainingUnassignedAllelesMap = remainingUnassignedAlleles.ToDictionary(a => a, a => 2);
+
+        // Start assigning remaining alleles to one of invalid assigned genes
+        var updatedInterGenes = new List<int>(interGenes);
+
+        foreach (var overusedAllele in alleleCountMap.Where(kv => kv.Value > LinearLinkageEncodingConstant.ALLOWED_AMOUNT_OF_SAME_ALLELES).ToList())
+        {
+            var allele = overusedAllele.Key;
+
+            // Determine the indices of allele values
+            var indicesOfOverusedAllele = new List<int>(Enumerable.Range(0, updatedInterGenes.Count)
+                .Where(i => updatedInterGenes[i] == allele).ToList());
+
+            // Repeat process until only MAX_NUMBER_OF_SAME_ALLELE remain
+            int countReassignments = indicesOfOverusedAllele.Count - LinearLinkageEncodingConstant.ALLOWED_AMOUNT_OF_SAME_ALLELES;
+            var random = RandomizationProvider.Current;
+
+            for (int i = 0; i < countReassignments; i++)
+            {
+                var remainingPossibleUnassignedAlleles = remainingUnassignedAllelesMap.Keys.ToList();
+
+                // Randomly assign one of the remaining unused alleles
+                int randomRemainingUnusedAlleleIndex = random.GetInt(0, remainingPossibleUnassignedAlleles.Count);
+                int randomRemainingUnusedAllele = remainingPossibleUnassignedAlleles[randomRemainingUnusedAlleleIndex];
+
+                int randomIndexOfOverusedAllelesIndex = random.GetInt(0, indicesOfOverusedAllele.Count);
+                int randomIndexOfOverusedAlleles = indicesOfOverusedAllele[randomIndexOfOverusedAllelesIndex];
+                // Replace the overused allele with the random remaining unused allele
+
+                updatedInterGenes[randomIndexOfOverusedAlleles] = randomRemainingUnusedAllele;
+
+                // Decrease usage of this element
+                remainingUnassignedAllelesMap[randomRemainingUnusedAllele]--;
+                if (remainingUnassignedAllelesMap[randomRemainingUnusedAllele] == 0)
+                    remainingUnassignedAllelesMap.Remove(randomRemainingUnusedAllele);
+
+                indicesOfOverusedAllele.RemoveAt(randomIndexOfOverusedAllelesIndex);
+            }
+        }
+
+        return new LinearLinkageEncoding(linearLinkageEncoding.GetGraph(),
+            updatedInterGenes.Select(g => new Gene(g)).ToList());
     }
 
     private static LinearLinkageEncoding RepairModulesWithOnlyOneVertexOrEdge(LinearLinkageEncoding repairedLinearLinkageEncoding)
@@ -335,8 +404,8 @@ public sealed class LinearLinkageEncodingOperator
                     if (!incidentModules.Any())
                         continue;
 
-                    var random = new Random();
-                    var randomIncidentModule = incidentModules[random.Next(incidentModules.Count)];
+                    var random = RandomizationProvider.Current;
+                    var randomIncidentModule = incidentModules[random.GetInt(0, incidentModules.Count)];
 
                     // Move index to target module and remove from current module
                     invalidModule.RemoveIndex(nonConnectedModularisableElement.GetIndex());

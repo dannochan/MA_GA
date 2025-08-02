@@ -171,14 +171,14 @@ public class ModuleService
                 var remainingIndices = new List<int>(module.GetIndices());
                 while (remainingIndices.Count > 0)
                 {
-                    var randomStartElementIndex = RandomizationProvider.Current.GetInt(0, remainingIndices.Count);
+                    var randomStartElementIndex = RandomizationProvider.Current.GetInt(0, remainingIndices.Count - 1);
                     var startElement = graph.GetModularisableElementByIndex(remainingIndices[randomStartElementIndex]);
                     var indicesOfSplitteModule = CreateIndicesOfSubGraphRandomly(startElement, graph, halfSizeOfModule, remainingIndices);
 
                     Module newModule = new Module();
                     newModule.AddIndices(indicesOfSplitteModule);
                     splitModules.Add(newModule);
-                    remainingIndices.Clear();
+                    remainingIndices.RemoveAll(x => indicesOfSplitteModule.Contains(x));
 
                 }
                 return splitModules;
@@ -186,12 +186,12 @@ public class ModuleService
 
     }
 
-/*
-    public static int DetermineSplittedModuleSize(List<object> indices)
-    {
-        return indices.Count / 2;
-    }
-*/
+    /*
+        public static int DetermineSplittedModuleSize(List<object> indices)
+        {
+            return indices.Count / 2;
+        }
+    */
     /// <summary>
     /// Creates a subgraph of the given modularisable element by randomly selecting indices from the graph.
     /// It takes following parameters:
@@ -241,7 +241,7 @@ public class ModuleService
             }
             else if (currentElement is ObjectRelation relation)
             {
-                
+
                 var sourceVertex = relation.SourceObject;
                 var targetVertex = relation.TargetObject;
 

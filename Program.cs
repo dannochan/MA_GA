@@ -26,14 +26,12 @@ class MainApp
 
         using (StreamReader sr = new StreamReader(filePath))
         {
-
             Console.WriteLine("Reading JSON file...");
             string json = sr.ReadToEnd();
             rawObject = JsonSerializer.Deserialize<GraphObject>(json);
 
             if (rawObject != null)
             {
-
                 ObjectHelper.MapDataObjects(rawObject, dataObjectCenter, logger);
             }
 
@@ -55,9 +53,9 @@ class MainApp
                 var graph = dataObjectCenter.GetGraph();
                 if (graph != null)
                 {
-                   // ProcessGraphPartitioning(logger, graph);
+                    //  ProcessGraphPartitioning(logger, graph);
                     // Run the genetic algorithm engine
-                    RunGAEngine(logger, dataObjectCenter);
+                    //  RunGAEngine(logger, dataObjectCenter);
                 }
                 // ProcessGraphPartitioning(logger, graph);
                 else
@@ -75,15 +73,12 @@ class MainApp
 
                 // Run the genetic algorithm engine
                 RunGAEngine(logger, dataObjectCenter);
-
             }
             else
             {
                 Console.WriteLine("DataObjects is null");
             }
-
         }
-
     }
 
     private static void ProcessGraphPartitioning(ILogger logger, AdjacencyGraph<DataObject, IObjectRelation> graph)
@@ -107,12 +102,10 @@ class MainApp
 
             //  CreateClusteredGraphAndDisplay(partitionResult);
         }
-
     }
 
     private static void RunGAEngine(ILogger logger, Graph dataObjectCenter)
     {
-
         // create ga engine
         var geneticAlgorithmParameter = new GeneticAlgorithmParameter(
             "Interger",
@@ -131,7 +124,7 @@ class MainApp
             0, // Count generation
             10, // Minimum Pareto set size
             100, // Maximum Pareto set size
-             true // Set to true to use weighted sum method
+            true // Set to true to use weighted sum method
         )
         {
             MaxGenerations = 100,
