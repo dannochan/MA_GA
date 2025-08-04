@@ -59,6 +59,17 @@ public abstract class Objective
         return $"{GetObjectiveName()} (Weight: {weight})";
     }
 
+    /// <summary>
+    /// Evaluates the objective for a given chromosome.
+    /// This method should be overridden in derived classes to provide specific evaluation logic.
+    /// chromosome will be cast to LinearLinkageEncoding.
+    /// If the chromosome is not of type LinearLinkageEncoding, an ArgumentException will be thrown.
+    /// Modules will be extracted from the chromosome and passed to CalculateValue.
+    /// </summary>
+    /// <param name="chromosome"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+
     public double Evaluate(IChromosome chromosome)
     {
         if (chromosome is not LinearLinkageEncoding encoding)
