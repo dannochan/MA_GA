@@ -206,17 +206,17 @@ public class LinearLinkageEncoding : ChromosomeBase
         }
 
         Console.WriteLine("End of Gene Indices ");
+        /*
+                Console.WriteLine("IntergeGenes:");
+                var intergeGeneIndices = GetIntegerGenes().Select(g => g.Value).ToList();
+                for (int i = 0; i < indices.Count; i++)
+                {
+                    var geneIndex = indices[i];
+                    Console.Write(intergeGeneIndices[geneIndex] + " -> ");
+                }
 
-        Console.WriteLine("IntergeGenes:");
-        var intergeGeneIndices = GetIntegerGenes().Select(g => g.Value).ToList();
-        for (int i = 0; i < indices.Count; i++)
-        {
-            var geneIndex = indices[i];
-            Console.Write(intergeGeneIndices[geneIndex] + " -> ");
-        }
-
-        Console.WriteLine("End of Gene Indices ");
-
+                Console.WriteLine("End of Gene Indices ");
+        */
 
 
     }

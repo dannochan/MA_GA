@@ -73,7 +73,8 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         var objectives = new List<Objective>
         {
               new CohesionObjective(graph, 1),
-            //  new CouplingObjective(graph, 1)
+              new CouplingObjective(graph, 1),
+              new ModularityObjective(graph, 1),
         };
 
         var fitnessFunction = new FitnessFunction(objectives, graph);
