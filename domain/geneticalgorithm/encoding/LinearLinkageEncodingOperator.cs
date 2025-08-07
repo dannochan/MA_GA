@@ -65,6 +65,7 @@ public sealed class LinearLinkageEncodingOperator
 
     public static IChromosome MoveRandomGeneToIncidentModule(LinearLinkageEncoding encoding)
     {
+
         //select only modules which have neighbors and it element is not isolated
         var moduleWithIncidenModules = encoding.GetModules().Where(module =>
              !ModuleInformationService.IsIsolated(module, encoding.GetGraph()) &&
@@ -76,7 +77,7 @@ public sealed class LinearLinkageEncodingOperator
         }
 
         var random = RandomizationProvider.Current;
-        var sourceModuleIndex = random.GetInt(0, moduleWithIncidenModules.Count);
+        var sourceModuleIndex = random.GetInt(0, moduleWithIncidenModules.Count - 1);// - 1);
         var sourceModule = moduleWithIncidenModules[sourceModuleIndex];
 
         var graph = encoding.GetGraph();
@@ -92,7 +93,7 @@ public sealed class LinearLinkageEncodingOperator
             return encoding;
         }
 
-        var modularisableElemToMove = candidateElements.Keys.ToList()[random.GetInt(0, candidateElements.Count)];
+        var modularisableElemToMove = candidateElements.Keys.ToList()[random.GetInt(0, candidateElements.Count)]; // -1
 
         // target module 
         var targetModules = candidateElements[modularisableElemToMove];
@@ -111,7 +112,7 @@ public sealed class LinearLinkageEncodingOperator
             effectedModules.Add(sourceModule);
         }
 
-        // check if source module connected 
+        // check if source module still connected when elements are moved
         var isSourceModuleConnected = ModuleInformationService.IsModuleConnected(sourceModule, graph);
 
         if (!isSourceModuleConnected)
@@ -132,7 +133,7 @@ public sealed class LinearLinkageEncodingOperator
             return encoding;
         }
 
-        var integerGenes = encoding.GetIntegerGenes().ToList();
+        var integerGenes = encoding.GetIntegerGenes();
         effectedModules.ForEach(module => UpdateModule(module, integerGenes));
         //   var newIntegergenes = new List<Gene>(integerGenes.Count);
         //   foreach (var module in effectedModules)
@@ -198,8 +199,14 @@ public sealed class LinearLinkageEncodingOperator
 
         }
 
+        /*
+                if (!repairedLinearLinkageEncoding.IsValid())
+                {
+                    repairedLinearLinkageEncoding = FixLinearLinkageEncoding(repairedLinearLinkageEncoding);
+                }
 
 
+        */
         // Add logic to check for connectivity and repair, similar to Jav
         return repairedLinearLinkageEncoding;
     }
@@ -355,22 +362,33 @@ public sealed class LinearLinkageEncodingOperator
             .ToList();
 
         var rnd = RandomizationProvider.Current;
-        foreach (var module in invalidModules)
+        for (int i = 0; i < invalidModules.Count - 1; i++)
         {
-            // Find neighbors (modules sharing an edge in the knowledge graph)
-            var neighbors = ModuleInformationService.GetModuleNeighbors(module, repairedLinearLinkageEncoding)
-                .Where(neighbor => neighbor != module)
-                .ToList();
+            if (invalidModules[i].GetIndices().Count <= 2)
+            {
+                // If the module has only one element, randomly assign it to a neighboring module
+                var neighbors = ModuleInformationService.GetModuleNeighbors(invalidModules[i], repairedLinearLinkageEncoding);
+                if (neighbors.Count == 0) continue;
 
-            if (!neighbors.Any())
-                continue;
+                var selectedNeighbor = neighbors[rnd.GetInt(0, neighbors.Count - 1)];
 
-            // Randomly select a neighbor module to merge with
-            var selectedNeighbor = neighbors[rnd.GetInt(0, neighbors.Count)];
+                // Merge modules
+                var mergeModule = ModuleService.MergeModules(invalidModules[i], selectedNeighbor);
 
-            // Merge modules
-            ModuleService.MergeModules(module, selectedNeighbor);
-            modules.Remove(module);
+                if (invalidModules.Contains(invalidModules[i]))
+                {
+                    // replace the invalid module with the merged one
+
+                    invalidModules.Remove(invalidModules[i]);
+                    invalidModules.Add(mergeModule);
+                }
+
+                modules.Remove(invalidModules[i]);
+                modules.Remove(selectedNeighbor);
+                modules.Add(mergeModule);
+
+            }
+
         }
 
         // Update the LinearLinkageEncoding with the repaired modules
