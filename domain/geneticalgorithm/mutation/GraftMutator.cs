@@ -40,6 +40,13 @@ public class GraftMutator : MutationBase
         if (encoding == null)
             throw new InvalidOperationException("Chromosome must be of type YourEncodingChromosome.");
 
+        // Check if the encoding is valid
+
+        if (!encoding.IsValid())
+        {
+            return;
+        }
+
         var rnd = RandomizationProvider.Current;
 
         double opRoll = rnd.GetFloat();
