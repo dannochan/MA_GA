@@ -27,6 +27,7 @@ public class Graph
     private readonly AdjacencyGraph<DataObject, IObjectRelation> _Graph;
 
     private readonly ConcurrentDictionary<ModularisableElement, List<ModularisableElement>> IncidentModularisableElements;
+    private int EDGE_COUNT = 0; 
 
 
     public Graph()
@@ -72,7 +73,7 @@ public class Graph
 
         edgeObjects.Add(relation);
         _Graph.AddEdge(relation);
-        _edgeDictionary.Add(relation.GetIndex(), relation);
+        _edgeDictionary.Add(EDGE_COUNT++, relation);
         // update vertex weights based on relation type
         relation.SourceObject.UpdateWeight(ObjectHelper.ConvertRelationTypeToWeight(relation.RelationType));
         relation.TargetObject.UpdateWeight(ObjectHelper.ConvertRelationTypeToWeight(relation.RelationType));
@@ -167,16 +168,7 @@ public class Graph
                 modularisableElements.Add(vertex);
             }
         }
-        // Add edges that are modularisable elements
-        _Graph.Edges.ToList().ForEach(
-            edge =>
-            {
-                if (edge is ModularisableElement modularisableElement)
-                {
-                    modularisableElements.Add((ObjectRelation)edge);
-                }
-            }
-        );
+
 
         return modularisableElements;
     }
@@ -197,10 +189,6 @@ public class Graph
         if (_nodeDictionary.ContainsKey(index))
         {
             return _nodeDictionary[index];
-        }
-        else if (_edgeDictionary.ContainsKey(index))
-        {
-            return _edgeDictionary[index];
         }
         else
         {
@@ -231,11 +219,11 @@ public class Graph
 
     }
 
-
-
-
-
-
-
-
+    public List<ObjectRelation> GetVertexEdgesByIndex(int index)
+    {
+        return _Graph.Edges
+            .Where(e => e.Source.GetIndex() == index || e.Target.GetIndex() == index)
+            .Select(e => (ObjectRelation)e)
+            .ToList();
+    }
 }

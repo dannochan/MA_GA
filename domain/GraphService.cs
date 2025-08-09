@@ -200,23 +200,23 @@ public static class GraphService
     public static List<ModularisableElement> GetIncidentElements(ModularisableElement element, Graph graph)
     {
         var incidentElements = new List<ModularisableElement>();
-        if (element is ObjectRelation)
-        {
-            var relation = (ObjectRelation)element;
-            incidentElements.Add(relation.SourceObject);
-            incidentElements.Add(relation.TargetObject);
-        }
-        else
-        {
+
             var vertex = (DataObject)element;
             var edges = graph.GetGraph().Edges
                 .Where(e => e.SourceObject.Equals(vertex) || e.TargetObject.Equals(vertex))
                 .ToList();
             foreach (var edge in edges)
             {
-                incidentElements.Add((ObjectRelation)edge);
+                if(vertex.Equals(edge.SourceObject))
+                {
+                    incidentElements.Add(edge.TargetObject);
+                }
+                else
+                {
+                    incidentElements.Add(edge.SourceObject);
+                }
             }
-        }
+        
         return incidentElements;
     }
 
@@ -241,7 +241,7 @@ public static class GraphService
             .Where(v => v != null)
             .Cast<DataObject>()
             .ToList();
-        var edges = modularisableElements
+        var edges = originalGraph.GetGraph().Edges
             .Select(me => me as ObjectRelation)
             .Where(e => e != null)
             .Cast<ObjectRelation>()

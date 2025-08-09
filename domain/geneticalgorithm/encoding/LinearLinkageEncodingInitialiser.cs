@@ -30,24 +30,19 @@ public sealed class LinearLinkageEncodingInitialiser
             var module = new Module();
 
 
-            var edgesOfComponent = targetGraphEdges.Where(edge => component.Contains(edge.Source) || component.Contains(edge.Target)).Distinct().ToList();
 
             foreach (var vertex in component)
             {
                 module.AddIndex(vertex.GetIndex());
             }
-            foreach (var edge in edgesOfComponent)
-            {
-                module.AddIndex(edge.GetIndex());
 
-            }
             modules.Add(module);
 
         }
 
         // create chromosome with list of modules
         var modularisableElementSize = graph.GetModularisableElements().Count;
-        var genes = new List<Gene>(); 
+        var genes = new List<Gene>();
         for (int i = 0; i < modularisableElementSize; i++)
         {
             genes.Add(new Gene(i));
@@ -88,15 +83,21 @@ public sealed class LinearLinkageEncodingInitialiser
                     sortedElements[dataObject.Component] = new List<int>();
                 }
                 sortedElements[dataObject.Component].Add(dataObject.GetIndex());
+
             }
-            else if (element is ObjectRelation objectRelation)
+
+            /*
+        }
+        else if (element is ObjectRelation objectRelation)
+        {
+            if (!sortedElements.ContainsKey(objectRelation.Component))
             {
-                if (!sortedElements.ContainsKey(objectRelation.Component))
-                {
-                    sortedElements[objectRelation.Component] = new List<int>();
-                }
-                sortedElements[objectRelation.Component].Add(objectRelation.GetIndex());
+                sortedElements[objectRelation.Component] = new List<int>();
             }
+            sortedElements[objectRelation.Component].Add(objectRelation.GetIndex());
+        }
+
+        */
         }
 
         foreach (var component in sortedElements)

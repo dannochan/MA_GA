@@ -74,7 +74,7 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         {
               new CohesionObjective(graph, 1),
               new CouplingObjective(graph, 1),
-              new ModularityObjective(graph, 1),
+        //      new ModularityObjective(graph, 1),
         };
 
         var fitnessFunction = new FitnessFunction(objectives, graph);

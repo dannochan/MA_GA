@@ -2,7 +2,7 @@ using System;
 
 namespace MA_GA.Models;
 
-public class ObjectRelation : ModularisableElement, IObjectRelation
+public class ObjectRelation :  IObjectRelation
 {
     public int EdgeNumber { get; set; }
     public RelationType RelationType { get; set; }
@@ -32,10 +32,12 @@ public class ObjectRelation : ModularisableElement, IObjectRelation
         Weight = ObjectHelper.ConvertRelationTypeToWeight(relationType);
     }
 
+/*
     public override int GetIndex()
     {
         return EdgeNumber;
     }
+    */
 
     public override bool Equals(object? obj)
     {

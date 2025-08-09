@@ -30,21 +30,28 @@ public class FitnessFunction : IFitness
     /// <returns></returns>
     public double Evaluate(IChromosome chromosome)
     {
-        return _objectives.Select(obj =>
-        {
-            var weight = obj.GetWeight() / _sumObjectiveWeights;
-            var objectiveValue = obj.Evaluate(chromosome);
+        /*
+ return _objectives.Select(obj =>
+ {
 
-            var weightedValue = weight * objectiveValue;
-            if (obj.GetOptimizationType() == OptimizationType.Maximum)
-            {
-                return weightedValue *= -1;
-            }
-            ;
 
-            return weightedValue;
+     var weight = obj.GetWeight() / _sumObjectiveWeights;
+     var objectiveValue = obj.Evaluate(chromosome);
 
-        }).Sum();
+     var weightedValue = weight * objectiveValue;
+     // TODO: how to deal with type of objectives, see paper of ali p49
+
+     if (obj.GetOptimizationType() == OptimizationType.Minimum)
+     {
+         return weightedValue *= -1;
+     }
+     ;
+
+     return weightedValue;
+
+ }).Sum();  */
+
+        return EvaluateAll(chromosome).Sum();
     }
 
     public double[] EvaluateAll(IChromosome chromosome)

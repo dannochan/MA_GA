@@ -1,6 +1,7 @@
 using System;
 using System.Dynamic;
 using System.Runtime.CompilerServices;
+using GeneticSharp;
 using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.Models;
 using QuikGraph;
@@ -38,12 +39,12 @@ public class ModuleInformationService
         var neighborModulesWhereVertexIsIncidentToOtherModuleEdge =
             GetModuleNeighborsWhereVertexIsIncideentToOtherModuleEdge(targetModule, encoding.GetGraph(), remainingModules);
         remainingModules.RemoveAll(module => neighborModulesWhereVertexIsIncidentToOtherModuleEdge.Contains(module));
-        var neighborModulesWhereEdgeIsIncidentToOtherModuleVertex =
-            GetModuleNeighborsWhereEdgeIsIncidentToOtherModuleVertex(targetModule, encoding.GetGraph(), remainingModules);
+        // var neighborModulesWhereEdgeIsIncidentToOtherModuleVertex =
+        GetModuleNeighborsWhereEdgeIsIncidentToOtherModuleVertex(targetModule, encoding.GetGraph(), remainingModules);
 
         var neighborModules = new List<Module>();
         neighborModules.AddRange(neighborModulesWhereVertexIsIncidentToOtherModuleEdge);
-        neighborModules.AddRange(neighborModulesWhereEdgeIsIncidentToOtherModuleVertex);
+        //  neighborModules.AddRange(neighborModulesWhereEdgeIsIncidentToOtherModuleVertex);
         neighborModules = neighborModules.Distinct().ToList();
         if (neighborModules.Contains(targetModule))
         {
@@ -66,8 +67,7 @@ public class ModuleInformationService
         modules.ForEach(module =>
         {
             var edgesInOtherModule = module.GetIndices()
-                .Select(index => graph.GetModularisableElementByIndex((int)index))
-                .OfType<ObjectRelation>()
+                .SelectMany(graph.GetVertexEdgesByIndex)
                 .Where(relation => targetModule.CheckIndexInModule(relation.Source.GetIndex()) ||
                                    targetModule.CheckIndexInModule(relation.Target.GetIndex()))
                 .ToList();
@@ -91,9 +91,10 @@ public class ModuleInformationService
         var neighborModules = new List<Module>();
 
         var edgesInTargetModule = targetModule.GetIndices()
-            .Select(index => graph.GetModularisableElementByIndex((int)index))
-            .OfType<ObjectRelation>()
-            .ToList();
+                .SelectMany(graph.GetVertexEdgesByIndex)
+                .Where(relation => targetModule.CheckIndexInModule(relation.Source.GetIndex()) ||
+                                   targetModule.CheckIndexInModule(relation.Target.GetIndex()))
+                .ToList();
 
         modules.ForEach(module =>
         {
@@ -163,10 +164,12 @@ public class ModuleInformationService
         {
             return false;
         }
+        var edgesOfIndices = indices.SelectMany(i => graph.GetVertexEdgesByIndex(i)).ToList();
 
-        var remainingEdges = indices.Select(i => graph.GetModularisableElementByIndex(i)).OfType<ObjectRelation>()
+        var remainingEdges = edgesOfIndices
             .Where(edge => !subgraph.Edges.Contains(edge))
             .ToList();
+
 
 
         var subgraphVertexSet = new HashSet<DataObject>(
@@ -187,8 +190,7 @@ public class ModuleInformationService
     )
     {
         return module.GetIndices()
-            .Select(i => graph.GetModularisableElementByIndex((int)i))
-            .OfType<ObjectRelation>()
+            .SelectMany(i => graph.GetVertexEdgesByIndex((int)i))
             .ToList();
     }
 
@@ -222,6 +224,13 @@ public class ModuleInformationService
         return boundaryEdges;
     }
 
+    /// <summary>
+    /// Get edges that occur between two modules. by checking if a edge has an end in one module and the other not
+    /// </summary>
+    /// <param name="module"></param>
+    /// <param name="graph"></param>
+    /// <returns></returns>/
+
     public static HashSet<ObjectRelation> GetBoundaryEdgesOfModule(
         Module module,
         Graph graph
@@ -230,7 +239,8 @@ public class ModuleInformationService
         var boundaryEdges = graph.GetGraph().Edges.Where(
             edge =>
             {
-                if (!module.CheckIndexInModule(edge.GetIndex()))
+                if (!module.CheckIndexInModule(edge.Source.GetIndex()) &&
+                    !module.CheckIndexInModule(edge.Target.GetIndex()))
                 {
                     return false;
                 }
@@ -249,10 +259,7 @@ public class ModuleInformationService
         {
             return GetIncidenModulesToVertex(vertex, encoding);
         }
-        else if (element is ObjectRelation edge)
-        {
-            return GetIncidentModulesToEdge(edge, encoding);
-        }
+
         throw new ArgumentException("Element must be either a DataObject or an ObjectRelation.");
     }
 
@@ -269,38 +276,40 @@ public class ModuleInformationService
         var incidentModules = encoding.GetModules();
 
 
-        return incidentEdges.Select(edge => incidentModules.FirstOrDefault(module => !module.CheckIndexInModule(vertex.GetIndex()) && module.CheckIndexInModule(edge.GetIndex())))
+        return incidentEdges.Select(edge => incidentModules.FirstOrDefault(module => !module.CheckIndexInModule(vertex.GetIndex()) && (module.CheckIndexInModule(edge.Source.GetIndex()) || module.CheckIndexInModule(edge.Target.GetIndex()))))
             .Where(module => module != null)
             .Distinct()
             .ToList();
     }
 
+    /*
+        private static List<Module> GetIncidentModulesToEdge(
+            ObjectRelation edge,
+            LinearLinkageEncoding encoding
 
-    private static List<Module> GetIncidentModulesToEdge(
-        ObjectRelation edge,
-        LinearLinkageEncoding encoding
-
-    )
-    {
-        var moduleOfEdge = GetModule(edge, encoding);
-        var moduleSourceVertex = GetModule(edge.Source, encoding);
-        var moduleTargetVertex = GetModule(edge.Target, encoding);
-
-        var modules = new List<Module>();
-
-
-        if (moduleSourceVertex != moduleOfEdge)
+        )
         {
-            modules.Add(moduleSourceVertex);
+            var moduleOfEdge = GetModule(edge, encoding);
+            var moduleSourceVertex = GetModule(edge.Source, encoding);
+            var moduleTargetVertex = GetModule(edge.Target, encoding);
 
-        }
-        if (moduleTargetVertex != moduleOfEdge && !modules.Contains(moduleTargetVertex))
-        {
-            modules.Add(moduleTargetVertex);
+            var modules = new List<Module>();
+
+
+            if (moduleSourceVertex != moduleOfEdge)
+            {
+                modules.Add(moduleSourceVertex);
+
+            }
+            if (moduleTargetVertex != moduleOfEdge && !modules.Contains(moduleTargetVertex))
+            {
+                modules.Add(moduleTargetVertex);
+            }
+
+            return modules;
         }
 
-        return modules;
-    }
+        */
 
     public static List<ModularisableElement> GetNonConnectedModularisableElements(
         Module module,
@@ -312,7 +321,9 @@ public class ModuleInformationService
             .Select(i => graph.GetModularisableElementByIndex((int)i))
             .ToList();
         var verticesIfModule = modularisableElements.OfType<DataObject>().ToList();
-        var edgesIfModule = modularisableElements.OfType<ObjectRelation>().ToList();
+        var edgesIfModule = module.GetIndices()
+            .SelectMany(i => graph.GetVertexEdgesByIndex((int)i))
+            .ToList();
 
         foreach (var vertex in verticesIfModule)
         {
@@ -324,15 +335,6 @@ public class ModuleInformationService
             }
         }
 
-        foreach (var edge in edgesIfModule)
-        {
-            bool isEdgeIncidentToVertex = verticesIfModule.Any(vertex =>
-                vertex.Equals(edge.Source) || vertex.Equals(edge.Target));
-            if (!isEdgeIncidentToVertex)
-            {
-                nonConnectedElements.Add(edge);
-            }
-        }
 
         return nonConnectedElements;
 
@@ -352,11 +354,8 @@ public class ModuleInformationService
             return false; // An empty module is considered isolated
         }
         var modularisableElement = graph.GetModularisableElementByIndex((int)indices.First());
-        if (modularisableElement is ObjectRelation edge)
-        {
-            return false; // An edge cannot be isolated
-        }
-        else if (modularisableElement is DataObject vertex)
+
+        if (modularisableElement is DataObject vertex)
         {
             return graph.IsIsolatedVertex(vertex);
         }

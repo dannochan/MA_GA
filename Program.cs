@@ -53,7 +53,7 @@ class MainApp
                 var graph = dataObjectCenter.GetGraph();
                 if (graph != null)
                 {
-                    //  ProcessGraphPartitioning(logger, graph);
+                    //   ProcessGraphPartitioning(logger, graph);
                     // Run the genetic algorithm engine
                     //  RunGAEngine(logger, dataObjectCenter);
                 }

@@ -96,10 +96,7 @@ public class ModuleService
              verticesOfConnectedSets.Contains(edge.SourceObject) || verticesOfConnectedSets.Contains(edge.TargetObject)).ToList();
 
             var indexOfConnectedSet = new HashSet<object>();
-            foreach (var edge in edgesOfConnectedSet)
-            {
-                indexOfConnectedSet.Add(edge.GetIndex());
-            }
+
 
             foreach (var vertex in verticesOfConnectedSets)
             {
@@ -112,6 +109,7 @@ public class ModuleService
 
         // handle isolated edges by add them to separate modules
         // TODO: How handle isolated edges?
+        /*
         foreach (var edge in edgesOfModule)
         {
 
@@ -124,7 +122,7 @@ public class ModuleService
                 listOfConnectedSet.Add([edge.GetIndex()]);
             }
         }
-
+*/
         // Create new modules
         return listOfConnectedSet.Select(indices =>
         {
@@ -205,6 +203,7 @@ public class ModuleService
     {
         var selectedIndices = new HashSet<object>();
         var visitedModularisableElement = new HashSet<int>();
+        var visitedEdges = new HashSet<IObjectRelation>();
 
         var queue = new Stack<ModularisableElement>();
         queue.Push(modularisableElement);
@@ -227,40 +226,27 @@ public class ModuleService
                 }
 
                 var edgesInModuleAndNotVisited = edgesOfCurrentVertex
-                                .Select(e => (ObjectRelation)e)
-                                .Where(e =>
-                                    indicesOfModule.Contains(e.GetIndex()) &&
-                                    !visitedModularisableElement.Contains(e.GetIndex())).ToList();
+                .Select(e => (ObjectRelation)e)
+                .Where(e =>
+                    indicesOfModule.Contains(e.Source.GetIndex()) && indicesOfModule.Contains(e.Target.GetIndex()) &&
+                    !visitedEdges.Contains(e)).ToList();
 
                 foreach (var edge in edgesInModuleAndNotVisited)
                 {
-                    queue.Push(edge);
+                    if (edge.Source.Equals(vertex))
+                    {
+                        queue.Push(edge.Target);
+                    }
+                    else
+                    {
+                        queue.Push(edge.Source);
+                    }
+                    visitedEdges.Add(edge);
                 }
 
 
             }
-            else if (currentElement is ObjectRelation relation)
-            {
 
-                var sourceVertex = relation.SourceObject;
-                var targetVertex = relation.TargetObject;
-
-                if (!visitedModularisableElement.Contains(sourceVertex.GetIndex()) &&
-                         indicesOfModule.Contains(sourceVertex.GetIndex()) &&
-                          indicesOfModule.Contains(relation.GetIndex())
-                          )
-                {
-                    queue.Push(relation.SourceObject);
-                }
-
-                if (!visitedModularisableElement.Contains(targetVertex.GetIndex()) &&
-                 indicesOfModule.Contains(targetVertex.GetIndex())
-                && indicesOfModule.Contains(relation.GetIndex()))
-                {
-                    queue.Push(relation.TargetObject);
-                }
-
-            }
             visitedModularisableElement.Add(currentElement.GetIndex());
 
         }
@@ -274,7 +260,7 @@ public class ModuleService
 
 
         return graph.GetGraph().Edges.Where(
-            edge => module.CheckIndexInModule(edge.GetIndex())
+            edge => module.CheckIndexInModule(edge.Source.GetIndex()) && module.CheckIndexInModule(edge.Target.GetIndex())
         ).Select(e => (ObjectRelation)e).ToList();
     }
 

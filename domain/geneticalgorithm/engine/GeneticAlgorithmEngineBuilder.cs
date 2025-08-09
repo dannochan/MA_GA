@@ -140,10 +140,10 @@ public class GeneticAlgorithmEngineBuilder
             IChromosome chromosome = isGreedyAlgoResult
                 ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph)
                 : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
-            //    var initialChrome = Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
-            //    var lle = (LinearLinkageEncoding)initialChrome;
-            //    lle.DisplayChromosome();
-            return new Population(2, 4, chromosome);
+            var initialChrome = Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
+            var lle = (LinearLinkageEncoding)initialChrome;
+            lle.DisplayChromosome();
+            return new Population(2, 100, chromosome);
         }
     }
 }
