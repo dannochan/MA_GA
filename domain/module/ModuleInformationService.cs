@@ -351,7 +351,7 @@ public class ModuleInformationService
 
         if (indices.Count > 1)
         {
-            return false; // An empty module is considered isolated
+            return false; 
         }
         var modularisableElement = graph.GetModularisableElementByIndex((int)indices.First());
 

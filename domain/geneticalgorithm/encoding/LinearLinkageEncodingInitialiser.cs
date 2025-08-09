@@ -69,6 +69,7 @@ public sealed class LinearLinkageEncodingInitialiser
 
 
         var modularisableElements = graph.GetModularisableElements();
+        var edgeList = graph.GetGraph().Edges.ToList();
 
         var sortedElements = new Dictionary<string, List<int>>();
 
@@ -86,19 +87,8 @@ public sealed class LinearLinkageEncodingInitialiser
 
             }
 
-            /*
-        }
-        else if (element is ObjectRelation objectRelation)
-        {
-            if (!sortedElements.ContainsKey(objectRelation.Component))
-            {
-                sortedElements[objectRelation.Component] = new List<int>();
-            }
-            sortedElements[objectRelation.Component].Add(objectRelation.GetIndex());
         }
 
-        */
-        }
 
         foreach (var component in sortedElements)
         {

@@ -358,13 +358,13 @@ public sealed class LinearLinkageEncodingOperator
         var modules = new HashSet<Module>(repairedLinearLinkageEncoding.GetModules());
 
         // Identify modules with 1 or 2 elements that are not isolated
-        var invalidModules = repairedLinearLinkageEncoding.GetModules().Where(m => m.GetIndices().Count <= 2 && !ModuleInformationService.IsIsolated(m, knowledgeGraph))
+        var invalidModules = repairedLinearLinkageEncoding.GetModules().Where(m => m.GetIndices().Count <= 1 && !ModuleInformationService.IsIsolated(m, knowledgeGraph))
             .ToList();
 
         var rnd = RandomizationProvider.Current;
         for (int i = 0; i < invalidModules.Count - 1; i++)
         {
-            if (invalidModules[i].GetIndices().Count <= 2)
+            if (invalidModules[i].GetIndices().Count <= 1)
             {
                 // If the module has only one element, randomly assign it to a neighboring module
                 var neighbors = ModuleInformationService.GetModuleNeighbors(invalidModules[i], repairedLinearLinkageEncoding);

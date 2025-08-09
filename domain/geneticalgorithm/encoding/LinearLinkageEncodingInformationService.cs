@@ -148,7 +148,7 @@ public sealed class LinearLinkageEncodingInformationService
     public static bool IsOneModuleConsistOfOneEdge(LinearLinkageEncoding encoding)
     {
         var graph = encoding.GetGraph();
-        return encoding.GetModules().Any(module => !ModuleInformationService.IsIsolated(module, graph) && module.GetIndices().Count <= 2);
+        return encoding.GetModules().Any(module => !ModuleInformationService.IsIsolated(module, graph) && module.GetIndices().Count <= 1);
     }
 
     public static bool IsMonolith(LinearLinkageEncoding encoding)

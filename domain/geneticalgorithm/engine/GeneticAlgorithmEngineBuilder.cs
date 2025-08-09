@@ -135,7 +135,7 @@ public class GeneticAlgorithmEngineBuilder
 
         // Create a population with the given graph and genetic algorithm parameters
         private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter,
-            bool isGreedyAlgoResult = false)
+            bool isGreedyAlgoResult = true)
         {
             IChromosome chromosome = isGreedyAlgoResult
                 ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph)
@@ -143,7 +143,7 @@ public class GeneticAlgorithmEngineBuilder
             var initialChrome = Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
             var lle = (LinearLinkageEncoding)initialChrome;
             lle.DisplayChromosome();
-            return new Population(2, 100, chromosome);
+            return new Population(2, 4, chromosome);
         }
     }
 }
