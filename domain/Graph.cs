@@ -27,7 +27,7 @@ public class Graph
     private readonly AdjacencyGraph<DataObject, IObjectRelation> _Graph;
 
     private readonly ConcurrentDictionary<ModularisableElement, List<ModularisableElement>> IncidentModularisableElements;
-    private int EDGE_COUNT = 0; 
+    private int EDGE_COUNT = 0;
 
 
     public Graph()
@@ -96,7 +96,7 @@ public class Graph
 
         foreach (var dataObject in nodeObjects)
         {
-            if (dataObject.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            if (dataObject.ShortName.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
                 nodeWanted = (DataObject?)dataObject;
             }
@@ -215,7 +215,7 @@ public class Graph
 
     public bool IsIsolatedVertex(DataObject dataObject)
     {
-        
+
         return _Graph.OutDegree(dataObject) == 0;
 
     }
