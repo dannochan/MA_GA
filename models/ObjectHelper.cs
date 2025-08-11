@@ -58,15 +58,32 @@ public static class ObjectHelper
         // map relation objects
         if (rawObject.relations != null)
         {
+            int indexForIO = 0;
             foreach (var item in rawObject.relations)
             {
-                dataObjectCenter.AddRelationToGraph(new ObjectRelation(
+                if (item.from.ToString().StartsWith("IO") || item.to.ToString().StartsWith("IO"))
+                {
+                    dataObjectCenter.AddRelationToGraph(new ObjectRelation(
+    indexForIO++,
+   convertIntToRelationTyp(item.type),
+    dataObjectCenter.GetNodeObjectByName(item.from),
+    dataObjectCenter.GetNodeObjectByName(item.to)
+
+));
+
+                }
+                else
+                {
+                    dataObjectCenter.AddRelationToGraph(new ObjectRelation(
                     elementIndex++,
                    convertIntToRelationTyp(item.type),
                     dataObjectCenter.GetNodeObjectByName(item.from),
                     dataObjectCenter.GetNodeObjectByName(item.to)
 
                 ));
+                }
+
+
 
 
             }

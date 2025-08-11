@@ -36,7 +36,7 @@ public class FitnessFunction : IFitness
             var objectiveValue = obj.Evaluate(chromosome);
 
             var weightedValue = weight * objectiveValue;
-            if (obj.GetOptimizationType() == OptimizationType.Maximum)
+            if (obj.GetOptimizationType() == OptimizationType.Minimum)
             {
                 return weightedValue *= -1;
             }
