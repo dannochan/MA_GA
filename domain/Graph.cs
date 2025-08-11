@@ -95,7 +95,7 @@ public class Graph
 
         foreach (var dataObject in nodeObjects)
         {
-            if (dataObject.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            if (dataObject.ShortName.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
                 nodeWanted = (DataObject?)dataObject;
             }

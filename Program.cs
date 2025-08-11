@@ -20,11 +20,13 @@ class MainApp
         ILogger logger = factory.CreateLogger("Program");
         // define the path to the JSON file
         string filePath = "/home/danno/Documents/MA_Project/MA_GA/data/SmallTestcase.json";
+                string filePath2 = "/home/danno/Documents/MA_Project/MA_GA/data/BigTestcase-2.json";
+
         // object to hold the data
         Graph dataObjectCenter = new Graph();
         GraphObject rawObject;
 
-        using (StreamReader sr = new StreamReader(filePath))
+        using (StreamReader sr = new StreamReader(filePath2))
         {
             Console.WriteLine("Reading JSON file...");
             string json = sr.ReadToEnd();
