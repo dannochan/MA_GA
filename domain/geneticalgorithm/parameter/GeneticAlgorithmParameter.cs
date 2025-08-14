@@ -16,7 +16,7 @@ public class GeneticAlgorithmParameter
     public float MutationRate { get; set; }
     public int MaxGenerations { get; set; }
     public int TournamentSize { get; set; }
-    public int ElitismCount { get; set; }
+    public float ElitismCount { get; set; }
 
     public double ConvergedGeneRate { get; set; }
 
@@ -39,7 +39,7 @@ public class GeneticAlgorithmParameter
         float mutationRate,
         int maxGenerations,
         int tournamentSize,
-        int elitismCount,
+        float elitismCount,
         double convergedGeneRate,
         double convergenceRate,
         int countGeneration,

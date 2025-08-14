@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using MA_GA.domain.geneticalgorithm.crossover;
 using MA_GA.domain.geneticalgorithm.selection;
 using MA_GA.domain.geneticalgorithm.mutation;
+using MA_GA.domain.reinsertion;
 
 
 namespace MA_GA.domain.geneticalgorithm.engine;
@@ -87,7 +88,8 @@ public class GeneticAlgorithmEngineBuilder
             {
                 Termination = new GenerationNumberTermination(geneticAlgorithmParameter.MaxGenerations),
                 CrossoverProbability = geneticAlgorithmParameter.CrossoverRate,
-                MutationProbability = geneticAlgorithmParameter.MutationRate
+                MutationProbability = geneticAlgorithmParameter.MutationRate,
+                //  Reinsertion = new GaElitistReinsertion(geneticAlgorithmParameter.ElitismCount)
             };
         }
 
@@ -127,23 +129,29 @@ public class GeneticAlgorithmEngineBuilder
             Console.WriteLine($"Offspring Selection: {geneticAlgorithmParameter.OffspringSelection}");
             switch (geneticAlgorithmParameter.OffspringSelection)
             {
-                default:
+                case "Roulette":
+                    return new RouletteWheelSelection();
+                case "Tournament":
                     return new TournamentSelection(geneticAlgorithmParameter.TournamentSize, true);
+                default:
+                    return new GaTournamentSelection(geneticAlgorithmParameter.TournamentSize, true);
             }
         }
 
 
         // Create a population with the given graph and genetic algorithm parameters
         private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter,
-            bool isGreedyAlgoResult = true)
+            bool isGreedyAlgoResult = false)
         {
             IChromosome chromosome = isGreedyAlgoResult
                 ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph)
                 : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
-            var initialChrome = Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
+            var initialChrome = isGreedyAlgoResult
+                ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph)
+                : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
             var lle = (LinearLinkageEncoding)initialChrome;
             lle.DisplayChromosome();
-            return new Population(2, 4, chromosome);
+            return new Population(30, 100, chromosome);
         }
     }
 }

@@ -20,6 +20,7 @@ class MainApp
         ILogger logger = factory.CreateLogger("Program");
         // define the path to the JSON file
         string filePath = "/home/danno/Documents/MA_Project/MA_GA/data/SmallTestcase.json";
+        string filePath2 = "/home/danno/Documents/MA_Project/MA_GA/data/BigTestcase-2.json";
         // object to hold the data
         Graph dataObjectCenter = new Graph();
         GraphObject rawObject;
@@ -53,7 +54,7 @@ class MainApp
                 var graph = dataObjectCenter.GetGraph();
                 if (graph != null)
                 {
-                       ProcessGraphPartitioning(logger, graph);
+                    //  ProcessGraphPartitioning(logger, graph);
                     // Run the genetic algorithm engine
                     //  RunGAEngine(logger, dataObjectCenter);
                 }
@@ -100,7 +101,7 @@ class MainApp
             Console.WriteLine(GraphService.DiplayGraphByComponents(partitionResult));
             // generate DOT representation of the graph
 
-            //  CreateClusteredGraphAndDisplay(partitionResult);
+            CreateClusteredGraphAndDisplay(partitionResult);
         }
     }
 
@@ -109,16 +110,16 @@ class MainApp
         // create ga engine
         var geneticAlgorithmParameter = new GeneticAlgorithmParameter(
             "Interger",
-            "Tournament",
+            "Default",
             "ElitismSelection",
             "GroupCrossover",
             "GraftMutation",
             100, // Population size
-            0.5f, // Crossover rate
-            0.01f, // Mutation rate
-            800, // Max generations
-            1, // Tournament size
-            2, // Elitism count
+            0.8f, // Crossover rate
+            0.5f, // Mutation rate
+            100, // Max generations
+            17, // Tournament size
+            0.05f, // Elitism count
             0.01, // Converged gene rate
             0.01, // Convergence rate
             0, // Count generation
@@ -127,9 +128,7 @@ class MainApp
             true // Set to true to use weighted sum method
         )
         {
-            MaxGenerations = 100,
-            CrossoverRate = 0.5f,
-            MutationRate = 0.01f
+
         };
         var gaEngine = new MainGeneticAlgorithmEngine();
         logger.LogInformation("Running genetic algorithm engine.");

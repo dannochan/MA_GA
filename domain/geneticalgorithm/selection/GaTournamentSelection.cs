@@ -10,11 +10,9 @@ public class GaTournamentSelection : SelectionBase
     public int Size { get; set; }
     public bool AllowWinnerCompeteNextTournament { get; set; }
 
-    public GaTournamentSelection() : this(2)
-    {
 
-    }
-    public GaTournamentSelection(int size, bool allowWinnerCompeteNextTournament = true) : base(2)
+
+    public GaTournamentSelection(int size, bool allowWinnerCompeteNextTournament = true) : base(size)
     {
         Size = size;
         AllowWinnerCompeteNextTournament = allowWinnerCompeteNextTournament;
