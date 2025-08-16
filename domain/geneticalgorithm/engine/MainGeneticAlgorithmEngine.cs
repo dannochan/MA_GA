@@ -74,7 +74,7 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         {
               new CohesionObjective(graph, 1),
               new CouplingObjective(graph, 1),
-        //      new ModularityObjective(graph, 1),
+             new ModularityObjective(graph, 1),
         };
 
         var fitnessFunction = new FitnessFunction(objectives, graph);
@@ -121,7 +121,10 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         // Display the results
         Console.WriteLine(geneticAlgorithmResults.DisplaySolutionUsingShortName());
 
-        return new GeneticAlgorithmExecutionResult();
+        return new GeneticAlgorithmExecutionResult()
+        {
+            GeneticAlgorithmResults = geneticAlgorithmResults
+        };
     }
 
 }

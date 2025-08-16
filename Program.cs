@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Diagnostics;
+using System.Net.Http.Json;
 using System.Text.Json;
 using MA_GA.domain;
 using MA_GA.domain.geneticalgorithm.encoding;
@@ -18,56 +19,62 @@ class MainApp
         // logger
         using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
         ILogger logger = factory.CreateLogger("Program");
+        // running this program in vs code and use dotnet run to compile;
+        // this make sure reading the JSON files on project based directory (not bin/debug)
+        string dir = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+
         // define the path to the JSON file
-        string filePath = "/home/danno/Documents/MA_Project/MA_GA/data/SmallTestcase.json";
-        string filePath2 = "/home/danno/Documents/MA_Project/MA_GA/data/BigTestcase-2.json";
+        string filePath = Path.Combine(dir, "data", "SmallTestcase.json");
+        string filePath2 = Path.Combine(dir, "data", "BigTestcase-2.json");
         // object to hold the data
         Graph dataObjectCenter = new Graph();
         GraphObject rawObject;
 
 
 
-        using (StreamReader sr = new StreamReader(filePath2))
+        using (StreamReader sr = new StreamReader(filePath))
         {
             Console.WriteLine("Reading JSON file...");
             string json = sr.ReadToEnd();
             rawObject = JsonSerializer.Deserialize<GraphObject>(json);
 
-            if (rawObject != null)
-            {
-                ObjectHelper.MapDataObjects(rawObject, dataObjectCenter, logger);
-            }
+        }
 
-            if (!dataObjectCenter.IsEmpty())
-            {
+        if (rawObject != null)
+        {
+            ObjectHelper.MapDataObjects(rawObject, dataObjectCenter, logger);
+        }
 
-                logger.LogInformation("DataObjects are not empty, proceeding with graph displaying.");
-                // dataObjectCenter.ReadGraph();
-                var graph = dataObjectCenter.GetGraph();
-                if (graph != null)
-                {
-                    ProcessGraphPartitioning(logger, graph);
-                    // Run the genetic algorithm engine
-                    //  RunGAEngine(logger, dataObjectCenter);
-                }
-                // ProcessGraphPartitioning(logger, graph);
-                else
-                {
-                    logger.LogError("Graph is null after creation.");
-                }
+        if (dataObjectCenter.IsEmpty())
+        {
 
-                // Run the genetic algorithm engine
-                for (int i = 0; i < 1; i++)
-                {
-                    RunGAEngine(logger, dataObjectCenter);
-                }
-                //  RunGAEngine(logger, dataObjectCenter);
-            }
-            else
+            logger.LogError("DataObjects are empty, proceeding with graph displaying.");
+            throw new InvalidOperationException("DataObjects are empty, cannot proceed with graph displaying.");
+            // dataObjectCenter.ReadGraph();
+
+        }
+
+
+        logger.LogInformation("DataObjects loaded successfully. Proceeding with graph partitioning.");
+        var graph = dataObjectCenter.GetGraph();
+        if (graph != null)
+        {
+            // uncomment to deaktivate greedy partition algorithm
+            ProcessGraphPartitioning(logger, graph);
+            // Run the genetic algorithm engine
+            for (int i = 0; i < 1; i++)
             {
-                Console.WriteLine("DataObjects is null");
+                RunGAEngine(logger, dataObjectCenter);
             }
         }
+        // ProcessGraphPartitioning(logger, graph);
+        else
+        {
+            logger.LogError("Graph is null after creation.");
+            throw new InvalidOperationException("Graph is null, cannot proceed with graph processing.");
+        }
+
+
     }
 
     private static void ProcessGraphPartitioning(ILogger logger, AdjacencyGraph<DataObject, IObjectRelation> graph)
@@ -95,7 +102,7 @@ class MainApp
 
     private static void RunGAEngine(ILogger logger, Graph dataObjectCenter)
     {
-        // create ga engine
+        // create ga parameter for engine
         var geneticAlgorithmParameter = new GeneticAlgorithmParameter(
             "Interger",
             "Default",
@@ -106,7 +113,7 @@ class MainApp
             0.8f, // Crossover rate
             0.5f, // Mutation rate
             100, // Max generations
-            2, // Tournament size
+            15, // Tournament size
             0.05f, // Elitism count
             0.01, // Converged gene rate
             0.01, // Convergence rate
@@ -120,7 +127,8 @@ class MainApp
         };
         var gaEngine = new MainGeneticAlgorithmEngine();
         logger.LogInformation("Running genetic algorithm engine.");
-        gaEngine.run(dataObjectCenter, geneticAlgorithmParameter);
+        var optimizationResult = gaEngine.run(dataObjectCenter, geneticAlgorithmParameter);
+        optimizationResult.GeneticAlgorithmResults.DisplaySolutionUsingShortName();
         logger.LogInformation("Genetic algorithm engine run completed.");
     }
 
