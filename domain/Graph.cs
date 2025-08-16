@@ -107,20 +107,14 @@ public class Graph
     }
 
 
-    public void ReadList()
+    public String GetNodeNameById(int id)
     {
-        Console.WriteLine("Registered Data Objects are :");
-        foreach (var dataObject in nodeObjects)
+        if (_nodeDictionary.TryGetValue(id, out var dataObject))
         {
-            Console.WriteLine(dataObject.Name);
+            return dataObject.Name;
         }
-        Console.WriteLine("Relations are :");
-        foreach (var relation in edgeObjects)
-        {
-            Console.WriteLine($"{relation.SourceObject} - {relation.TargetObject} ({relation.RelationType})");
-        }
+        throw new KeyNotFoundException($"No node found with ID {id}");
     }
-
 
     public void ReadGraph()
     {

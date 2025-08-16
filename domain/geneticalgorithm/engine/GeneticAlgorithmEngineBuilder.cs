@@ -141,7 +141,7 @@ public class GeneticAlgorithmEngineBuilder
 
         // Create a population with the given graph and genetic algorithm parameters
         private IPopulation CreatePopulation(Graph graph, GeneticAlgorithmParameter geneticAlgorithmParameter,
-            bool isGreedyAlgoResult = false)
+            bool isGreedyAlgoResult = true)
         {
             IChromosome chromosome = isGreedyAlgoResult
                 ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph)

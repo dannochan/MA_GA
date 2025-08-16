@@ -25,7 +25,9 @@ class MainApp
         Graph dataObjectCenter = new Graph();
         GraphObject rawObject;
 
-        using (StreamReader sr = new StreamReader(filePath))
+
+
+        using (StreamReader sr = new StreamReader(filePath2))
         {
             Console.WriteLine("Reading JSON file...");
             string json = sr.ReadToEnd();
@@ -38,23 +40,13 @@ class MainApp
 
             if (!dataObjectCenter.IsEmpty())
             {
-                //  dataObjectCenter.ReadList();
-                //  dataObjectCenter.AddConnectionToNodes();
-                //  Console.WriteLine("Graph is not empty, connections added.");
-                //  dataObjectCenter.ReadNodeConnection();
-                //  Console.WriteLine("Connections read successfully.");
-                //  dataObjectCenter.RemoveNodeFromGraph("PKPla"); // Example of removing a node
-                //  Console.WriteLine("Node PKPla removed from graph.");
-                //  dataObjectCenter.ReadList();
-                //  Console.WriteLine("Graph after removal:");
-                //  dataObjectCenter.ReadNodeConnection();
 
                 logger.LogInformation("DataObjects are not empty, proceeding with graph displaying.");
                 // dataObjectCenter.ReadGraph();
                 var graph = dataObjectCenter.GetGraph();
                 if (graph != null)
                 {
-                    //  ProcessGraphPartitioning(logger, graph);
+                    ProcessGraphPartitioning(logger, graph);
                     // Run the genetic algorithm engine
                     //  RunGAEngine(logger, dataObjectCenter);
                 }
@@ -64,16 +56,12 @@ class MainApp
                     logger.LogError("Graph is null after creation.");
                 }
 
-                //   var encoding = LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(dataObjectCenter);
-                logger.LogInformation("Linear linkage encoding initialized with modules for each connected component.");
-
-                // Display the encoding
-                //  encoding.DisplayChromosome();
-                //  var validationResult = LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(encoding);
-                //   Console.WriteLine($"Is the encoding valid? {validationResult}");
-
                 // Run the genetic algorithm engine
-                RunGAEngine(logger, dataObjectCenter);
+                for (int i = 0; i < 1; i++)
+                {
+                    RunGAEngine(logger, dataObjectCenter);
+                }
+                //  RunGAEngine(logger, dataObjectCenter);
             }
             else
             {
@@ -101,7 +89,7 @@ class MainApp
             Console.WriteLine(GraphService.DiplayGraphByComponents(partitionResult));
             // generate DOT representation of the graph
 
-            CreateClusteredGraphAndDisplay(partitionResult);
+            //   CreateClusteredGraphAndDisplay(partitionResult);
         }
     }
 
@@ -118,7 +106,7 @@ class MainApp
             0.8f, // Crossover rate
             0.5f, // Mutation rate
             100, // Max generations
-            17, // Tournament size
+            2, // Tournament size
             0.05f, // Elitism count
             0.01, // Converged gene rate
             0.01, // Convergence rate

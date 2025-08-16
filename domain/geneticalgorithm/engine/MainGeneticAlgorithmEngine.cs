@@ -108,6 +108,19 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         // run the genetic algorithm
         //  geneticAlgorithmEngine.Start();
 
+        // testing result class
+        var geneticAlgorithmResults = new GeneticAlgorithmResults
+        {
+            graph = graph,
+            ModularisationExcecutionTimeInMillisecond = (long)time.TotalMilliseconds,
+            ModulesFromBestSolution = BestChromosome.GetModules(),
+            IntergeGeneFromBestSolution = BestChromosome.IntegerGenes.Select(g => (int)g.Value).ToList(),
+            BestFitness = geneticAlgorithmEngine.BestChromosome.Fitness.Value
+        };
+
+        // Display the results
+        Console.WriteLine(geneticAlgorithmResults.DisplaySolutionUsingShortName());
+
         return new GeneticAlgorithmExecutionResult();
     }
 
