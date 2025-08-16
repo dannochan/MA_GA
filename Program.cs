@@ -1,16 +1,12 @@
-﻿using System.Diagnostics;
-using System.Net.Http.Json;
-using System.Text.Json;
+﻿using System.Text.Json;
 using MA_GA.domain;
-using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.domain.geneticalgorithm.engine;
 using MA_GA.domain.geneticalgorithm.parameter;
 using MA_GA.domain.GreedyAlgorithm;
 using MA_GA.Models;
 using Microsoft.Extensions.Logging;
 using QuikGraph;
-using QuikGraph.Algorithms;
-using QuikGraph.Algorithms.ConnectedComponents;
+
 
 class MainApp
 {
@@ -30,8 +26,6 @@ class MainApp
         Graph dataObjectCenter = new Graph();
         GraphObject rawObject;
 
-
-
         using (StreamReader sr = new StreamReader(filePath))
         {
             Console.WriteLine("Reading JSON file...");
@@ -47,31 +41,24 @@ class MainApp
 
         if (dataObjectCenter.IsEmpty())
         {
-
             logger.LogError("DataObjects are empty, proceeding with graph displaying.");
             throw new InvalidOperationException("DataObjects are empty, cannot proceed with graph displaying.");
-            // dataObjectCenter.ReadGraph();
-
         }
-
 
         logger.LogInformation("DataObjects loaded successfully. Proceeding with graph partitioning.");
         var graph = dataObjectCenter.GetGraph();
-        if (graph != null)
-        {
-            // uncomment to deaktivate greedy partition algorithm
-            ProcessGraphPartitioning(logger, graph);
-            // Run the genetic algorithm engine
-            for (int i = 0; i < 1; i++)
-            {
-                RunGAEngine(logger, dataObjectCenter);
-            }
-        }
-        // ProcessGraphPartitioning(logger, graph);
-        else
+        if (graph == null)
         {
             logger.LogError("Graph is null after creation.");
             throw new InvalidOperationException("Graph is null, cannot proceed with graph processing.");
+        }
+
+        // uncomment to deactivate greedy partition algorithm
+        ProcessGraphPartitioning(logger, graph);
+        // Run the genetic algorithm engine
+        for (int i = 0; i < 1; i++)
+        {
+            RunGAEngine(logger, dataObjectCenter);
         }
 
 
@@ -105,7 +92,7 @@ class MainApp
         // create ga parameter for engine
         var geneticAlgorithmParameter = new GeneticAlgorithmParameter(
             "Interger",
-            "Default",
+            "defaul ga tournament",
             "ElitismSelection",
             "GroupCrossover",
             "GraftMutation",
@@ -120,7 +107,8 @@ class MainApp
             0, // Count generation
             10, // Minimum Pareto set size
             100, // Maximum Pareto set size
-            true // Set to true to use weighted sum method
+            true, // Set to true to use weighted sum method
+            true
         )
         {
 

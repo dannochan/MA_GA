@@ -3,6 +3,7 @@ using GeneticSharp;
 using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.domain.module;
 using MA_GA.Models;
+using Microsoft.Extensions.Logging;
 using QuikGraph.Algorithms.ConnectedComponents;
 
 namespace MA_GA.domain.geneticalgorithm.encoding;
@@ -79,10 +80,16 @@ public sealed class LinearLinkageEncodingInitialiser
         {
             if (element is DataObject dataObject)
             {
+                if (dataObject.Component == null)
+                {
+                    Console.WriteLine("dont forget to uncomment partitioning process!!!!!!!!!!!!!!!!!!!!!");
+                    throw new ArgumentException("DataObject component cannot be null", nameof(dataObject));
+                }
                 if (!sortedElements.ContainsKey(dataObject.Component))
                 {
                     sortedElements[dataObject.Component] = new List<int>();
                 }
+
                 sortedElements[dataObject.Component].Add(dataObject.GetIndex());
 
             }
