@@ -26,7 +26,7 @@ class MainApp
         Graph dataObjectCenter = new Graph();
         GraphObject rawObject;
 
-        using (StreamReader sr = new StreamReader(filePath))
+        using (StreamReader sr = new StreamReader(filePath2))
         {
             Console.WriteLine("Reading JSON file...");
             string json = sr.ReadToEnd();
