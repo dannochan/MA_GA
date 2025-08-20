@@ -158,8 +158,6 @@ public class ModuleInformationService
 
         var graphConnectivityInspector = GraphService.GetConnectivityInspector(subgraph);
 
-
-
         if (!graphConnectivityInspector.IsConnected())
         {
             return false;
@@ -169,8 +167,6 @@ public class ModuleInformationService
         var remainingEdges = edgesOfIndices
             .Where(edge => !subgraph.Edges.Contains(edge))
             .ToList();
-
-
 
         var subgraphVertexSet = new HashSet<DataObject>(
             subgraph.Vertices.Select(v => v as DataObject).Where(v => v != null)
