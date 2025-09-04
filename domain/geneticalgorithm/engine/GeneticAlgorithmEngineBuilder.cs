@@ -62,6 +62,7 @@ public class GeneticAlgorithmEngineBuilder
                 crossover,
                 mutation)
             {
+
                 Termination = new GenerationNumberTermination(geneticAlgorithmParameter.MaxGenerations),
                 CrossoverProbability = geneticAlgorithmParameter.CrossoverRate,
                 MutationProbability = geneticAlgorithmParameter.MutationRate
@@ -151,7 +152,12 @@ public class GeneticAlgorithmEngineBuilder
                         ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph)
                         : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
             var lle = (LinearLinkageEncoding)initialChrome;
+
+            Console.WriteLine("Initial Chromosome:");
             lle.DisplayChromosome();
+            Console.WriteLine("END of Initial Chromosome");
+
+
 
             return new Population(30, geneticAlgorithmParameter.PopulationSize, chromosome);
         }

@@ -80,6 +80,22 @@ public class Graph
 
     }
 
+    public List<ObjectRelation> FindIncidentRelationsForVertex(DataObject vertex)
+    {
+        var incidentEdges = new List<ObjectRelation>();
+
+        foreach (var edge in _edgeDictionary)
+        {
+            if (edge.Value.SourceObject.GetIndex() == vertex.GetIndex() || edge.Value.TargetObject.GetIndex() == vertex.GetIndex())
+            {
+                incidentEdges.Add(edge.Value);
+            }
+
+        }
+
+        return incidentEdges;
+    }
+
 
     public DataObject GetNodeObjectByName(string name)
     {

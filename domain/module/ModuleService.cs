@@ -203,7 +203,7 @@ public class ModuleService
     {
         var selectedIndices = new HashSet<object>();
         var visitedModularisableElement = new HashSet<int>();
-        var visitedEdges = new HashSet<IObjectRelation>();
+        var visitedEdges = new HashSet<ObjectRelation>();
 
         var queue = new Stack<ModularisableElement>();
         queue.Push(modularisableElement);
@@ -216,20 +216,12 @@ public class ModuleService
             if (currentElement is DataObject vertex)
             {
 
-                var edgesOfCurrentVertex = new List<IObjectRelation>();
-                foreach (var edge in graph.GetGraph().Edges)
-                {
-                    if (edge.SourceObject.GetIndex() == vertex.GetIndex() || edge.TargetObject.GetIndex() == vertex.GetIndex())
-                    {
-                        edgesOfCurrentVertex.Add(edge);
-                    }
-                }
+                var edgesOfCurrentVertex = graph.FindIncidentRelationsForVertex(vertex);
 
                 var edgesInModuleAndNotVisited = edgesOfCurrentVertex
-                .Select(e => (ObjectRelation)e)
                 .Where(e =>
                     indicesOfModule.Contains(e.Source.GetIndex()) && indicesOfModule.Contains(e.Target.GetIndex()) &&
-                    !visitedEdges.Contains(e)).ToList();
+                    !visitedEdges.Contains(e)).ToList().OrderBy(e => e.Weight).ToList();
 
                 foreach (var edge in edgesInModuleAndNotVisited)
                 {

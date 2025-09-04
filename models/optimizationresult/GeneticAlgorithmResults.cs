@@ -24,10 +24,13 @@ public class GeneticAlgorithmResults
 
     public string DisplaySolutionUsingShortName()
     {
+        Console.WriteLine($"Module Count : {ModulesFromBestSolution.Count}");
         var sb = new StringBuilder();
         sb.AppendLine("=== Modules ===");
         for (int i = 0; i < ModulesFromBestSolution.Count; i++)
         {
+            Console.WriteLine($"Module {i + 1}:");
+            Console.WriteLine("Node Ids : " + string.Join(", ", ModulesFromBestSolution[i].GetIndices()));
             var module = ModulesFromBestSolution[i];
             var names = module.GetIndices().Select(id => $"{id} : {graph.GetNodeNameById(id)}").ToList();
 

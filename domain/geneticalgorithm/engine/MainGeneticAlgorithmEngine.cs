@@ -99,8 +99,8 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         // print the best chromosome
         Console.WriteLine($"Best Fitness: {geneticAlgorithmEngine.BestChromosome.Fitness.Value}");
         // print modules of the best chromosome
-        var BestChromosome = (LinearLinkageEncoding)geneticAlgorithmEngine.BestChromosome;
-        BestChromosome.DisplayChromosome();
+        var BestChromosome = geneticAlgorithmEngine.BestChromosome as LinearLinkageEncoding;
+        BestChromosome?.DisplayChromosome();
 
         var time = geneticAlgorithmEngine.TimeEvolving;
         Console.WriteLine($"Time taken: {time.TotalSeconds} seconds");
@@ -113,13 +113,12 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         {
             graph = graph,
             ModularisationExcecutionTimeInMillisecond = (long)time.TotalMilliseconds,
-            ModulesFromBestSolution = BestChromosome.GetModules(),
-            IntergeGeneFromBestSolution = BestChromosome.IntegerGenes.Select(g => (int)g.Value).ToList(),
+            ModulesFromBestSolution = BestChromosome!.GetModules().Select(m => m.Clone()).ToList(),
+            IntergeGeneFromBestSolution = BestChromosome.GetIntegerGenes().Select(g => (int)g.Value).ToList(),
             BestFitness = geneticAlgorithmEngine.BestChromosome.Fitness.Value
         };
 
         // Display the results
-        Console.WriteLine(geneticAlgorithmResults.DisplaySolutionUsingShortName());
 
         return new GeneticAlgorithmExecutionResult()
         {

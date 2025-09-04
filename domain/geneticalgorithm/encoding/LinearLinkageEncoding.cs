@@ -133,6 +133,16 @@ public class LinearLinkageEncoding : ChromosomeBase
         return Length;
     }
 
+    public Gene GetIntegerGene(int index)
+    {
+        if (index < 0 || index >= IntegerGenes.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+        }
+
+        return IntegerGenes[index];
+    }
+
     public bool IsValid()
     {
         // Implement validation logic if needed

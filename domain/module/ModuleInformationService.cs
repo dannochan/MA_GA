@@ -26,7 +26,7 @@ public class ModuleInformationService
     public static Module GetModule(ModularisableElement element, LinearLinkageEncoding encoding)
     {
         return encoding.GetModules()
-            .FirstOrDefault(m => m.GetIndices().Contains(element.GetIndex()));
+            .First(m => m.GetIndices().Contains(element.GetIndex()));
     }
 
     public static List<Module> GetModuleNeighbors(
@@ -347,7 +347,7 @@ public class ModuleInformationService
 
         if (indices.Count > 1)
         {
-            return false; 
+            return false;
         }
         var modularisableElement = graph.GetModularisableElementByIndex((int)indices.First());
 

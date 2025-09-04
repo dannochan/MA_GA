@@ -69,7 +69,7 @@ public sealed class LinearLinkageEncodingInformationService
     public static int GetNumberOfNonIsolatedModules(LinearLinkageEncoding encoding)
     {
         return encoding.GetModules()
-            .Count(module => ModuleInformationService.IsIsolated(module, encoding.GetGraph()));
+            .Count(module => !ModuleInformationService.IsIsolated(module, encoding.GetGraph()));
     }
 
     public static bool IsValidChromose(IChromosome chromosome)

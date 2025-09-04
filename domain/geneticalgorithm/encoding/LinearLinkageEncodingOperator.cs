@@ -134,12 +134,17 @@ public sealed class LinearLinkageEncodingOperator
         }
 
         var integerGenes = encoding.GetIntegerGenes();
-        effectedModules.ForEach(module => UpdateModule(module, integerGenes));
+        // effectedModules.ForEach(module => UpdateModule(module, integerGenes));
         //   var newIntegergenes = new List<Gene>(integerGenes.Count);
         //   foreach (var module in effectedModules)
         //   {
         //       UpdateModule(module, integerGenes);
         //   }
+        for (int i = 0; i < effectedModules.Count; i++)
+        {
+            var module = effectedModules[i];
+            UpdateModule(module, integerGenes);
+        }
 
         return new LinearLinkageEncoding(encoding.GetGraph(), integerGenes);
 

@@ -54,9 +54,13 @@ class MainApp
         }
 
         // uncomment to deactivate greedy partition algorithm
-        ProcessGraphPartitioning(logger, graph);
+        lock (dataObjectCenter)
+        {
+            //  ProcessGraphPartitioning(logger, graph);
+        }
+
         // Run the genetic algorithm engine
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 5; i++)
         {
             RunGAEngine(logger, dataObjectCenter);
         }
@@ -97,18 +101,18 @@ class MainApp
             "GroupCrossover",
             "GraftMutation",
             100, // Population size
-            0.2f, // Crossover rate
-            0.1f, // Mutation rate
+            0.8f, // Crossover rate
+            0.5f, // Mutation rate
             100, // Max generations
-            2, // Tournament size
-            0.05f, // Elitism count
+            4, // Tournament size
+            0.5f, // Elitism count
             0.01, // Converged gene rate
             0.01, // Convergence rate
             0, // Count generation
             10, // Minimum Pareto set size
             100, // Maximum Pareto set size
             true, // Set to true to use weighted sum method
-            true
+            false
         )
         {
 
@@ -116,7 +120,7 @@ class MainApp
         var gaEngine = new MainGeneticAlgorithmEngine();
         logger.LogInformation("Running genetic algorithm engine.");
         var optimizationResult = gaEngine.run(dataObjectCenter, geneticAlgorithmParameter);
-        optimizationResult.GeneticAlgorithmResults.DisplaySolutionUsingShortName();
+        Console.WriteLine(optimizationResult.GeneticAlgorithmResults.DisplaySolutionUsingShortName());
         logger.LogInformation("Genetic algorithm engine run completed.");
     }
 

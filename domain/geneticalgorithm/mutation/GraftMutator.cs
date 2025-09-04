@@ -41,35 +41,45 @@ public class GraftMutator : MutationBase
             throw new InvalidOperationException("Chromosome must be of type YourEncodingChromosome.");
 
         // Check if the encoding is valid
-
-        if (!encoding.IsValid())
+        if (LinearLinkageEncodingInformationService.IsValidChromose(encoding))
         {
             return;
         }
 
         var rnd = RandomizationProvider.Current;
 
-        double opRoll = rnd.GetFloat();
+        if (rnd.GetFloat() < probability)
+        {
 
-        if (opRoll < divideModuleprobability)
-        {
-            // Divide a random module
-            LinearLinkageEncodingOperator.DivideRandomModule(encoding);
-        }
-        else if (opRoll < combinedModuleprobability)
-        {
-            // Combine modules
-            if (LinearLinkageEncodingInformationService.GetNumberOfNonIsolatedModules(encoding) > 2)
+            var opRoll = rnd.GetFloat();
+
+            if (opRoll < divideModuleprobability)
             {
-                LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
+                // Divide a random module
+                LinearLinkageEncodingOperator.DivideRandomModule(encoding);
+            }
+            else if (opRoll < combinedModuleprobability)
+            {
+                // Combine modules
+                if (LinearLinkageEncodingInformationService.GetNumberOfNonIsolatedModules(encoding) > 2)
+                {
+                    LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
+                }
+
+            }
+            else
+            {
+                // Move a gene to a different module
+                LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
+            }
+            // else: no mutation this time
+            // Ensure the encoding is still valid after mutation
+            if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
+            {
+                LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
             }
 
         }
-        else
-        {
-            // Move a gene to a different module
-            LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
-        }
-        // else: no mutation this time
+
     }
 }

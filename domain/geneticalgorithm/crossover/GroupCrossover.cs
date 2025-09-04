@@ -28,7 +28,9 @@ public class GroupCrossover : CrossoverBase
             offspring1 = parent1.Clone();
             offspring2 = parent2.Clone();
 
-
+            // If either parent is invalid, return clones of the parents
+            // offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
+            // offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
 
             return new List<IChromosome> { offspring1, offspring2 };
         }
@@ -46,8 +48,9 @@ public class GroupCrossover : CrossoverBase
 
         for (int i = 0; i < parent1.Length; i++)
         {
-            var geneInParent1 = parent1.GetGene(i);
-            var geneInParent2 = parent2.GetGene(i);
+
+            var geneInParent1 = parent1.GetIntegerGene(i);
+            var geneInParent2 = parent2.GetIntegerGene(i);
 
             if (IsEndingNode(geneInParent1, i) && IsEndingNode(geneInParent2, i)) continue;
 
@@ -97,7 +100,7 @@ public class GroupCrossover : CrossoverBase
 
     private void AssignGeneToOneOfNewModules(LinearLinkageEncoding encodingParent, IDictionary<int, Module> newModuleForOffspring, int index)
     {
-        var geneInParent = encodingParent.GetGene(index);
+        var geneInParent = encodingParent.GetIntegerGene(index);
         var moduleOfGene = encodingParent.GetModuleOfAllele((int)geneInParent.Value);
         var alleleEndingNodeInParent = moduleOfGene.GetAlleleOfEndingNode();
 
@@ -137,7 +140,7 @@ public class GroupCrossover : CrossoverBase
 
     private bool IsEndingNode(LinearLinkageEncoding encoding, int index)
     {
-        return IsEndingNode(encoding.GetGene(index), index);
+        return IsEndingNode(encoding.GetIntegerGene(index), index);
     }
 
     /// <summary>
@@ -163,7 +166,7 @@ public class GroupCrossover : CrossoverBase
             var isIsolatedVertex = moduleElement is DataObject dataObject &&
             baseGraph.IsIsolatedVertex(dataObject);
 
-            if (isIsolatedVertex || (IsEndingNode(encodingParent1, i) && IsEndingNode(encodingParent2, i)) || (IsEndingNode(encodingParent1, i) && random.GetDouble() < 0.5) || (IsEndingNode(encodingParent2, i) && random.GetDouble() < 0.5))
+            if (isIsolatedVertex || (IsEndingNode(encodingParent1, i) && IsEndingNode(encodingParent2, i)) || (IsEndingNode(encodingParent1, i) && random.GetDouble() < 0.5d) || (IsEndingNode(encodingParent2, i) && random.GetDouble() < 0.5d))
             {
 
                 var module = new Module();
