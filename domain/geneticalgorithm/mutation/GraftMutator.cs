@@ -41,7 +41,7 @@ public class GraftMutator : MutationBase
             throw new InvalidOperationException("Chromosome must be of type YourEncodingChromosome.");
 
         // Check if the encoding is valid
-        if (LinearLinkageEncodingInformationService.IsValidChromose(encoding))
+        if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
         {
             return;
         }
