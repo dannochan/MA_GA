@@ -147,7 +147,7 @@ public class GeneticAlgorithmEngineBuilder
                 ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph)
                 : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
 
-            /*  for checking initial chromosome       */
+            /*  for checking initial chromosome      
             var initialChrome = geneticAlgorithmParameter.UseGreedyPartition
                         ? LinearLinkageEncodingInitialiser.InitializeLinearLinkageEncodingWithGreedyAlgorithm(graph)
                         : Genotypeinitializer.GenerateGenotypeWithModulesForEachConnectedComponet(graph);
@@ -157,9 +157,9 @@ public class GeneticAlgorithmEngineBuilder
             lle.DisplayChromosome();
             Console.WriteLine("END of Initial Chromosome");
 
+ */
 
-
-            return new Population(30, geneticAlgorithmParameter.PopulationSize, chromosome);
+            return new Population(30, 100, chromosome);
         }
     }
 }

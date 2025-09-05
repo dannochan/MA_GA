@@ -31,6 +31,7 @@ public class GaTournamentSelection : SelectionBase
 
         var list = generation.Chromosomes.OfType<LinearLinkageEncoding>().ToList();
         var list2 = new List<LinearLinkageEncoding>();
+        // TODO: Check if criteria is valid 
         while (list2.Count < number)
         {
             int[] randomIndexes = RandomizationProvider.Current.GetUniqueInts(Size, 0, list.Count);
