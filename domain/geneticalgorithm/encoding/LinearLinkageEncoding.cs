@@ -68,7 +68,7 @@ public class LinearLinkageEncoding : ChromosomeBase
 
     public List<Gene> GetIntegerGenes()
     {
-        return IntegerGenes;
+        return IntegerGenes.ToList();
     }
 
     public void ReplaceIntegerGene(int index, Gene gene)
@@ -105,11 +105,11 @@ public class LinearLinkageEncoding : ChromosomeBase
     {
         var random = RandomizationProvider.Current;
         var value = random.GetDouble();
-        if (value < 1.0 / 3.0)
+        if (value < 1.0d / 3.0d)
         {
             return LinearLinkageEncodingOperator.DivideRandomModule(encoding);
         }
-        else if (value < 2.0 / 3.0)
+        else if (value < 2.0d / 3.0d)
         {
             if (LinearLinkageEncodingInformationService.GetNumberOfNonIsolatedModules(encoding) > 2)
             {
@@ -168,7 +168,7 @@ public class LinearLinkageEncoding : ChromosomeBase
         {
             clonedEncoding.ReplaceIntegerGene(i, new Gene(IntegerGenes[i].Value));
         }
-        clonedEncoding.Modules = Modules.Select(m => m.Clone()).ToList();
+        //  clonedEncoding.Modules = Modules.Select(m => m.Clone()).ToList();
 
         return clonedEncoding;
     }
