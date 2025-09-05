@@ -111,8 +111,8 @@ public sealed class LinearLinkageEncodingOperator
         if (sourceModule.GetIndices().Count > 0)
         {
 
-        // check if source module still connected when elements are moved
-        var isSourceModuleConnected = ModuleInformationService.IsModuleConnected(sourceModule, graph);
+            // check if source module still connected when elements are moved
+            var isSourceModuleConnected = ModuleInformationService.IsModuleConnected(sourceModule, graph);
 
             if (!isSourceModuleConnected)
             {
@@ -121,15 +121,12 @@ public sealed class LinearLinkageEncodingOperator
             }
             else
             {
-                        effectedModules.Add(sourceModule);
-            
+                effectedModules.Add(sourceModule);
+
+            }
+
+
         }
-
-    
-        }
-
-
-
 
 
         return UpdateIntegerGenes(effectedModules, encoding);
@@ -139,10 +136,6 @@ public sealed class LinearLinkageEncodingOperator
 
     public static LinearLinkageEncoding UpdateIntegerGenes(List<Module> effectedModules, LinearLinkageEncoding encoding)
     {
-        if (effectedModules.Count == 0)
-        {
-            return encoding;
-        }
 
         var integerGenes = encoding.GetIntegerGenes();
         // effectedModules.ForEach(module => UpdateModule(module, integerGenes));
