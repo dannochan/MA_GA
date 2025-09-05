@@ -82,18 +82,18 @@ public sealed class LinearLinkageEncodingOperator
 
         var graph = encoding.GetGraph();
 
-        var movableElements = sourceModule.GetIndices().Select(index => graph.GetModularisableElementByIndex(index)).ToDictionary(
+        var movableElementsWithNeighbourInOtherModules = sourceModule.GetIndices().Select(index => graph.GetModularisableElementByIndex(index)).ToDictionary(
             element => element,
             element => ModuleInformationService.GetIncidentModules(element, encoding));
 
-        var candidateElements = movableElements.Where(kv => kv.Value.Any()).ToDictionary(kv => kv.Key, kv => kv.Value);
+        var candidateElements = movableElementsWithNeighbourInOtherModules.Where(kv => kv.Value.Any()).ToDictionary(kv => kv.Key, kv => kv.Value);
 
         if (!candidateElements.Any())
         {
             return encoding;
         }
 
-        var modularisableElemToMove = candidateElements.Keys.ToList()[random.GetInt(0, candidateElements.Count)]; // -1
+        var modularisableElemToMove = candidateElements.Keys.ToList()[random.GetInt(0, candidateElements.Count - 1)]; // -1
 
         // target module 
         var targetModules = candidateElements[modularisableElemToMove];
@@ -107,19 +107,30 @@ public sealed class LinearLinkageEncodingOperator
         // affected modules
         var effectedModules = new List<Module> { targetModule };
         // add source module if it still has indices
+
         if (sourceModule.GetIndices().Count > 0)
         {
-            effectedModules.Add(sourceModule);
-        }
 
         // check if source module still connected when elements are moved
         var isSourceModuleConnected = ModuleInformationService.IsModuleConnected(sourceModule, graph);
 
-        if (!isSourceModuleConnected)
-        {
-            var splitUpdateModules = ModuleService.SplitNonIncidentModule(sourceModule, encoding).ToList();
-            effectedModules.AddRange(splitUpdateModules);
+            if (!isSourceModuleConnected)
+            {
+                var splitUpdateModules = ModuleService.SplitNonIncidentModule(sourceModule, encoding).ToList();
+                effectedModules.AddRange(splitUpdateModules);
+            }
+            else
+            {
+                        effectedModules.Add(sourceModule);
+            
         }
+
+    
+        }
+
+
+
+
 
         return UpdateIntegerGenes(effectedModules, encoding);
 
