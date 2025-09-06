@@ -76,7 +76,7 @@ public abstract class Objective
         {
             throw new ArgumentException($"Chromosome must be of type {nameof(LinearLinkageEncoding)}", nameof(chromosome));
         }
-        var lle = encoding as LinearLinkageEncoding;
+        var lle = encoding;
         return this.CalculateValue(lle.GetModules());
     }
 

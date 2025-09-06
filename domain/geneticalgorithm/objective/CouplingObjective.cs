@@ -15,10 +15,19 @@ public class CouplingObjective : Objective
     }
     public override double CalculateValue(List<Module> modules)
     {
+        var visitedEdges = new HashSet<IObjectRelation>();
         return modules.Where(module => !ModuleInformationService.IsIsolated(module, graph)).Sum(
          module =>
          {
-             return ModuleInformationService.GetBoundaryEdgesOfModule(module, graph).Sum(edge => edge.Weight);
+             return ModuleInformationService.GetBoundaryEdgesOfModule(module, graph).Sum(edge =>
+             {
+                 if (visitedEdges.Contains(edge))
+                 {
+                     return 0.0; // Skip already visited edges
+                 }
+                 visitedEdges.Add(edge);
+                 return edge.Weight;
+             });
          }
        );
     }
