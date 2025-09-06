@@ -41,7 +41,7 @@ public class CohesionObjective : Objective
                 }
                 else
                 {
-                    sum += edge.Weight / 2;
+                    sum += edge.Weight / 2.0;
                 }
 
             }
