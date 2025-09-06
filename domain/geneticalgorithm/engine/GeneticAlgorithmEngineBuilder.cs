@@ -132,10 +132,8 @@ public class GeneticAlgorithmEngineBuilder
             {
                 case "Roulette":
                     return new RouletteWheelSelection();
-                case "Tournament":
-                    return new TournamentSelection(geneticAlgorithmParameter.TournamentSize, true);
                 default:
-                    return new GaTournamentSelection(geneticAlgorithmParameter.TournamentSize, true);
+                    return new TournamentSelection(geneticAlgorithmParameter.TournamentSize, true);
             }
         }
 
@@ -159,7 +157,7 @@ public class GeneticAlgorithmEngineBuilder
 
  */
 
-            return new Population(30, 100, chromosome);
+            return new Population(20, 100, chromosome);
         }
     }
 }
