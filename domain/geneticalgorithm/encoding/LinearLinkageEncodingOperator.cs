@@ -204,7 +204,7 @@ public sealed class LinearLinkageEncodingOperator
 
         if (LinearLinkageEncodingInformationService.IsMonolith(repairedLinearLinkageEncoding))
         {
-            repairedLinearLinkageEncoding = RandomlySplitUpModulesV2(lle);
+            repairedLinearLinkageEncoding = RandomlySplitUpModulesV2(repairedLinearLinkageEncoding);
 
         }
 
@@ -233,7 +233,7 @@ public sealed class LinearLinkageEncodingOperator
 
         // Select a random module to split
         var random = RandomizationProvider.Current;
-        var selectedModule = modulesToSplit[random.GetInt(0, modulesToSplit.Count)];
+        var selectedModule = modulesToSplit[random.GetInt(0, modulesToSplit.Count - 1)];
 
         var splitupModule = ModuleService.DivideModuleRandomWalk2(selectedModule, lle.GetGraph());
         return UpdateIntegerGenes(splitupModule, lle);
@@ -241,58 +241,6 @@ public sealed class LinearLinkageEncodingOperator
 
 
 
-    private static LinearLinkageEncoding RepairInvalidGeneAssignment2(LinearLinkageEncoding repairedLinearLinkageEncoding)
-    {
-        var genes = repairedLinearLinkageEncoding.GetIntegerGenes().Select(g => (int)g.Value).ToList();
-        var alleleCounts = new Dictionary<int, int>();
-        var unusedAlleles = new List<int>();
-        int numGenes = genes.Count;
-
-        // Count occurrencesgit c
-        foreach (int allele in genes)
-        {
-            if (!alleleCounts.ContainsKey(allele))
-                alleleCounts[allele] = 0;
-            alleleCounts[allele]++;
-        }
-
-        // Build list of all possible alleles (assuming alleles are 0..numGenes-1)
-        for (int i = 0; i < numGenes - 1; i++)
-        {
-            if (!alleleCounts.ContainsKey(i) || alleleCounts[i] < LinearLinkageEncodingConstant.ALLOWED_AMOUNT_OF_SAME_ALLELES)
-            {
-                for (int cnt = alleleCounts.ContainsKey(i) ? alleleCounts[i] : 0;
-                     cnt < LinearLinkageEncodingConstant.ALLOWED_AMOUNT_OF_SAME_ALLELES; cnt++)
-                {
-                    unusedAlleles.Add(i);
-                }
-            }
-        }
-
-        // Shuffle unusedAlleles for random assignment
-        var random = RandomizationProvider.Current;
-        unusedAlleles = unusedAlleles.OrderBy(x => random.GetInt(0, int.MaxValue)).ToList();
-
-        // Replace overused alleles
-        for (int i = 0; i < genes.Count; i++)
-        {
-            int allele = (int)genes[i];
-            if (alleleCounts[allele] > LinearLinkageEncodingConstant.ALLOWED_AMOUNT_OF_SAME_ALLELES)
-            {
-                // Replace with an unused allele
-                if (unusedAlleles.Count > 0)
-                {
-                    genes[i] = unusedAlleles[0];
-                    alleleCounts[allele]--;
-                    alleleCounts[unusedAlleles[0]] = alleleCounts.GetValueOrDefault(unusedAlleles[0], 0) + 1;
-                    unusedAlleles.RemoveAt(0);
-                }
-            }
-        }
-
-        // Assume you have a constructor like: new LinearLinkageEncoding(List<int> genes, KnowledgeGraph knowledgeGraph)
-        return new LinearLinkageEncoding(repairedLinearLinkageEncoding.GetGraph(), genes.Select(g => new Gene(g)).ToList());
-    }
     public static LinearLinkageEncoding RepairInvalidGeneAssignment(LinearLinkageEncoding linearLinkageEncoding)
     {
         var interGenes = linearLinkageEncoding.GetIntegerGenes().Select(g => (int)g.Value).ToList();

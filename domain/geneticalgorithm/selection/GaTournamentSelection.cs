@@ -36,7 +36,7 @@ public class GaTournamentSelection : SelectionBase
         {
             int[] randomIndexes = RandomizationProvider.Current.GetUniqueInts(Size, 0, list.Count);
             LinearLinkageEncoding chromosome = list
-                .Where((c, i) => randomIndexes.Contains(i) && c.IsValid())
+                .Where((c, i) => randomIndexes.Contains(i))
                 .OrderByDescending(c => c.Fitness)
                 .First();
 
