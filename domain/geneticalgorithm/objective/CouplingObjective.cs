@@ -16,20 +16,23 @@ public class CouplingObjective : Objective
     public override double CalculateValue(List<Module> modules)
     {
         var visitedEdges = new HashSet<IObjectRelation>();
-        return modules.Where(module => !ModuleInformationService.IsIsolated(module, graph)).Sum(
-         module =>
-         {
-             return ModuleInformationService.GetBoundaryEdgesOfModule(module, graph).Sum(edge =>
-             {
-                 if (visitedEdges.Contains(edge))
-                 {
-                     return 0.0; // Skip already visited edges
-                 }
-                 visitedEdges.Add(edge);
-                 return edge.Weight;
-             });
-         }
-       );
+        double totalCoupling = 0.0;
+
+        foreach (var module in modules)
+        {
+            if (ModuleInformationService.IsIsolated(module, graph))
+                continue;
+
+            foreach (var edge in ModuleInformationService.GetBoundaryEdgesOfModule(module, graph))
+            {
+                if (visitedEdges.Add(edge))
+                {
+                    totalCoupling += edge.Weight;
+                }
+            }
+        }
+
+        return totalCoupling;
     }
     public override string GetObjectiveName()
     {

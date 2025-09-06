@@ -46,7 +46,7 @@ public abstract class Objective
 
     public void SetNumberOfElementsPerModule(int numberOFElementsPerModule)
     {
-        this.numberOfElementsPerModule = numberOFElementsPerModule;
+        numberOfElementsPerModule = numberOFElementsPerModule;
     }
 
     public void GetPrepare()
@@ -72,12 +72,8 @@ public abstract class Objective
 
     public double Evaluate(IChromosome chromosome)
     {
-        if (chromosome is not LinearLinkageEncoding encoding)
-        {
-            throw new ArgumentException($"Chromosome must be of type {nameof(LinearLinkageEncoding)}", nameof(chromosome));
-        }
-        var lle = encoding;
-        return this.CalculateValue(lle.GetModules());
+        var lle = new LinearLinkageEncoding(chromosome, graph);
+        return CalculateValue(lle.GetModules());
     }
 
 }
