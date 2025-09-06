@@ -18,12 +18,19 @@ public class CohesionObjective : Objective
     }
     public override double CalculateValue(List<Module> modules)
     {
+        var visitedEdges = new HashSet<IObjectRelation>();
         return modules.Where(module => !ModuleInformationService.IsIsolated(module, graph)).Sum(module =>
         {
             var edges = ModuleInformationService.GetModuleEdges(module, graph);
+
             double sum = 0.0;
             foreach (var edge in edges)
             {
+                if (visitedEdges.Contains(edge))
+                {
+                    continue; // Skip already visited edges
+                }
+                visitedEdges.Add(edge);
                 var source = edge.Source;
                 var target = edge.Target;
 
