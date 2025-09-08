@@ -26,7 +26,7 @@ class MainApp
         Graph dataObjectCenter = new Graph();
         GraphObject rawObject;
 
-        using (StreamReader sr = new StreamReader(filePath2))
+        using (StreamReader sr = new StreamReader(filePath))
         {
             Console.WriteLine("Reading JSON file...");
             string json = sr.ReadToEnd();
@@ -56,11 +56,11 @@ class MainApp
         // uncomment to deactivate greedy partition algorithm
         lock (dataObjectCenter)
         {
-            //  ProcessGraphPartitioning(logger, graph);
+            ProcessGraphPartitioning(logger, graph);
         }
 
         // Run the genetic algorithm engine
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 1; i++)
         {
             RunGAEngine(logger, dataObjectCenter);
         }
@@ -96,15 +96,15 @@ class MainApp
         // create ga parameter for engine
         var geneticAlgorithmParameter = new GeneticAlgorithmParameter(
             "Interger",
-            "defaul ga tournament",
+            "Tournament",
             "ElitismSelection",
             "GroupCrossover",
             "GraftMutation",
             100, // Population size
             0.8f, // Crossover rate
-            0.5f, // Mutation rate
+            0.6f, // Mutation rate
             100, // Max generations
-            4, // Tournament size
+            5, // Tournament size
             0.5f, // Elitism count
             0.01, // Converged gene rate
             0.01, // Convergence rate
@@ -112,7 +112,7 @@ class MainApp
             10, // Minimum Pareto set size
             100, // Maximum Pareto set size
             true, // Set to true to use weighted sum method
-            false
+            true
         )
         {
 
