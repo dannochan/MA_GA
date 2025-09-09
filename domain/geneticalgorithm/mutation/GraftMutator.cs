@@ -41,14 +41,10 @@ public class GraftMutator : MutationBase
             throw new InvalidOperationException("Chromosome must be of type YourEncodingChromosome.");
 
         // Check if the encoding is valid
-        if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
-        {
-            var LLe = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
-            if (LLe != null)
-            {
-                encoding = (LinearLinkageEncoding)LLe;
-            }
-        }
+        //   if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
+        //   {
+        //       return;
+        //   }
 
         var rnd = RandomizationProvider.Current;
 
@@ -60,57 +56,29 @@ public class GraftMutator : MutationBase
             if (opRoll < divideModuleprobability)
             {
                 // Divide a random module
-                var newLLe = LinearLinkageEncodingOperator.DivideRandomModule(encoding);
-                if (newLLe != null)
-                {
-                    encoding = (LinearLinkageEncoding)newLLe;
-                }
+                LinearLinkageEncodingOperator.DivideRandomModule(encoding);
             }
             else if (opRoll < combinedModuleprobability + divideModuleprobability)
             {
                 // Combine modules
                 if (LinearLinkageEncodingInformationService.GetNumberOfNonIsolatedModules(encoding) > 2)
                 {
-                    var newLLe = LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
-
-                    if (newLLe != null)
-                    {
-                        encoding = (LinearLinkageEncoding)newLLe;
-                    }
+                    LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
                 }
 
             }
             else
             {
                 // Move a gene to a different module
-                var newLLe = LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
-
-                if (newLLe != null)
-                {
-                    encoding = (LinearLinkageEncoding)newLLe;
-                }
+                LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
             }
-
+            // else: no mutation this time
             // Ensure the encoding is still valid after mutation
             if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
             {
-                var LLe = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
-                if (LLe != null)
-                {
-                    encoding = (LinearLinkageEncoding)LLe;
-                }
+                LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
             }
 
-        }
-
-        if (chromosome is LinearLinkageEncoding lle)
-        {
-            for (int i = 0; i < lle.GetChromosomeLength(); i++)
-            {
-                lle.ReplaceIntegerGene(i, encoding.GetIntegerGene(i));
-            }
-
-            lle.Modules = encoding.Modules.Select(m => m.Clone()).ToList();
         }
 
     }

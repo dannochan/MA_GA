@@ -48,13 +48,10 @@ public class Graph
     {
         nodeObjects.Add(dataObject);
         // only add node to graph when it is not an information object
-        /**
         if (dataObject.ObjectType == ObjectType.InformationObject)
         {
             return;
         }
-
-        **/
         _Graph.AddVertex(dataObject);
         _nodeDictionary.Add(dataObject.GetIndex(), dataObject);
     }
@@ -68,14 +65,11 @@ public class Graph
             throw new ArgumentNullException(nameof(relation), "Relation cannot be null");
         }
         // check if either source or / both target objects are information objects
-        /**
         if (relation.SourceObject.ObjectType == ObjectType.InformationObject ||
             relation.TargetObject.ObjectType == ObjectType.InformationObject)
         {
             return; // do not add relation between two information objects
         }
-
-        **/
 
         edgeObjects.Add(relation);
         _Graph.AddEdge(relation);
@@ -181,7 +175,7 @@ public class Graph
         {
             if (vertex is ModularisableElement modularisableElement)
             {
-                modularisableElements.Add(modularisableElement);
+                modularisableElements.Add(vertex);
             }
         }
 
