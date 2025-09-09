@@ -319,7 +319,7 @@ public sealed class LinearLinkageEncodingOperator
             .ToList();
 
         var rnd = RandomizationProvider.Current;
-        for (int i = 0; i < invalidModules.Count - 1; i++)
+        for (int i = 0; i < invalidModules.Count; i++)
         {
             if (invalidModules[i].GetIndices().Count <= 1)
             {
@@ -331,15 +331,15 @@ public sealed class LinearLinkageEncodingOperator
 
                 // Merge modules
                 var mergeModule = ModuleService.MergeModules(invalidModules[i], selectedNeighbor);
+                /*
+                                if (invalidModules.Contains(invalidModules[i]))
+                                {
+                                    // replace the invalid module with the merged one
 
-                if (invalidModules.Contains(invalidModules[i]))
-                {
-                    // replace the invalid module with the merged one
-
-                    invalidModules.Remove(invalidModules[i]);
-                    invalidModules.Add(mergeModule);
-                }
-
+                                    invalidModules.Remove(invalidModules[i]);
+                                    invalidModules.Add(mergeModule);
+                                }
+                */
                 modules.Remove(invalidModules[i]);
                 modules.Remove(selectedNeighbor);
                 modules.Add(mergeModule);

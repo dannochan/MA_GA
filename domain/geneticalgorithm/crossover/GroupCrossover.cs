@@ -29,8 +29,10 @@ public class GroupCrossover : CrossoverBase
             offspring2 = parent2.Clone();
 
             // If either parent is invalid, return  repaired clones of the parents
-            offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
-            offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
+            offspring1 = !parent1.IsValid() ? LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1) : offspring1;
+            offspring2 = !parent2.IsValid() ? LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2) : offspring2;
+
+
 
             return new List<IChromosome> { offspring1, offspring2 };
         }
@@ -44,15 +46,19 @@ public class GroupCrossover : CrossoverBase
         var newModulesForOffspring1 = DetermineNewModulesForOffspring(parent1, parent2);
         var newModulesForOffspring2 = newModulesForOffspring1
                                   .ToDictionary(kvp => kvp.Key,
-                                                kvp => (Module)kvp.Value.Clone());
+                                                kvp => kvp.Value.Clone());
 
-        for (int i = 0; i < parent1.Length; i++)
+        for (int i = 0; i < parent1.GetIntegerGenes().Count; i++)
         {
+
 
             var geneInParent1 = parent1.GetIntegerGene(i);
             var geneInParent2 = parent2.GetIntegerGene(i);
 
-            if (IsEndingNode(geneInParent1, i) && IsEndingNode(geneInParent2, i)) continue;
+            if (IsEndingNode(geneInParent1, i) && IsEndingNode(geneInParent2, i))
+            {
+                continue;
+            }
 
             AssignGeneToOneOfNewModules(parent1, newModulesForOffspring1, i);
             AssignGeneToOneOfNewModules(parent2, newModulesForOffspring2, i);
@@ -113,18 +119,29 @@ public class GroupCrossover : CrossoverBase
         var modularisableElement = baseGraph.GetModularisableElementByIndex(index);
         var incidentModularisableElements = baseGraph.GetIncidentModularisableElements(modularisableElement);
 
-        var potentialModules = newModuleForOffspring.Values
-            .Where(m => incidentModularisableElements.Any(e => m.CheckIndexInModule(e.GetIndex())))
-            .ToList();
+        var newModuleForOffspringList = newModuleForOffspring.Values.ToList();
 
-        if (potentialModules.Count > 0)
+        var moduleOfIncidentModularisableElements = newModuleForOffspringList
+
+        .Where(m => incidentModularisableElements.Any(e => m.CheckIndexInModule(modularisableElement.GetIndex())))
+
+        .ToList();
+
+
+        if (moduleOfIncidentModularisableElements.Count > 0)
+
         {
+
             var random = RandomizationProvider.Current;
-            var randomModule = potentialModules[random.GetInt(0, potentialModules.Count)];
+
+            var randomModule = moduleOfIncidentModularisableElements[random.GetInt(0, moduleOfIncidentModularisableElements.Count)];
+
             randomModule.AddIndex(index);
+
         }
         else
         {
+            //     if (newModuleForOffspring.Keys.Contains(index)) return;
             // If no potential module found, create a new one
             var newModule = new Module();
             newModule.AddIndex(index);
@@ -153,14 +170,14 @@ public class GroupCrossover : CrossoverBase
     /// </summary>
     /// <param name="encodingParent1"></param>
     /// <param name="encodingParent2"></param>
-    /// <returns></returns>
+    /// <returns>Dict, where index of the ending node is the key and the corresponding module is the value</returns>
 
     private IDictionary<int, Module> DetermineNewModulesForOffspring(LinearLinkageEncoding encodingParent1, LinearLinkageEncoding encodingParent2)
     {
         var random = RandomizationProvider.Current;
         var newModules = new Dictionary<int, Module>();
 
-        for (int i = 0; i < encodingParent1.Length; i++)
+        for (int i = 0; i < encodingParent1.IntegerGenes.Count; i++)
         {
             var moduleElement = baseGraph.GetModularisableElementByIndex(i);
             var isIsolatedVertex = moduleElement is DataObject dataObject &&

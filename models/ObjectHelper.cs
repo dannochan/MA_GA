@@ -9,6 +9,7 @@ namespace MA_GA.Models;
 // </summary>
 public static class ObjectHelper
 {
+    private static int INDEX = 0;
 
     public static void MapDataObjects(GraphObject rawObject, Graph dataObjectCenter, ILogger logger)
     {
@@ -36,7 +37,7 @@ public static class ObjectHelper
 
         if (rawObject.functions != null)
         {
-            var index = 0;
+
             foreach (var item in rawObject.functions)
             {
                 dataObjectCenter.AddNodeToGraph(new DataObject(
@@ -44,11 +45,11 @@ public static class ObjectHelper
                     ObjectType.FunctionObject,
                     item.nameShort,
                     item.externalComponent,
-                    index++ // Assigning an index to each function object
+                    INDEX++ // Assigning an index to each function object
                 ));
             }
 
-            elementIndex += index; // Update the element index after adding function objects
+
         }
         else
         {
@@ -61,7 +62,7 @@ public static class ObjectHelper
             foreach (var item in rawObject.relations)
             {
                 dataObjectCenter.AddRelationToGraph(new ObjectRelation(
-                    elementIndex++,
+                    INDEX++,
                    convertIntToRelationTyp(item.type),
                     dataObjectCenter.GetNodeObjectByName(item.from),
                     dataObjectCenter.GetNodeObjectByName(item.to)
