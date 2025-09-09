@@ -36,7 +36,7 @@ public class GraftMutator : MutationBase
     {
 
         // You may need to cast to your concrete chromosome type
-        var encoding = new LinearLinkageEncoding(chromosome, baseGraph);
+        var encoding = chromosome as LinearLinkageEncoding;
         if (encoding == null)
             throw new InvalidOperationException("Chromosome must be of type YourEncodingChromosome.");
 
@@ -56,29 +56,57 @@ public class GraftMutator : MutationBase
             if (opRoll < divideModuleprobability)
             {
                 // Divide a random module
-                LinearLinkageEncodingOperator.DivideRandomModule(encoding);
+                var newLLe = LinearLinkageEncodingOperator.DivideRandomModule(encoding);
+                if (newLLe != null)
+                {
+                    encoding = (LinearLinkageEncoding)newLLe;
+                }
             }
             else if (opRoll < combinedModuleprobability + divideModuleprobability)
             {
                 // Combine modules
                 if (LinearLinkageEncodingInformationService.GetNumberOfNonIsolatedModules(encoding) > 2)
                 {
-                    LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
+                    var newLLe = LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
+
+                    if (newLLe != null)
+                    {
+                        encoding = (LinearLinkageEncoding)newLLe;
+                    }
                 }
 
             }
             else
             {
                 // Move a gene to a different module
-                LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
+                var newLLe = LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
+
+                if (newLLe != null)
+                {
+                    encoding = (LinearLinkageEncoding)newLLe;
+                }
             }
-            // else: no mutation this time
+
             // Ensure the encoding is still valid after mutation
             if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
             {
-                LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
+                var LLe = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
+                if (LLe != null)
+                {
+                    encoding = (LinearLinkageEncoding)LLe;
+                }
             }
 
+        }
+
+        if (chromosome is LinearLinkageEncoding lle)
+        {
+            for (int i = 0; i < lle.GetChromosomeLength(); i++)
+            {
+                lle.ReplaceIntegerGene(i, encoding.GetIntegerGene(i));
+            }
+
+            lle.Modules = encoding.Modules.Select(m => m.Clone()).ToList();
         }
 
     }
