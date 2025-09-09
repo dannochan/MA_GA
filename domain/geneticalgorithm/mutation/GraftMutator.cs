@@ -36,15 +36,19 @@ public class GraftMutator : MutationBase
     {
 
         // You may need to cast to your concrete chromosome type
-        var encoding = chromosome as LinearLinkageEncoding;
+        var encoding = new LinearLinkageEncoding(chromosome, baseGraph);
         if (encoding == null)
             throw new InvalidOperationException("Chromosome must be of type YourEncodingChromosome.");
 
         // Check if the encoding is valid
-        //   if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
-        //   {
-        //       return;
-        //   }
+        if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
+        {
+            var LLe = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
+            if (LLe != null)
+            {
+                encoding = (LinearLinkageEncoding)LLe;
+            }
+        }
 
         var rnd = RandomizationProvider.Current;
 
