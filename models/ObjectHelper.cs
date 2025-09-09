@@ -9,28 +9,12 @@ namespace MA_GA.Models;
 // </summary>
 public static class ObjectHelper
 {
+    private static int ELEMENT_INDEX = 0;
 
     public static void MapDataObjects(GraphObject rawObject, Graph dataObjectCenter, ILogger logger)
     {
         int elementIndex = 0;
-        // map information objects
-        if (rawObject.informationObjects != null)
-        {
-            foreach (var item in rawObject.informationObjects)
-            {
-                dataObjectCenter.AddNodeToGraph(new DataObject(
-                    item.name,
-                    ObjectType.InformationObject,
-                    item.nameShort,
-                    item.externalComponent
-                ));
-            }
 
-        }
-        else
-        {
-            logger.LogError("InformationObjects is null");
-        }
 
         // map function objects
 
@@ -44,7 +28,7 @@ public static class ObjectHelper
                     ObjectType.FunctionObject,
                     item.nameShort,
                     item.externalComponent,
-                    index++ // Assigning an index to each function object
+                    ELEMENT_INDEX++ // Assigning an index to each function object
                 ));
             }
 
@@ -55,13 +39,33 @@ public static class ObjectHelper
             logger.LogError("FunctionObjects is null");
         }
 
+        // map information objects
+        if (rawObject.informationObjects != null)
+        {
+            foreach (var item in rawObject.informationObjects)
+            {
+                dataObjectCenter.AddNodeToGraph(new DataObject(
+                    item.name,
+                    ObjectType.InformationObject,
+                    item.nameShort,
+                    item.externalComponent,
+                    ELEMENT_INDEX++ // Assigning an index to each information object
+                ));
+            }
+
+        }
+        else
+        {
+            logger.LogError("InformationObjects is null");
+        }
+
         // map relation objects
         if (rawObject.relations != null)
         {
             foreach (var item in rawObject.relations)
             {
                 dataObjectCenter.AddRelationToGraph(new ObjectRelation(
-                    elementIndex++,
+                    ELEMENT_INDEX++,
                    convertIntToRelationTyp(item.type),
                     dataObjectCenter.GetNodeObjectByName(item.from),
                     dataObjectCenter.GetNodeObjectByName(item.to)
@@ -88,15 +92,15 @@ public static class ObjectHelper
     {
         return relationType switch
         {
-            RelationType.Konjunktion => 2,
-            RelationType.Disjunktion => 1,
-            RelationType.ExclusiveDisjunktion => 3,
-            RelationType.Create => 3,
-            RelationType.Read => 1,
-            RelationType.Update => 3,
-            RelationType.RelatedTo => 0,
-            RelationType.PartOf => 0,
-            RelationType.IsA => 0,
+            RelationType.Konjunktion => 20,
+            RelationType.Disjunktion => 15,
+            RelationType.ExclusiveDisjunktion => 25,
+            RelationType.Create => 20,
+            RelationType.Read => 15,
+            RelationType.Update => 15,
+            RelationType.RelatedTo => 15,
+            RelationType.PartOf => 20,
+            RelationType.IsA => 20,
             _ => throw new ArgumentOutOfRangeException(nameof(relationType), "Invalid relation type")
         };
     }

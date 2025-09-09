@@ -177,9 +177,12 @@ public sealed class LinearLinkageEncodingOperator
         integerGenes[indices.Last()] = updatedLastGene;
     }
 
-    public static LinearLinkageEncoding FixLinearLinkageEncoding(LinearLinkageEncoding lle)
+    public static IChromosome FixLinearLinkageEncoding(LinearLinkageEncoding lle)
     {
-        var repairedLinearLinkageEncoding = new LinearLinkageEncoding(lle.GetGraph(), lle.GetIntegerGenes());
+
+        var repairedLinearLinkageEncoding = new LinearLinkageEncoding(lle.GetGraph(),
+    lle.GetIntegerGenes());
+
 
         if (!LinearLinkageEncodingInformationService.IsAllElementsInModuleConnected(repairedLinearLinkageEncoding))
         {
@@ -187,11 +190,16 @@ public sealed class LinearLinkageEncodingOperator
 
         }
 
-        if (LinearLinkageEncodingInformationService.IsOneModuleConsistOfOneEdge(repairedLinearLinkageEncoding))
+        if (LinearLinkageEncodingInformationService.IsOneModuleConsistOfOneVertex(repairedLinearLinkageEncoding))
         {
+            if (LinearLinkageEncodingInformationService.IsOneModuleConsistOfOnlyInformationObjects(repairedLinearLinkageEncoding))
+            {
+                repairedLinearLinkageEncoding = RepairModulesWithOnlyInformationObjects(repairedLinearLinkageEncoding);
+            }
+            else
 
-            repairedLinearLinkageEncoding =
-                    RepairModulesWithOnlyOneVertexOrEdge(repairedLinearLinkageEncoding);
+                repairedLinearLinkageEncoding =
+                        RepairModulesWithOnlyOneVertexOrEdge(repairedLinearLinkageEncoding);
 
         }
 
@@ -202,25 +210,77 @@ public sealed class LinearLinkageEncodingOperator
 
         }
 
-        if (LinearLinkageEncodingInformationService.IsMonolith(repairedLinearLinkageEncoding))
+        if (LinearLinkageEncodingInformationService.IsMonolith(lle))
         {
-            repairedLinearLinkageEncoding = RandomlySplitUpModulesV2(repairedLinearLinkageEncoding);
+            repairedLinearLinkageEncoding = RandomlySplitUpModulesV2(lle);
 
         }
 
-        /*
-                if (!repairedLinearLinkageEncoding.IsValid())
-                {
-                    repairedLinearLinkageEncoding = FixLinearLinkageEncoding(repairedLinearLinkageEncoding);
-                }
+        if (LinearLinkageEncodingInformationService.IsOneModuleConsistOfOnlyInformationObjects(repairedLinearLinkageEncoding))
+        {
+            repairedLinearLinkageEncoding = RepairModulesWithOnlyInformationObjects(repairedLinearLinkageEncoding);
+        }
 
 
-        */
-        // Add logic to check for connectivity and repair, similar to Jav
         return repairedLinearLinkageEncoding;
     }
 
-    private static LinearLinkageEncoding RandomlySplitUpModulesV2(LinearLinkageEncoding lle)
+    public static LinearLinkageEncoding RepairModulesWithOnlyInformationObjects(LinearLinkageEncoding lle)
+    {
+        var knowledgeGraph = lle.GetGraph();
+        var modules = new HashSet<Module>(lle.GetModules());
+
+        // Identify modules with only information objects that are not isolated
+        var invalidModules = lle.GetModules().Where(m => m.GetIndices().Count >= 1 && !ModuleInformationService.IsIsolated(m, knowledgeGraph) &&
+                                                        m.GetIndices().All(index => knowledgeGraph.GetGraph().Vertices.ElementAt(index).ObjectType == ObjectType.InformationObject))
+            .ToList();
+
+        var rnd = RandomizationProvider.Current;
+        for (int i = 0; i < invalidModules.Count; i++)
+        {
+            if (invalidModules[i].GetIndices().Count == 1)
+            {
+                // If the module has only information objects, randomly assign one to a neighboring module
+                var neighbors = ModuleInformationService.GetModuleNeighbors(invalidModules[i], lle);
+                if (neighbors.Count == 0) continue;
+
+                var selectedNeighbor = neighbors[rnd.GetInt(0, neighbors.Count - 1)];
+
+                // Move one index to the neighboring module
+                var indexToMove = invalidModules[i].GetIndices()[rnd.GetInt(0, invalidModules[i].GetIndices().Count - 1)];
+                invalidModules[i].RemoveIndex(indexToMove);
+                selectedNeighbor.AddIndex(indexToMove);
+
+                if (invalidModules[i].GetIndices().Count == 0)
+                    modules.Remove(invalidModules[i]);
+            }
+            else
+            {
+                // If the module has multiple information objects, split one off to a neighboring module
+                var neighbors = ModuleInformationService.GetModuleNeighbors(invalidModules[i], lle);
+                if (neighbors.Count == 0) continue;
+
+                var selectedNeighbor = neighbors[rnd.GetInt(0, neighbors.Count - 1)];
+
+                for (int j = 0; j < invalidModules[i].GetIndices().Count; j++)
+                {
+                    var indexToMove = invalidModules[i].GetIndices()[rnd.GetInt(0, invalidModules[i].GetIndices().Count - 1)];
+                    invalidModules[i].RemoveIndex(indexToMove);
+                    selectedNeighbor.AddIndex(indexToMove);
+                }
+
+
+                if (invalidModules[i].GetIndices().Count == 0)
+                    modules.Remove(invalidModules[i]);
+            }
+
+        }
+
+        // Update the LinearLinkageEncoding with the repaired modules
+        return UpdateIntegerGenes(modules.ToList(), lle);
+    }
+
+    public static LinearLinkageEncoding RandomlySplitUpModulesV2(LinearLinkageEncoding lle)
     {
         // Get modules with more than one element
         var modulesToSplit = lle.GetModules().Where(m => m.GetIndices().Count > 1).ToList();
@@ -309,7 +369,7 @@ public sealed class LinearLinkageEncodingOperator
             updatedInterGenes.Select(g => new Gene(g)).ToList());
     }
 
-    private static LinearLinkageEncoding RepairModulesWithOnlyOneVertexOrEdge(LinearLinkageEncoding repairedLinearLinkageEncoding)
+    public static LinearLinkageEncoding RepairModulesWithOnlyOneVertexOrEdge(LinearLinkageEncoding repairedLinearLinkageEncoding)
     {
         var knowledgeGraph = repairedLinearLinkageEncoding.GetGraph();
         var modules = new HashSet<Module>(repairedLinearLinkageEncoding.GetModules());
@@ -319,7 +379,7 @@ public sealed class LinearLinkageEncodingOperator
             .ToList();
 
         var rnd = RandomizationProvider.Current;
-        for (int i = 0; i < invalidModules.Count - 1; i++)
+        for (int i = 0; i < invalidModules.Count; i++)
         {
             if (invalidModules[i].GetIndices().Count <= 1)
             {
@@ -331,15 +391,16 @@ public sealed class LinearLinkageEncodingOperator
 
                 // Merge modules
                 var mergeModule = ModuleService.MergeModules(invalidModules[i], selectedNeighbor);
+                /*
+                                if (invalidModules.Contains(invalidModules[i]))
+                                {
+                                    // replace the invalid module with the merged one
 
-                if (invalidModules.Contains(invalidModules[i]))
-                {
-                    // replace the invalid module with the merged one
+                                    invalidModules.Remove(invalidModules[i]);
+                                    invalidModules.Add(mergeModule);
 
-                    invalidModules.Remove(invalidModules[i]);
-                    invalidModules.Add(mergeModule);
-                }
-
+                                }
+                */
                 modules.Remove(invalidModules[i]);
                 modules.Remove(selectedNeighbor);
                 modules.Add(mergeModule);
@@ -431,5 +492,10 @@ public sealed class LinearLinkageEncodingOperator
         return UpdateIntegerGenes(splitupModule, initialLinearLinkageEncoding);
 
 
+    }
+
+    internal static void FixLinearLinkageEncoding(IChromosome chromosome)
+    {
+        throw new NotImplementedException();
     }
 }
