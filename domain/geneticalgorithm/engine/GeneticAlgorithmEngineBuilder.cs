@@ -157,7 +157,7 @@ public class GeneticAlgorithmEngineBuilder
 
  */
 
-            return new Population(20, 100, chromosome);
+            return new Population(30, 100, chromosome);
         }
     }
 }

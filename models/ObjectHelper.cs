@@ -88,12 +88,12 @@ public static class ObjectHelper
     {
         return relationType switch
         {
-            RelationType.Konjunktion => 2,
-            RelationType.Disjunktion => 1,
-            RelationType.ExclusiveDisjunktion => 3,
-            RelationType.Create => 3,
-            RelationType.Read => 1,
-            RelationType.Update => 3,
+            RelationType.Konjunktion => 20,
+            RelationType.Disjunktion => 15,
+            RelationType.ExclusiveDisjunktion => 25,
+            RelationType.Create => 20,
+            RelationType.Read => 15,
+            RelationType.Update => 15,
             RelationType.RelatedTo => 0,
             RelationType.PartOf => 0,
             RelationType.IsA => 0,
