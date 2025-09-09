@@ -202,9 +202,9 @@ public sealed class LinearLinkageEncodingOperator
 
         }
 
-        if (LinearLinkageEncodingInformationService.IsMonolith(repairedLinearLinkageEncoding))
+        if (LinearLinkageEncodingInformationService.IsMonolith(lle))
         {
-            repairedLinearLinkageEncoding = RandomlySplitUpModulesV2(repairedLinearLinkageEncoding);
+            repairedLinearLinkageEncoding = RandomlySplitUpModulesV2(lle);
 
         }
 
