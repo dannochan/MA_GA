@@ -29,8 +29,8 @@ public class GroupCrossover : CrossoverBase
             offspring2 = parent2.Clone();
 
             // If either parent is invalid, return  repaired clones of the parents
-            offspring1 = (LinearLinkageEncoding)LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
-            offspring2 = (LinearLinkageEncoding)LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
+            offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
+            offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
 
             return new List<IChromosome> { offspring1, offspring2 };
         }
@@ -65,12 +65,12 @@ public class GroupCrossover : CrossoverBase
 
         if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring1))
         {
-            offspring1 = (LinearLinkageEncoding)LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
+            offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
         }
         ;
         if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring2))
         {
-            offspring2 = (LinearLinkageEncoding)LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
+            offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
         }
 
 

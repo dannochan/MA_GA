@@ -56,12 +56,9 @@ public class GraphPartitionGreedyAlgorithm
 
                     // TODO: how to handle information objects?
                     // remove edges that have vertices that are information objects
-                    /**
                     sortedGroup.RemoveAll(edge =>
                         edge.SourceObject.ObjectType == ObjectType.InformationObject ||
                         edge.TargetObject.ObjectType == ObjectType.InformationObject);
-
-                        **/
 
                     foreach (var edge in sortedGroup)
                     {
@@ -91,7 +88,7 @@ public class GraphPartitionGreedyAlgorithm
         var newGraph = InitGraph.Clone() ?? throw new ArgumentNullException(nameof(InitGraph), "Graph cannot be null");
 
         // remove vertex that are information objects
-        // newGraph.RemoveVertexIf(vertex => vertex.ObjectType == ObjectType.InformationObject);
+        newGraph.RemoveVertexIf(vertex => vertex.ObjectType == ObjectType.InformationObject);
 
 
         // Implement the partitioning logic here

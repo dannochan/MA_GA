@@ -1,7 +1,6 @@
 using System;
 using GeneticSharp;
 using MA_GA.domain.module;
-using MA_GA.Models;
 
 namespace MA_GA.domain.geneticalgorithm.encoding;
 
@@ -95,17 +94,12 @@ public sealed class LinearLinkageEncodingInformationService
             return false;
         }
 
-        if (IsOneModuleConsistOfOneVertex(linearLinkageEncoding))
+        if (IsOneModuleConsistOfOneEdge(linearLinkageEncoding))
         {
             return false;
         }
 
         if (IsMonolith(linearLinkageEncoding))
-        {
-            return false;
-        }
-
-        if (IsOneModuleConsistOfOnlyInformationObjects(linearLinkageEncoding))
         {
             return false;
         }
@@ -151,22 +145,10 @@ public sealed class LinearLinkageEncodingInformationService
             ModuleInformationService.IsModuleConnected(module, graph));
     }
 
-    public static bool IsOneModuleConsistOfOneVertex(LinearLinkageEncoding encoding)
+    public static bool IsOneModuleConsistOfOneEdge(LinearLinkageEncoding encoding)
     {
         var graph = encoding.GetGraph();
-        var modules = encoding.GetModules().Where(module => !ModuleInformationService.IsIsolated(module, graph)).ToList();
-
-        return modules.Any(module => module.GetIndices().Count <= 1);
-    }
-
-    public static bool IsOneModuleConsistOfOnlyInformationObjects(LinearLinkageEncoding encoding)
-    {
-        var graph = encoding.GetGraph().GetGraph();
-
-        var modules = encoding.GetModules().Where(module => !ModuleInformationService.IsIsolated(module, encoding.GetGraph())).ToList();
-
-        return modules.Any(module =>
-            module.GetIndices().All(index => graph.Vertices.ElementAt(index).ObjectType == ObjectType.InformationObject));
+        return encoding.GetModules().Any(module => !ModuleInformationService.IsIsolated(module, graph) && module.GetIndices().Count <= 1);
     }
 
     public static bool IsMonolith(LinearLinkageEncoding encoding)
