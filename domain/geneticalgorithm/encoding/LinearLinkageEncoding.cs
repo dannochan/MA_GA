@@ -53,7 +53,7 @@ public class LinearLinkageEncoding : ChromosomeBase
 
         IntegerGenes = genes.ToList();
         Modules = LinearLinkageEncodingInformationService.DetermineModules(this);
-        CreateGenes();
+        SyncWithBaseGenes();
 
     }
 
@@ -63,7 +63,8 @@ public class LinearLinkageEncoding : ChromosomeBase
 
         var encoding = new LinearLinkageEncoding(BaseGraph, CloneGenes);
 
-        return MutateLinearLinkageEncoding(encoding);
+        return encoding;
+
     }
 
     public List<Gene> GetIntegerGenes()
@@ -101,26 +102,19 @@ public class LinearLinkageEncoding : ChromosomeBase
         }
     }
 
-    private IChromosome MutateLinearLinkageEncoding(LinearLinkageEncoding encoding)
+    public void CopyFrom(LinearLinkageEncoding other)
     {
-        var random = RandomizationProvider.Current;
-        var value = random.GetDouble();
-        if (value < 1.0d / 3.0d)
-        {
-            return LinearLinkageEncodingOperator.DivideRandomModule(encoding);
-        }
-        else if (value < 2.0d / 3.0d)
-        {
-            if (LinearLinkageEncodingInformationService.GetNumberOfNonIsolatedModules(encoding) > 2)
-            {
-                return LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
-            }
-        }
+        if (other == null) throw new ArgumentNullException(nameof(other));
 
-        return LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
+        for (int i = 0; i < other.IntegerGenes.Count; i++)
+            ReplaceIntegerGene(i, new Gene(other.IntegerGenes[i].Value));
 
+        Modules = other.Modules.Select(m => m.Clone()).ToList();
+        Fitness = other.Fitness;
     }
 
+
+    // This chromosome does not generate random genes; instead, it initializes genes based on modules from the graph.
 
     public override Gene GenerateGene(int geneIndex)
     {
@@ -162,25 +156,31 @@ public class LinearLinkageEncoding : ChromosomeBase
     public override LinearLinkageEncoding Clone()
     {
 
-        var clonedEncoding = base.Clone() as LinearLinkageEncoding;
-        //  clonedEncoding.Modules = new List<Module>(Modules.Select(m => m.Clone()));
-        for (int i = 0; i < clonedEncoding.IntegerGenes.Count; i++)
+        var clonedGenes = IntegerGenes.Select(g => new Gene(g.Value)).ToList();
+        var clonedEncoding = new LinearLinkageEncoding(BaseGraph, clonedGenes)
         {
-            clonedEncoding.ReplaceIntegerGene(i, new Gene(IntegerGenes[i].Value));
-        }
-        //  clonedEncoding.Modules = Modules.Select(m => m.Clone()).ToList();
+            Modules = this.Modules.Select(m => m.Clone()).ToList()
+        };
 
         return clonedEncoding;
     }
 
     public Module GetModuleOfAllele(int allele)
     {
-        Module module = Modules.First(m => m.CheckIndexInModule(allele));
+        Module module = Modules.FirstOrDefault(m => m.CheckIndexInModule(allele));
         if (module == null)
         {
             throw new NullReferenceException($"Module not found for allele {allele}. Ensure the allele is part of the encoding.");
         }
         return module;
+    }
+
+    private void SyncWithBaseGenes()
+    {
+        for (int i = 0; i < IntegerGenes.Count; i++)
+        {
+            ReplaceGene(i, new Gene(IntegerGenes[i].Value));
+        }
     }
 
     public override string ToString()
