@@ -19,72 +19,45 @@ public class GroupCrossover : CrossoverBase
         var parent1 = new LinearLinkageEncoding(parents[0], baseGraph);
         var parent2 = new LinearLinkageEncoding(parents[1], baseGraph);
 
+        LinearLinkageEncoding offspring1 = parent1.Clone();
+        LinearLinkageEncoding offspring2 = parent2.Clone();
 
-        LinearLinkageEncoding offspring1;
-        LinearLinkageEncoding offspring2;
-
-        if (!parent1.IsValid() || !parent2.IsValid())
-        {
-            offspring1 = parent1.Clone();
-            offspring2 = parent2.Clone();
-
-            // If either parent is invalid, return  repaired clones of the parents
-            offspring1 = !parent1.IsValid() ? LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1) : offspring1;
-            offspring2 = !parent2.IsValid() ? LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2) : offspring2;
-
-
-
-            return new List<IChromosome> { offspring1, offspring2 };
-        }
-        else
-        {
-            offspring1 = (LinearLinkageEncoding)parent1.CreateNew();
-            offspring2 = (LinearLinkageEncoding)parent2.CreateNew();
-        }
-
-
-        var newModulesForOffspring1 = DetermineNewModulesForOffspring(parent1, parent2);
-        var newModulesForOffspring2 = newModulesForOffspring1
-                                  .ToDictionary(kvp => kvp.Key,
-                                                kvp => kvp.Value.Clone());
-
-        for (int i = 0; i < parent1.GetIntegerGenes().Count; i++)
-        {
-
-
-            var geneInParent1 = parent1.GetIntegerGene(i);
-            var geneInParent2 = parent2.GetIntegerGene(i);
-
-            if (IsEndingNode(geneInParent1, i) && IsEndingNode(geneInParent2, i))
-            {
-                continue;
-            }
-
-            AssignGeneToOneOfNewModules(parent1, newModulesForOffspring1, i);
-            AssignGeneToOneOfNewModules(parent2, newModulesForOffspring2, i);
-
-        }
-
-
-        UpdateparentToOffspring(offspring1, newModulesForOffspring1.Values.ToList());
-        UpdateparentToOffspring(offspring2, newModulesForOffspring2.Values.ToList());
-
-        if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring1))
-        {
+        // If parents invalid, repair
+        if (!parent1.IsValid())
             offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
-        }
-        ;
-        if (!LinearLinkageEncodingInformationService.IsValidChromose(offspring2))
-        {
+        if (!parent2.IsValid())
             offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
+
+        // Determine new modules for offspring
+        var newModules1 = DetermineNewModulesForOffspring(parent1, parent2);
+        var newModules2 = newModules1.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Clone());
+
+        for (int i = 0; i < parent1.IntegerGenes.Count; i++)
+        {
+            if (IsEndingNode(parent1.GetIntegerGene(i), i) && IsEndingNode(parent2.GetIntegerGene(i), i))
+                continue;
+
+            AssignGeneToNewModule(parent1, newModules1, i);
+            AssignGeneToNewModule(parent2, newModules2, i);
         }
 
+        UpdateParentToOffspring(offspring1, newModules1.Values.ToList());
+        UpdateParentToOffspring(offspring2, newModules2.Values.ToList());
+
+        // Recompute modules and ensure validity
+        offspring1.Modules = LinearLinkageEncodingInformationService.DetermineModules(offspring1);
+        offspring2.Modules = LinearLinkageEncodingInformationService.DetermineModules(offspring2);
+
+        if (!offspring1.IsValid())
+            offspring1 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring1);
+        if (!offspring2.IsValid())
+            offspring2 = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(offspring2);
 
         return new List<IChromosome> { offspring1, offspring2 };
     }
 
 
-    private void UpdateparentToOffspring(LinearLinkageEncoding offspring, List<Module> modules)
+    private void UpdateParentToOffspring(LinearLinkageEncoding offspring, List<Module> modules)
     {
         foreach (var module in modules)
         {
@@ -104,7 +77,7 @@ public class GroupCrossover : CrossoverBase
 
     }
 
-    private void AssignGeneToOneOfNewModules(LinearLinkageEncoding encodingParent, IDictionary<int, Module> newModuleForOffspring, int index)
+    private void AssignGeneToNewModule(LinearLinkageEncoding encodingParent, IDictionary<int, Module> newModuleForOffspring, int index)
     {
         var geneInParent = encodingParent.GetIntegerGene(index);
         var moduleOfGene = encodingParent.GetModuleOfAllele((int)geneInParent.Value);
@@ -123,7 +96,7 @@ public class GroupCrossover : CrossoverBase
 
         var moduleOfIncidentModularisableElements = newModuleForOffspringList
 
-        .Where(m => incidentModularisableElements.Any(e => m.CheckIndexInModule(modularisableElement.GetIndex())))
+        .Where(m => incidentModularisableElements.Any(e => m.CheckIndexInModule(e.GetIndex())))
 
         .ToList();
 
@@ -145,20 +118,12 @@ public class GroupCrossover : CrossoverBase
             // If no potential module found, create a new one
             var newModule = new Module();
             newModule.AddIndex(index);
-            newModuleForOffspring.Add(index, newModule);
+            newModuleForOffspring[index] = newModule;
         }
 
     }
 
-    private bool IsEndingNode(Gene geneInParent, int i)
-    {
-        return geneInParent.Value is int value && value == i;
-    }
-
-    private bool IsEndingNode(LinearLinkageEncoding encoding, int index)
-    {
-        return IsEndingNode(encoding.GetIntegerGene(index), index);
-    }
+    private bool IsEndingNode(Gene gene, int i) => gene.Value is int value && value == i;
 
     /// <summary>
     /// Determines new modules for the offspring based on the parents' encodings.
@@ -172,30 +137,27 @@ public class GroupCrossover : CrossoverBase
     /// <param name="encodingParent2"></param>
     /// <returns>Dict, where index of the ending node is the key and the corresponding module is the value</returns>
 
-    private IDictionary<int, Module> DetermineNewModulesForOffspring(LinearLinkageEncoding encodingParent1, LinearLinkageEncoding encodingParent2)
+    private IDictionary<int, Module> DetermineNewModulesForOffspring(LinearLinkageEncoding parent1, LinearLinkageEncoding parent2)
     {
-        var random = RandomizationProvider.Current;
+        var rnd = RandomizationProvider.Current;
         var newModules = new Dictionary<int, Module>();
 
-        for (int i = 0; i < encodingParent1.IntegerGenes.Count; i++)
+        for (int i = 0; i < parent1.IntegerGenes.Count; i++)
         {
-            var moduleElement = baseGraph.GetModularisableElementByIndex(i);
-            var isIsolatedVertex = moduleElement is DataObject dataObject &&
-            baseGraph.IsIsolatedVertex(dataObject);
+            var element = baseGraph.GetModularisableElementByIndex(i);
+            bool isIsolated = element is DataObject data && baseGraph.IsIsolatedVertex(data);
 
-            if (isIsolatedVertex || (IsEndingNode(encodingParent1, i) && IsEndingNode(encodingParent2, i)) || (IsEndingNode(encodingParent1, i) && random.GetDouble() < 0.5d) || (IsEndingNode(encodingParent2, i) && random.GetDouble() < 0.5d))
+            if (isIsolated ||
+                (IsEndingNode(parent1.GetIntegerGene(i), i) && IsEndingNode(parent2.GetIntegerGene(i), i)) ||
+                (IsEndingNode(parent1.GetIntegerGene(i), i) && rnd.GetDouble() < 0.5d) ||
+                (IsEndingNode(parent2.GetIntegerGene(i), i) && rnd.GetDouble() < 0.5d))
             {
-
                 var module = new Module();
                 module.AddIndex(i);
-
                 newModules.Add(i, module);
-
             }
-
         }
 
         return newModules;
-
     }
 }
