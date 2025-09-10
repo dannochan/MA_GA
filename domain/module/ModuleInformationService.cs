@@ -145,7 +145,7 @@ public class ModuleInformationService
     {
         var indices = module.GetIndices();
 
-        return CheckModuleConnectivityByIndices(module.GetIndices(), graph);
+        return CheckModuleConnectivityByIndices(module.GetIndices().ToList(), graph);
     }
 
     public static bool CheckModuleConnectivityByIndices(
