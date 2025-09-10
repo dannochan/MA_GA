@@ -39,9 +39,14 @@ public class MultiObjectivesEvaluator
             {
                 return weightedValue *= -1;
             }
-            if (!LinearLinkageEncodingInformationService.IsValidLinearLinkageEncoding(lle))
+            if (LinearLinkageEncodingInformationService.IsMonolith(lle))
             {
                 // return lower fitness for monolith solution
+                return weightedValue *= 0.5;
+            }
+            if (LinearLinkageEncodingInformationService.IsOneModuleConsistOfOneEdge(lle))
+            {
+                // return lower fitness for invalid solution
                 return weightedValue *= 0.5;
             }
      ;
