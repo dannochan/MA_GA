@@ -105,17 +105,16 @@ public class Module
 
     public override bool Equals(object? obj)
     {
-        return obj is Module module &&
-               EqualityComparer<LinkedList<object>>.Default.Equals(Indices, module.Indices) &&
-               EqualityComparer<HashSet<object>>.Default.Equals(IndexSet, module.IndexSet);
+        return obj is Module module && this.GetIndices().SequenceEqual(module.GetIndices());
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Indices, IndexSet);
+        return HashCode.Combine(string.Join(",", GetIndices()));
     }
 
-    public List<int> GetIndices()
+
+    public IReadOnlyList<int> GetIndices()
     {
         return Indices.Select(index => (int)index).ToList();
     }
