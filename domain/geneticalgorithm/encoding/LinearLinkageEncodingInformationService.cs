@@ -121,9 +121,10 @@ public sealed class LinearLinkageEncodingInformationService
                 alleleDictionary[currentAllele]++;
                 if (alleleDictionary[currentAllele] > 2)
                 {
-                    Console.WriteLine($"Allele {currentAllele} appears more than twice in the encoding.");
+                 //   Console.WriteLine($"Allele {currentAllele} appears more than twice in the encoding.");
                     return false; // Allele value appears more than onc
                 }
+
 
 
             }

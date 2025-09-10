@@ -246,7 +246,7 @@ public sealed class LinearLinkageEncodingOperator
         var interGenes = linearLinkageEncoding.GetIntegerGenes().Select(g => (int)g.Value).ToList();
 
         // Create a list of remaining allele values, which should be assigned afterwards
-        var remainingUnassignedAlleles = Enumerable.Range(0, linearLinkageEncoding.Length).ToList();
+        var remainingUnassignedAlleles = Enumerable.Range(0, linearLinkageEncoding.GetIntegerGenes().Count).ToList();
 
         // Create a map to track the number of already existing allele values.
         var alleleCountMap = new Dictionary<int, int>();
