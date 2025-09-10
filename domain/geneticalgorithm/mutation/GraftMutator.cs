@@ -10,8 +10,8 @@ public class GraftMutator : MutationBase
 {
 
     private readonly Graph baseGraph;
-    private float divideModuleprobability;
-    private float combinedModuleprobability;
+    private float divideModuleProbability;
+    private float combineModuleProbability;
     private float movegeneToDifferentModuleProbability;
 
 
@@ -27,97 +27,48 @@ public class GraftMutator : MutationBase
     private void DetermineMutationWeights(MutationWeight mutationWeight)
     {
         float sumPossibilities = mutationWeight.SplitModulesWeight + mutationWeight.CombineModulesWeight + mutationWeight.MoveGeneToDifferentModuleWeight;
-        divideModuleprobability = mutationWeight.SplitModulesWeight / sumPossibilities;
-        combinedModuleprobability = mutationWeight.CombineModulesWeight / sumPossibilities;
+        divideModuleProbability = mutationWeight.SplitModulesWeight / sumPossibilities;
+        combineModuleProbability = mutationWeight.CombineModulesWeight / sumPossibilities;
         movegeneToDifferentModuleProbability = mutationWeight.MoveGeneToDifferentModuleWeight / sumPossibilities;
     }
 
     protected override void PerformMutate(IChromosome chromosome, float probability)
     {
 
-        // You may need to cast to your concrete chromosome type
-        var encoding = new LinearLinkageEncoding(chromosome, baseGraph);
-        if (encoding == null)
+        if (chromosome is not LinearLinkageEncoding lle)
             throw new InvalidOperationException("Chromosome must be of type YourEncodingChromosome.");
 
-        // Check if the encoding is valid
-        if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
-        {
-            var newLLE = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
-            if (newLLE != null)
-            {
-                encoding = newLLE;
-            }
-            ;
-        }
+
+        var encoding = new LinearLinkageEncoding(lle, baseGraph);
 
         var rnd = RandomizationProvider.Current;
 
+        // Only mutate if probability allows
         if (rnd.GetFloat() < probability)
         {
-
             var opRoll = rnd.GetFloat();
 
-            if (opRoll < divideModuleprobability)
+            if (opRoll < divideModuleProbability)
             {
-                // Divide a random module
-                var newLLE = LinearLinkageEncodingOperator.DivideRandomModule(encoding);
-                if (newLLE != null)
-                {
-                    encoding = (LinearLinkageEncoding)newLLE;
-                }
+                encoding = LinearLinkageEncodingOperator.DivideRandomModule(encoding);
             }
-            else if (opRoll < combinedModuleprobability + divideModuleprobability)
+            else if (opRoll < divideModuleProbability + combineModuleProbability)
             {
-                // Combine modules
                 if (LinearLinkageEncodingInformationService.GetNumberOfNonIsolatedModules(encoding) > 2)
-                {
-                    var newLLE = LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
-                    if (newLLE != null)
-                    {
-                        encoding = (LinearLinkageEncoding)newLLE;
-                    }
-                }
-
+                    encoding = LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
             }
             else
             {
-                // Move a gene to a different module
-                var newLLE = LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
-                if (newLLE != null)
-                {
-                    encoding = (LinearLinkageEncoding)newLLE;
-                }
-            }
-            // else: no mutation this time
-            // Ensure the encoding is still valid after mutation
-
-
-        }
-
-        if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
-        {
-            var newLLE = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
-            if (newLLE != null)
-            {
-                encoding = newLLE;
+                encoding = LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
             }
         }
 
-        if (chromosome is LinearLinkageEncoding lle)
-        {
-            for (int i = 0; i < lle.GetChromosomeLength(); i++)
-            {
-                lle.ReplaceIntegerGene(i, encoding.GetIntegerGene(i));
-            }
-            lle.Fitness = encoding.Fitness;
-            lle.Modules = encoding.Modules.Select(m => m.Clone()).ToList();
+        // Single repair step after mutation
+        if (!encoding.IsValid())
+            encoding = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
 
-        }
-        else
-        {
-            throw new InvalidOperationException("Chromosome must be of type LinearLinkageEncoding.");
-        }
+        // Update the original chromosome in place
+        lle.CopyFrom(encoding);
 
     }
 }
