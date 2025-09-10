@@ -70,7 +70,7 @@ public class ModuleService
     public static List<Module> SplitNonIncidentModule(Module nonConnectedModule, LinearLinkageEncoding encoding)
     {
         var graph = encoding.GetGraph();
-        var subgraphOfModule = GraphService.CreateSubgraphGraphFromIndices(nonConnectedModule.GetIndices(), graph);
+        var subgraphOfModule = GraphService.CreateSubgraphGraphFromIndices(nonConnectedModule.GetIndices().ToList(), graph);
 
         // Extract Graph and connected sets
         // get vertices of subgraph
@@ -146,7 +146,7 @@ public class ModuleService
 
         var splitModules = new HashSet<Module>();
 
-        var indices = new ArrayList(module.GetIndices());
+        var indices = new ArrayList(module.GetIndices().ToList());
 
 
 
