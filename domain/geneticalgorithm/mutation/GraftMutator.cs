@@ -10,8 +10,8 @@ public class GraftMutator : MutationBase
 {
 
     private readonly Graph baseGraph;
-    private float divideModuleprobability;
-    private float combinedModuleprobability;
+    private float divideModuleProbability;
+    private float combineModuleProbability;
     private float movegeneToDifferentModuleProbability;
 
 
@@ -27,59 +27,48 @@ public class GraftMutator : MutationBase
     private void DetermineMutationWeights(MutationWeight mutationWeight)
     {
         float sumPossibilities = mutationWeight.SplitModulesWeight + mutationWeight.CombineModulesWeight + mutationWeight.MoveGeneToDifferentModuleWeight;
-        divideModuleprobability = mutationWeight.SplitModulesWeight / sumPossibilities;
-        combinedModuleprobability = mutationWeight.CombineModulesWeight / sumPossibilities;
+        divideModuleProbability = mutationWeight.SplitModulesWeight / sumPossibilities;
+        combineModuleProbability = mutationWeight.CombineModulesWeight / sumPossibilities;
         movegeneToDifferentModuleProbability = mutationWeight.MoveGeneToDifferentModuleWeight / sumPossibilities;
     }
 
     protected override void PerformMutate(IChromosome chromosome, float probability)
     {
 
-        // You may need to cast to your concrete chromosome type
-        var encoding = new LinearLinkageEncoding(chromosome, baseGraph);
-        if (encoding == null)
+        if (chromosome is not LinearLinkageEncoding lle)
             throw new InvalidOperationException("Chromosome must be of type YourEncodingChromosome.");
 
-        // Check if the encoding is valid
-        //   if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
-        //   {
-        //       return;
-        //   }
+
+        var encoding = new LinearLinkageEncoding(lle, baseGraph);
 
         var rnd = RandomizationProvider.Current;
 
+        // Only mutate if probability allows
         if (rnd.GetFloat() < probability)
         {
-
             var opRoll = rnd.GetFloat();
 
-            if (opRoll < divideModuleprobability)
+            if (opRoll < divideModuleProbability)
             {
-                // Divide a random module
-                LinearLinkageEncodingOperator.DivideRandomModule(encoding);
+                encoding = LinearLinkageEncodingOperator.DivideRandomModule(encoding);
             }
-            else if (opRoll < combinedModuleprobability + divideModuleprobability)
+            else if (opRoll < divideModuleProbability + combineModuleProbability)
             {
-                // Combine modules
                 if (LinearLinkageEncodingInformationService.GetNumberOfNonIsolatedModules(encoding) > 2)
-                {
-                    LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
-                }
-
+                    encoding = LinearLinkageEncodingOperator.CombineRandomGroup(encoding);
             }
             else
             {
-                // Move a gene to a different module
-                LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
+                encoding = LinearLinkageEncodingOperator.MoveRandomGeneToIncidentModule(encoding);
             }
-            // else: no mutation this time
-            // Ensure the encoding is still valid after mutation
-            if (!LinearLinkageEncodingInformationService.IsValidChromose(encoding))
-            {
-                LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
-            }
-
         }
+
+        // Single repair step after mutation
+        if (!encoding.IsValid())
+            encoding = LinearLinkageEncodingOperator.FixLinearLinkageEncoding(encoding);
+
+        // Update the original chromosome in place
+        lle.CopyFrom(encoding);
 
     }
 }

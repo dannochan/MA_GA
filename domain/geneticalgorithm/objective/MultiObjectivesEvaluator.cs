@@ -1,5 +1,6 @@
 using System;
 using GeneticSharp;
+using MA_GA.domain.geneticalgorithm.encoding;
 using MA_GA.models.enums;
 using MA_GA.Models;
 
@@ -24,11 +25,12 @@ public class MultiObjectivesEvaluator
     // TODO: CHECK IF OBJECTIVES WEIGHT should be considreed in the evaluation
     public double[] EvaluateAll(IChromosome chromosome)
     {
+        var lle = chromosome as LinearLinkageEncoding;
         var _sumObjectiveWeights = _objectives.Sum(o => o.GetWeight());
         return _objectives.Select(obj =>
         {
             var weight = obj.GetWeight() / _sumObjectiveWeights;
-            var objectiveValue = obj.Evaluate(chromosome);
+            var objectiveValue = obj.Evaluate(lle);
 
             var weightedValue = weight * objectiveValue;
             // TODO: how to deal with type of objectives, see paper of ali p49
@@ -36,6 +38,16 @@ public class MultiObjectivesEvaluator
             if (obj.GetOptimizationType() == OptimizationType.Minimum)
             {
                 return weightedValue *= -1;
+            }
+            if (LinearLinkageEncodingInformationService.IsMonolith(lle))
+            {
+                // return lower fitness for monolith solution
+                return weightedValue *= 0.5;
+            }
+            if (LinearLinkageEncodingInformationService.IsOneModuleConsistOfOneEdge(lle))
+            {
+                // return lower fitness for invalid solution
+                return weightedValue *= 0.5;
             }
      ;
 

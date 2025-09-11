@@ -9,6 +9,7 @@ namespace MA_GA.Models;
 // </summary>
 public static class ObjectHelper
 {
+    private static int INDEX = 0;
 
     public static void MapDataObjects(GraphObject rawObject, Graph dataObjectCenter, ILogger logger)
     {
@@ -36,7 +37,7 @@ public static class ObjectHelper
 
         if (rawObject.functions != null)
         {
-            var index = 0;
+
             foreach (var item in rawObject.functions)
             {
                 dataObjectCenter.AddNodeToGraph(new DataObject(
@@ -44,11 +45,11 @@ public static class ObjectHelper
                     ObjectType.FunctionObject,
                     item.nameShort,
                     item.externalComponent,
-                    index++ // Assigning an index to each function object
+                    INDEX++ // Assigning an index to each function object
                 ));
             }
 
-            elementIndex += index; // Update the element index after adding function objects
+
         }
         else
         {
@@ -61,7 +62,7 @@ public static class ObjectHelper
             foreach (var item in rawObject.relations)
             {
                 dataObjectCenter.AddRelationToGraph(new ObjectRelation(
-                    elementIndex++,
+                    INDEX++,
                    convertIntToRelationTyp(item.type),
                     dataObjectCenter.GetNodeObjectByName(item.from),
                     dataObjectCenter.GetNodeObjectByName(item.to)
@@ -88,12 +89,12 @@ public static class ObjectHelper
     {
         return relationType switch
         {
-            RelationType.Konjunktion => 2,
-            RelationType.Disjunktion => 1,
-            RelationType.ExclusiveDisjunktion => 3,
-            RelationType.Create => 3,
-            RelationType.Read => 1,
-            RelationType.Update => 3,
+            RelationType.Konjunktion => 20,
+            RelationType.Disjunktion => 15,
+            RelationType.ExclusiveDisjunktion => 25,
+            RelationType.Create => 20,
+            RelationType.Read => 15,
+            RelationType.Update => 15,
             RelationType.RelatedTo => 0,
             RelationType.PartOf => 0,
             RelationType.IsA => 0,

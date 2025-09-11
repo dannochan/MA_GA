@@ -40,7 +40,7 @@ public class ModuleInformationService
             GetModuleNeighborsWhereVertexIsIncideentToOtherModuleEdge(targetModule, encoding.GetGraph(), remainingModules);
         remainingModules.RemoveAll(module => neighborModulesWhereVertexIsIncidentToOtherModuleEdge.Contains(module));
         // var neighborModulesWhereEdgeIsIncidentToOtherModuleVertex =
-        GetModuleNeighborsWhereEdgeIsIncidentToOtherModuleVertex(targetModule, encoding.GetGraph(), remainingModules);
+        // GetModuleNeighborsWhereEdgeIsIncidentToOtherModuleVertex(targetModule, encoding.GetGraph(), remainingModules);
 
         var neighborModules = new List<Module>();
         neighborModules.AddRange(neighborModulesWhereVertexIsIncidentToOtherModuleEdge);
@@ -145,7 +145,7 @@ public class ModuleInformationService
     {
         var indices = module.GetIndices();
 
-        return CheckModuleConnectivityByIndices(module.GetIndices(), graph);
+        return CheckModuleConnectivityByIndices(module.GetIndices().ToList(), graph);
     }
 
     public static bool CheckModuleConnectivityByIndices(

@@ -36,7 +36,11 @@ class MainApp
 
         if (rawObject != null)
         {
-            ObjectHelper.MapDataObjects(rawObject, dataObjectCenter, logger);
+            lock (dataObjectCenter)
+            {
+                ObjectHelper.MapDataObjects(rawObject, dataObjectCenter, logger);
+            }
+            //      Console.WriteLine(GraphService.GenerateGraphToDOT(dataObjectCenter.GetGraph()));
         }
 
         if (dataObjectCenter.IsEmpty())
@@ -60,7 +64,7 @@ class MainApp
         }
 
         // Run the genetic algorithm engine
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 10; i++)
         {
             RunGAEngine(logger, dataObjectCenter);
         }
@@ -96,13 +100,13 @@ class MainApp
         // create ga parameter for engine
         var geneticAlgorithmParameter = new GeneticAlgorithmParameter(
             "Interger",
-            "Tournament",
+            "Roulette",
             "ElitismSelection",
             "GroupCrossover",
             "GraftMutation",
             100, // Population size
             0.8f, // Crossover rate
-            0.6f, // Mutation rate
+            0.7f, // Mutation rate
             100, // Max generations
             5, // Tournament size
             0.5f, // Elitism count
