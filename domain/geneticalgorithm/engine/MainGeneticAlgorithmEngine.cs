@@ -105,8 +105,6 @@ public class MainGeneticAlgorithmEngine : GeneticAlgorithmEngine
         var time = geneticAlgorithmEngine.TimeEvolving;
         Console.WriteLine($"Time taken: {time.TotalSeconds} seconds");
 
-        // run the genetic algorithm
-        //  geneticAlgorithmEngine.Start();
 
         // testing result class
         var geneticAlgorithmResults = new GeneticAlgorithmResults

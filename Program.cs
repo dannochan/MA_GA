@@ -106,9 +106,9 @@ class MainApp
             "GraftMutation",
             100, // Population size
             0.8f, // Crossover rate
-            0.6f, // Mutation rate
+            0.7f, // Mutation rate
             100, // Max generations
-            12, // Tournament size
+            5, // Tournament size
             0.5f, // Elitism count
             0.01, // Converged gene rate
             0.01, // Convergence rate
