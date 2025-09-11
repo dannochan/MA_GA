@@ -15,23 +15,7 @@ public static class ObjectHelper
     {
         int elementIndex = 0;
         // map information objects
-        if (rawObject.informationObjects != null)
-        {
-            foreach (var item in rawObject.informationObjects)
-            {
-                dataObjectCenter.AddNodeToGraph(new DataObject(
-                    item.name,
-                    ObjectType.InformationObject,
-                    item.nameShort,
-                    item.externalComponent
-                ));
-            }
 
-        }
-        else
-        {
-            logger.LogError("InformationObjects is null");
-        }
 
         // map function objects
 
@@ -54,6 +38,25 @@ public static class ObjectHelper
         else
         {
             logger.LogError("FunctionObjects is null");
+        }
+
+                if (rawObject.informationObjects != null)
+        {
+            foreach (var item in rawObject.informationObjects)
+            {
+                dataObjectCenter.AddNodeToGraph(new DataObject(
+                    item.name,
+                    ObjectType.InformationObject,
+                    item.nameShort,
+                    item.externalComponent,
+                    INDEX++ // Assigning an index to each information object
+                ));
+            }
+
+        }
+        else
+        {
+            logger.LogError("InformationObjects is null");
         }
 
         // map relation objects
